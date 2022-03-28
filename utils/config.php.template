@@ -1,0 +1,8 @@
+<?php
+const DB_HOST = '127.0.0.1';
+const DB_NAME = 'nyanscan';
+const DB_PORT = '3306';
+const DB_DRIVER = 'mysql';
+const DB_USER = '';
+const DB_PREFIX = '';
+const DB_PASSWORD = '';

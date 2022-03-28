@@ -8,7 +8,7 @@
 <body>
     <div id="login" style="background-color: darkcyan">
         <form method="post" action="login.php">
-            <input type="text" name="user" placeholder="Adresse mail" required="required">
+            <input type="email" name="user" placeholder="Adresse mail" required="required">
             <input type="password" name="password" placeholder="mot de passe" required="required">
             <input type="submit" name="login" value="Connexion">
         </form>
@@ -16,7 +16,7 @@
     <div id="register">
         <form method="post" action="register.php">
             <input type="text" name="username" placeholder="Nom d'utilisateur" required="required">
-            <input type="text" name="email" placeholder="Adresse mail" required="required">
+            <input type="email" name="email" placeholder="Adresse mail" required="required">
             <input type="password" name="password" placeholder="mot de passe" required="required">
             <input type="password" name="password-v" placeholder="verification" required="required">
             <label>
