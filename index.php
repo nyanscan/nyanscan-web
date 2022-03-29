@@ -8,12 +8,13 @@ session_start();
     <title>Connection | NyanScan</title>
 </head>
 <body>
-<?php
-if(isset($_SESSION["account-username"])) {
-    echo "Username : ". $_SESSION["account-username"];
-}
-?>
+    <?php
+        include ($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+    ?>
 
+    <?php
+        include ($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+    ?>
 
 </body>
 </html>

@@ -10,6 +10,9 @@ session_start();
 </head>
 <body>
     <?php
+    include ($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+    ?>
+    <?php
     if (!empty($_SESSION["errors"])) {
         echo "<div>";
         foreach ($_SESSION["errors"] as $err) {
@@ -43,5 +46,8 @@ session_start();
             <input type="submit" name="register" value="S'enregister">
         </form>
     </div>
+    <?php
+    include ($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+    ?>
 </body>
 </html>
