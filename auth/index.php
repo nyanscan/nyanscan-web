@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<?php
+session_start();
+?>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -6,11 +9,21 @@
     <link rel="stylesheet" type="text/css" href="../css/nyanscan.css">
 </head>
 <body>
+    <?php
+    if (!empty($_SESSION["errors"])) {
+        echo "<div>";
+        foreach ($_SESSION["errors"] as $err) {
+            echo "<span>".$err."</span>";
+        }
+        echo "</div>";
+        unset($_SESSION["errors"]);
+    }
+    ?>
     <div id="login" style="background-color: darkcyan">
         <form method="post" action="login.php">
             <input type="email" name="user" placeholder="Adresse mail" required="required">
             <input type="password" name="password" placeholder="mot de passe" required="required">
-            <input type="submit" name="login" value="Connexion">
+            <button type="submit"> Connexion </button>
         </form>
     </div>
     <div id="register">
