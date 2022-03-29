@@ -1,0 +1,5 @@
+<?php
+
+const STATUS_NOTHING = 0;
+const STATUS_EMAIL_VERIFIED = 1 << 0;
+const STATUS_EMAIL_NEWS_LETTER = 1 << 1;

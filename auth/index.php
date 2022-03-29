@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <?php
 session_start();
+if (isset($_SESSION["account-id"])) {
+    header("Location: /");
+}
 ?>
 <html>
 <head>
@@ -16,7 +19,7 @@ session_start();
     if (!empty($_SESSION["errors"])) {
         echo "<div>";
         foreach ($_SESSION["errors"] as $err) {
-            echo "<span>".$err."</span>";
+            echo "<span>".$err."</span><br>";
         }
         echo "</div>";
         unset($_SESSION["errors"]);
@@ -37,13 +40,13 @@ session_start();
             <input type="password" name="password-v" placeholder="verification" required="required">
             <label>
                 News Letter:
-                <input type="checkbox" name="newsletter" required="required">
+                <input type="checkbox" name="newsletter">
             </label>
             <label>
                 CGU:
                 <input type="checkbox" name="cgu" required="required">
             </label>
-            <input type="submit" name="register" value="S'enregister">
+            <button type="submit">S'enregister</button>
         </form>
     </div>
     <?php
