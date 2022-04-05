@@ -13,7 +13,7 @@ if (isset($_SESSION["account-id"])) {
 </head>
 <body>
 <?php
-include ($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/components/nav.php');
 ?>
 <?php
 if (!empty($_SESSION["errors"])) {

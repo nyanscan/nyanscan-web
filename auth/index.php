@@ -1,20 +1,14 @@
-<!DOCTYPE html>
 <?php
-session_start();
+
+
+$title = "Connexion | NyanScan";
+include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+
 if (isset($_SESSION["account-id"])) {
     header("Location: /");
 }
 ?>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Connection | NyanScan</title>
-    <link rel="stylesheet" type="text/css" href="../css/nyanscan.css">
-</head>
-<body>
-    <?php
-    include ($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
-    ?>
+
     <?php
     if (!empty($_SESSION["errors"])) {
         echo "<div>";
@@ -27,30 +21,12 @@ if (isset($_SESSION["account-id"])) {
     ?>
     <div id="login" style="background-color: darkcyan">
         <form method="post" action="login.php">
-            <input type="email" name="user" placeholder="Adresse mail" required="required">
-            <input type="password" name="password" placeholder="mot de passe" required="required">
-            <button type="submit"> Connexion </button>
+            <input  class="form-control" type="email" name="user" placeholder="Adresse mail" required="required">
+            <input  class="form-control" type="password" name="password" placeholder="mot de passe" required="required">
+            <button  class="form-control" type="submit"> Connexion </button>
         </form>
     </div>
-    <div id="register">
-        <form method="post" action="register.php">
-            <input type="text" name="username" placeholder="Nom d'utilisateur" required="required">
-            <input type="email" name="email" placeholder="Adresse mail" required="required">
-            <input type="password" name="password" placeholder="mot de passe" required="required">
-            <input type="password" name="password-v" placeholder="verification" required="required">
-            <label>
-                News Letter:
-                <input type="checkbox" name="newsletter">
-            </label>
-            <label>
-                CGU:
-                <input type="checkbox" name="cgu" required="required">
-            </label>
-            <button type="submit">S'enregister</button>
-        </form>
-    </div>
-    <?php
-    include ($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
-    ?>
-</body>
-</html>
+
+<?php
+include ($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+?>
