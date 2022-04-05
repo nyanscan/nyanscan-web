@@ -9,7 +9,7 @@ if (isset($_SESSION["account-id"])) {
 }
 ?>
 
-<div id="register">
+<div id="register" class="ns-f-bg">
     <form method="post" action="adduser.php">
         <input class="form-control" type="text" name="username" placeholder="Nom d'utilisateur" required="required">
         <input class="form-control"  type="email" name="email" placeholder="Adresse mail" required="required">
