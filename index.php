@@ -1,20 +1,13 @@
-<!DOCTYPE html>
 <?php
-session_start();
+    $title = "test";
+    include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+    include($_SERVER['DOCUMENT_ROOT'] . '/components/nav.php');
 ?>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Connection | NyanScan</title>
-</head>
-<body>
-    <?php
-        include ($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
-    ?>
 
-    <?php
-        include ($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
-    ?>
+<section>
+    <h1 class="">NyanScan</h1>
+</section>
 
-</body>
-</html>
+<?php
+    include ($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+?>

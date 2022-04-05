@@ -1,15 +1,18 @@
-<header>
+<!DOCTYPE html>
+<?php
+    session_start();
+?>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title> <?php echo $title??"NyanScan"; ?> </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-    <?php
-    if(isset($_SESSION["account-username"])) {
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
-        echo "Username : ". $_SESSION["account-username"];
-        echo "<a href=\"/auth/logout.php\">Deconexion</a>";
-    } else {
-        echo "<a href='/auth'>Conexion</a>";
-    }
-    ?>
+        <link rel="stylesheet" type="text/css" href="../css/nyanscan.css">
+    </head>
+    <body>
 
-
-</header>

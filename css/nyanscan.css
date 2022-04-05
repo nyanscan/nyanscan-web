@@ -1,5 +1,79 @@
-* {
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300&display=swap');
+  * {
     padding: 0;
     margin: 0;
     border-collapse: collapse;
+      font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --ns-color-deep-cove: #0C0A3E;
+    --ns-color-lucky-point: #242069;
+    --ns-color-east-bay: #423E8B;
+    --ns-color-butterfly-bush: #5A57A0;
+    --ns-color-honey-flower: #540D6E;
+    --ns-color-seance: #742591;
+    --ns-color-studio: #9241AF;
+    --ns-color-amethyst: #B065CD;
+    --ns-color-plum: #7B1E7A;
+    --ns-color-vivid-violet: #9E3D9C;
+    --ns-color-fushia-pink: #BF61BD;
+    --ns-color-orchid: #DA86D9;
+    --ns-color-mandy: #EE4266;
+    --ns-color-brink-pink: #FE6587;
+    --ns-color-tickle-me-pink: #FF849E;
+    --ns-color-wewak: #FE9EB3;
+    --ns-color-pink-salmon: #FF85A1;
+    --ns-color-sundow: #FE9FB4;
+    --ns-color-pink: #FED8E0;
+    --ns-color-azalea: #F7CAD0;
+    --ns-color-pale-rose: #FEE7ED;
+    --ns-color-lavender-blush: #FEF1F2;
+    --ns-color-dark-theme-bg: #404141;
+}
+
+.ns-b-azalea {
+    background-color: var(--ns-color-azalea);
+}
+
+.ns-text-red {
+    color: var(--ns-color-mandy);
+}
+
+.ns-f-bg {
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4)
+    ), url(../res/background.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    z-index: -2;
+}
+
+
+.ns-theme-bg {
+    background-color: var(--ns-color-dark-theme-bg);
+}
+
+.ns-theme-text {
+    color: #FEF1F2;
+}
+
+.ns-form-pink {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background-color: var(--ns-color-fushia-pink);
+    color: var(--ns-color-lavender-blush);
+    border: none;
+}
+
+.ns-form-pink:focus {
+    background-color: var(--ns-color-orchid);
+
 }
