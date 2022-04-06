@@ -31,6 +31,7 @@
     --ns-color-pale-rose: #FEE7ED;
     --ns-color-lavender-blush: #FEF1F2;
     --ns-color-dark-theme-bg: #404141;
+    --ns-color-white-theme-bg: #ffffff;
 }
 
 .ns-b-azalea {
@@ -52,17 +53,22 @@
     background-size: cover;
     height: 100vh;
     width: 100%;
-    overflow: hidden;
     z-index: -2;
+    position: fixed;
+    top: 0;
+    left: 0;
+
 }
 
 
 .ns-theme-bg {
     background-color: var(--ns-color-dark-theme-bg);
+    background-color: var(--ns-color-white-theme-bg);
 }
 
 .ns-theme-text {
     color: #FEF1F2;
+    color: #0F0F0F;
 }
 
 .ns-form-pink {
@@ -76,4 +82,46 @@
 .ns-form-pink:focus {
     background-color: var(--ns-color-orchid);
 
+}
+
+.ns-f-wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.ns-f-w-group {
+    width: 100%;
+    flex: 1 0 100%;
+    padding: 0 10px;
+}
+
+
+/*More boostrap */
+
+@media (min-width: 768px) {
+
+    .ns-f-w-group {
+        flex: 1 0 50%;
+        padding: 0 10px;
+    }
+
+    .w-md-25 {
+        width: 25% !important;
+    }
+
+    .w-md-50 {
+        width: 50% !important;
+    }
+
+    .w-md-75 {
+        width: 75% !important;
+    }
+
+    .w-md-100 {
+        width: 100% !important;
+    }
+
+    .w-md-auto {
+        width: auto !important;
+    }
 }
