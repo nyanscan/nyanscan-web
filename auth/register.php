@@ -13,7 +13,7 @@ if (isset($_SESSION["account-id"])) {
     <div class="ns-f-bg"></div>
     <div class="container vh-100">
         <div class="row vh-100">
-            <div id="register" class="ns-theme-bg ns-theme-text rounded my-5 align-self-center col-10 offset-1 col-md-8 offset-md-3">
+            <div id="register" class="ns-theme-bg ns-theme-text rounded my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
                 <div class="container pt-5 pb-3 d-flex flex-column align-items-center justify-content-around">
                     <div class="row"><h2>Créer un compte</h2></div>
                     <?php
@@ -42,7 +42,7 @@ if (isset($_SESSION["account-id"])) {
                         <input id="pasword" class="form-control ns-form-pink" type="password" name="password" required="required">
                         </div>
                         <div class="ns-f-w-group">
-                        <label for="password-v">Conhfirmation Mot De Passe :</label>
+                        <label for="password-v">Confirmation Mot De Passe :</label>
                         <input id="password-v" class="form-control ns-form-pink" type="password" name="password-v" required="required">
                         </div>
                         <div class="ns-f-w-group">

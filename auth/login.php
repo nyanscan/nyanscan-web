@@ -23,11 +23,11 @@ if (count($_POST) != 2 ||
 
         $user = $rq_select->fetchAll();
         if (count($user) === 0 || !password_verify($pwd, $user[0]["password"])) {
-            $errors[] = "Utilisateur ou mot de passe invalide";
+            $errors[] = "E-mail ou mot de passe invalide !";
         } else {
             $_SESSION["account-id"] = $user[0]["id"];
             $_SESSION["account-username"] = $user[0]["username"];
-            header("Location: ../index.php");
+            header("Location: ./");
         }
     }
 }

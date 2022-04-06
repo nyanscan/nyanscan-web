@@ -63,12 +63,12 @@
 
 .ns-theme-bg {
     background-color: var(--ns-color-dark-theme-bg);
-    background-color: var(--ns-color-white-theme-bg);
+    /*background-color: var(--ns-color-white-theme-bg);*/
 }
 
 .ns-theme-text {
     color: #FEF1F2;
-    color: #0F0F0F;
+    /*color: #0F0F0F;*/
 }
 
 .ns-form-pink {
@@ -95,6 +95,13 @@
     padding: 0 10px;
 }
 
+
+#ns-nav {
+    background-color: var(--ns-color-studio);
+    height: 72px;
+    width: 100%;
+    position: sticky;
+}
 
 /*More boostrap */
 
