@@ -4,7 +4,7 @@
     padding: 0;
     margin: 0;
     border-collapse: collapse;
-      font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 :root {
@@ -98,9 +98,36 @@
 
 #ns-nav {
     background-color: var(--ns-color-studio);
-    height: 72px;
+    height: 64px;
+    max-height: 64px;
+    overflow: hidden;
     width: 100%;
     position: sticky;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+#ns-nav > img {
+
+    left: 100px;
+    height: 40px;
+    width: 40px;
+}
+
+#ns-nav > form > input {
+    background-color: var(--ns-color-orchid);
+    border: none;
+    height: 32px;
+}
+
+#ns-nav-search::before {
+    content: ' ';
+    background-color: var(--ns-color-orchid);
+    background-color: red;
+    width: 15px;
 }
 
 /*More boostrap */

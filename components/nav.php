@@ -4,8 +4,11 @@
     <nav id="ns-nav">
         <img src="../res/logo-ns.png" alt="nyanscan-logo">
         <form class="form-inline">
-            <input type="search" placeholder="Rechercher...">
+            <input id="ns-nav-search" type="search" placeholder="Rechercher...">
         </form>
+        <div>
+
+        </div>
     </nav>
 
     <?php
