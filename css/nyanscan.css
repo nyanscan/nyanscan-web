@@ -9,15 +9,15 @@
 }
 
 :root {
-    --ns-color-honey-flower: #540D6E;
-    --ns-color-studio: #9241AF;
-    --ns-color-plum: #7B1E7A;
-    --ns-color-fushia-pink: #BF61BD;
-    --ns-color-orchid: #DA86D9;
-    --ns-color-mandy: #EE4266;
-    --ns-color-pink: #ff849e;
-    --ns-color-azalea: #F7CAD0;
-    --ns-color-azalea-rgb: 247, 202, 208;
+    --ns-color-violet-blue: #540D6E;
+    --ns-color-purpureus: #9241AF;
+    --ns-color-midnight: #7B1E7A;
+    --ns-color-deep-fushia: #BF61BD;
+    --ns-color-deep-mauve: #DA86D9;
+    --ns-color-paradise-pink: #EE4266;
+    --ns-color-tickle-me-pink: #FF85A1;
+    --ns-color-light-red: #F7CAD0;
+    --ns-color-light-red-rgb: 247, 202, 208;
     --ns-color-lavender-blush: #FEF1F2;
     --ns-color-white: #FEFEFE;
     --ns-color-black: #020202;
@@ -26,11 +26,11 @@
 }
 
 .ns-b-azalea {
-    background-color: var(--ns-color-azalea);
+    background-color: var(--ns-color-light-red);
 }
 
 .ns-text-red {
-    color: var(--ns-color-mandy);
+    color: var(--ns-color-paradise-pink);
 }
 
 .ns-f-bg {
@@ -65,13 +65,13 @@
 .ns-form-pink {
     margin-top: 5px;
     margin-bottom: 15px;
-    background-color: var(--ns-color-fushia-pink);
+    background-color: var(--ns-color-deep-fushia);
     color: var(--ns-color-lavender-blush);
     border: none;
 }
 
 .ns-form-pink:focus {
-    background-color: var(--ns-color-orchid);
+    background-color: var(--ns-color-deep-mauve);
 
 }
 
@@ -87,8 +87,9 @@
 }
 
 
+
 #ns-nav {
-    background-color: var(--ns-color-studio);
+    background-color: var(--ns-color-purpureus);
     height: 72px;
     max-height: 72px;
     overflow: hidden;
@@ -127,7 +128,7 @@
 }
 
 #ns-nav .ns-search {
-    background-color: var(--ns-color-orchid);
+    background-color: var(--ns-color-deep-mauve);
     border: none;
     height: 32px;
     width: calc(100% - 32px);
@@ -144,8 +145,8 @@
 }
 
 .ns-them-check:focus {
-    border-color: var(--ns-color-azalea);
-    box-shadow: 0 0 0 .25rem rgba(var(--ns-color-azalea));
+    border-color: var(--ns-color-light-red);
+    box-shadow: 0 0 0 .25rem rgba(var(--ns-color-light-red));
     background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba(255,133,161,1.0)'/></svg>")  !important;;
 }
 
@@ -159,7 +160,7 @@
 }
 
 #ns-footer {
-    background-color: var(--ns-color-studio);
+    background-color: var(--ns-color-purpureus);
     height: 560px;
     display: grid;
     grid-template-columns: 50% 50%;
@@ -187,7 +188,7 @@
     flex-shrink: 4;
 }
 #ns-footer-link a:hover {
-    color: var(--ns-color-orchid);
+    color: var(--ns-color-deep-mauve);
 }
 
 #ns-footer-logo {
@@ -210,12 +211,12 @@
 
     font-size: 32px;
     font-weight: 700;
-    color: var(--ns-color-mandy);
+    color: var(--ns-color-paradise-pink);
 }
 #ns-footer-logo p {
     font-size: 24px;
     font-weight: 700;
-    color: var(--ns-color-pink);
+    color: var(--ns-color-tickle-me-pink);
 }
 
 #ns-footer-social {
@@ -238,7 +239,7 @@
 }
 
 .ns-a-1:hover {
-    color: var(--ns-color-orchid);
+    color: var(--ns-color-deep-mauve);
 }
 
 .ns-a-clear {
@@ -248,6 +249,14 @@
 
 .ns-a-clear:hover {
     color: unset;
+}
+
+.ns-min-vh-100 {
+    min-height: calc(100vh - 72px);
+}
+
+.ns-min-vh-50 {
+    min-height: 50vh;
 }
 
 @media (min-width: 768px) {

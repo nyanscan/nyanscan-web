@@ -2,7 +2,7 @@
 include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
 ?>
 
-<header>
+<header class="sticky-top">
     <nav id="ns-nav" class="">
         <div class="ns-nav-part">
             <a href="/"><img class="ns-logo" src="../res/logo-ns.png" alt="nyanscan-logo"></a>
@@ -21,13 +21,4 @@ include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
 
         </div>
     </nav>
-    <?php
-        if (isset($_SESSION["account-username"])) {
-
-            echo "Username : " . $_SESSION["account-username"];
-            echo "<a href=\"/auth/logout.php\">Deconexion</a>";
-        } else {
-            echo "<a href='/auth'>Conexion</a>";
-        }
-    ?>
 </header>
