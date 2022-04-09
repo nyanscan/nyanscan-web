@@ -15,5 +15,5 @@
 
         <link rel="stylesheet" type="text/css" href="../css/nyanscan.css">
     </head>
-    <body>
+    <body class="min-vh-100">
 
