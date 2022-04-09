@@ -13,13 +13,13 @@
             <a href="/">Mon compte</a>
             <a href="/">Tendance</a>
             <a href="/">Catalogue</a>
-            <a href="/">Politique des Cookies</a>
             <a href="/">RGPD</a>
             <a href="/">CGU</a>
             <a href="/">A propos</a>
             <a href="/">Contact</a>
             <a href="/">FAQ</a>
             <a href="/">Plan du site</a>
+            <a href="/">Politique des Cookies</a>
         </div>
         <div id="ns-footer-social">
             <a href="/" class="ns-a-clear">

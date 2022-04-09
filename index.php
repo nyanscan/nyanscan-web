@@ -8,7 +8,7 @@
 <section class="ns-min-vh-100 ns-theme-bg">
 
 </section>
-<section class="ns-min-vh-100">
+<section class="ns-min-vh-100 ns-violet-blue-bg">
     <h1>NyanScan</h1>
     <p>NyanScan est un site de lecture de scan en ligne Avec son moteur de recherche complet, trouve le manga qui te plait en quelque clic !</p>
     <form class="form-inline w-100">

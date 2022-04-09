@@ -9,7 +9,7 @@ if (isset($_SESSION["account-id"])) {
 }
 ?>
     <section>
-        <div class="ns-f-bg"></div>
+        <div class="ns-f-bg ns-f-bg-auth"></div>
         <div class="container vh-100">
             <div class="row vh-100">
                 <div id="login" class="ns-theme-bg ns-theme-text rounded my-5 align-self-center col-10 offset-1 col-md-6 offset-md-3">

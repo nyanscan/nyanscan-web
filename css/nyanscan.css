@@ -1,7 +1,7 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
-  * {
+
+* {
     padding: 0;
     margin: 0;
     border-collapse: collapse;
@@ -25,6 +25,15 @@
     --ns-color-white-theme-bg: #ffffff;
 }
 
+#error {
+    font-size: 24px;
+    padding: 72px 0;
+}
+
+#error h1 {
+    font-size: 96px;
+}
+
 .ns-b-azalea {
     background-color: var(--ns-color-light-red);
 }
@@ -34,10 +43,7 @@
 }
 
 .ns-f-bg {
-    background: linear-gradient(
-            rgba(0, 0, 0, 0.4),
-            rgba(0, 0, 0, 0.4)
-    ), url(../res/background.jpg) no-repeat center center fixed;
+
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -51,15 +57,33 @@
 
 }
 
+.ns-f-bg-auth {
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4)
+    ), url(../res/background.jpg) no-repeat center center fixed;
+}
+
+.ns-f-bg-err {
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4)
+    ), url(../res/background_404.jpg) no-repeat center center fixed;
+}
 
 .ns-theme-bg {
     background-color: var(--ns-color-dark-theme-bg);
-    /*background-color: var(--ns-color-white-theme-bg);*/
+    background-color: var(--ns-color-white-theme-bg);
 }
+
+.ns-violet-blue-bg {
+    background-color: var(--ns-color-violet-blue);
+}
+
 
 .ns-theme-text {
     color: #FEF1F2;
-    /*color: #0F0F0F;*/
+    color: #0F0F0F;
 }
 
 .ns-form-pink {
@@ -87,7 +111,6 @@
 }
 
 
-
 #ns-nav {
     background-color: var(--ns-color-purpureus);
     height: 72px;
@@ -104,6 +127,10 @@
     row-gap: 0;
 
     align-items: center;
+}
+
+.ns-logo {
+    height: 96px;
 }
 
 #ns-nav .ns-logo {
@@ -147,12 +174,12 @@
 .ns-them-check:focus {
     border-color: var(--ns-color-light-red);
     box-shadow: 0 0 0 .25rem rgba(var(--ns-color-light-red));
-    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba(255,133,161,1.0)'/></svg>")  !important;;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba(255,133,161,1.0)'/></svg>") !important;;
 }
 
 .ns-them-check:checked {
     background-color: var(--ns-color-dark-theme-bg);
-    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba(255,133,161,1.0)'/></svg>")  !important;;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba(255,133,161,1.0)'/></svg>") !important;;
 }
 
 .ns-pict {
@@ -179,6 +206,7 @@
     gap: 16px 32px;
     max-height: 220px;
 }
+
 #ns-footer-link > a {
     color: var(--ns-color-black);
     text-decoration: none;
@@ -187,6 +215,7 @@
     flex-grow: 1;
     flex-shrink: 4;
 }
+
 #ns-footer-link a:hover {
     color: var(--ns-color-deep-mauve);
 }
@@ -204,15 +233,18 @@
     margin-right: 32px;
     height: 160px;
 }
+
 #ns-footer-logo div {
     display: inline-block;
 }
+
 #ns-footer-logo h3 {
 
     font-size: 32px;
     font-weight: 700;
     color: var(--ns-color-paradise-pink);
 }
+
 #ns-footer-logo p {
     font-size: 24px;
     font-weight: 700;
@@ -226,6 +258,7 @@
     align-items: center;
     margin: 0 auto;
 }
+
 #ns-footer-copyright {
     grid-column: 1 / span 2;
     grid-row: 3;
@@ -259,6 +292,12 @@
     min-height: 50vh;
 }
 
+.ns-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 @media (min-width: 768px) {
 
     .ns-f-w-group {
@@ -283,6 +322,28 @@
     }
 
     .w-md-auto {
+        width: auto !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .w-lg-25 {
+        width: 25% !important;
+    }
+
+    .w-lg-50 {
+        width: 50% !important;
+    }
+
+    .w-lg-75 {
+        width: 75% !important;
+    }
+
+    .w-lg-100 {
+        width: 100% !important;
+    }
+
+    .w-lg-auto {
         width: auto !important;
     }
 }
