@@ -2,8 +2,17 @@
     include($_SERVER['DOCUMENT_ROOT'] . '/components/nav.php');
 ?>
 
-<section class="ns-min-vh-100 ns-theme-bg">
-
+<section class="ns-theme-bg py-5">
+    <div class="ns-carousel">
+        <div class="ns-carousel-images">
+            <img src="res/banner/b1.jpg">
+            <img src="res/banner/b2.jpg">
+            <img src="res/banner/b3.jpeg">
+            <img src="res/banner/b1.jpg">
+        </div>
+        <div class="ns-carousel-points">
+        </div>
+    </div>
 </section>
 <section class="ns-min-vh-100 ns-theme-bg">
     <div class="ns-min-vh-100 ns-center py-5">

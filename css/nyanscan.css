@@ -39,6 +39,59 @@ h3 {
     font-size: 32px;
 }
 
+.ns-carousel {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+    justify-content: center;
+}
+.ns-carousel-images {
+    width: 100%;
+    height: 33.75vw;
+}
+
+.ns-carousel img {
+    position: absolute;
+    width: 60vw;
+    height: 33.75vw;
+    object-fit: cover;
+    left: 20vw;
+    cursor: pointer;
+}
+
+.ns-carousel .ns-carousel-1 {
+    transform: scale(0.8, 0.8) translateX(-13vw);
+}
+.ns-carousel .ns-carousel-2 {
+    z-index: 5;
+}
+.ns-carousel .ns-carousel-3 {
+    transform: scale(0.8, 0.8) translateX(13vw);
+}
+.ns-carousel .ns-carousel-off {
+    display: none;
+}
+
+.ns-carousel-points {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+.ns-carousel-point {
+    width: 16px;
+    height: 16px;
+    border-radius: 50rem;
+    background-color: #c4c4c4;
+    cursor: pointer;
+}
+
+.ns-carousel-point-active {
+    background-color: var(--ns-color-tickle-me-pink);
+}
+
 #error {
     font-size: 24px;
     padding: 72px 0;
@@ -115,14 +168,14 @@ h3 {
     background: linear-gradient(
             rgba(0, 0, 0, 0.4),
             rgba(0, 0, 0, 0.4)
-    ), url(../res/background.jpg) no-repeat center center fixed;
+    ), url(/res/background.jpg) no-repeat center center fixed;
 }
 
 .ns-f-bg-err {
     background: linear-gradient(
             rgba(0, 0, 0, 0.4),
             rgba(0, 0, 0, 0.4)
-    ), url(../res/background_404.jpg) no-repeat center center fixed;
+    ), url(/res/background_404.jpg) no-repeat center center fixed;
 }
 
 .ns-theme-bg {
