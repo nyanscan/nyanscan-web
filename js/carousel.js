@@ -10,7 +10,6 @@ for (let carousel of carousels) {
         for (let i = 0; i < image_count; i++) {
             const point_div = document.createElement("div");
             point_div.classList.add("ns-carousel-point");
-            // point_div.setAttribute(`ns-carousel-p`, ""+i);
             point_div.topCarousel = carousel;
             point_div.nsCarouselIndex = i;
             point_div.addEventListener("click", (evt) => {

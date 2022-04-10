@@ -15,6 +15,9 @@ if (isset($_SESSION["account-id"])) {
         <div class="row vh-100">
             <div id="register" class="ns-theme-bg ns-theme-text rounded my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
                 <div class="container pt-5 pb-3 d-flex flex-column align-items-center justify-content-around">
+                    <div class="row pb-3">
+                        <a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo"></a>
+                    </div>
                     <div class="row"><h2>Créer un compte</h2></div>
                     <?php
                     if (!empty($_SESSION["errors"])) {
