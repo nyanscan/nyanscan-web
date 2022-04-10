@@ -7,6 +7,7 @@
         <meta charset="UTF-8">
         <title> <?php echo $title??"NyanScan"; ?> </title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="../res/logo-ns-icon.ico">
 
 
         <!-- Bootstrap CSS -->
@@ -14,5 +15,5 @@
 
         <link rel="stylesheet" type="text/css" href="../css/nyanscan.css">
     </head>
-    <body>
+    <body class="min-vh-100">
 
