@@ -15,7 +15,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
         </div>
         <div class="ns-nav-part">
             <div class="form-check form-switch">
-                <input class="form-check-input ns-them-check" type="checkbox" role="switch">
+                <input id="ns-theme-toggle" class="form-check-input ns-them-check" type="checkbox" role="switch">
             </div>
             <a class="ns-a-1" href="/auth">Se Connecter</a>
 
