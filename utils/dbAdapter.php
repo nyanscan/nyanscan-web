@@ -13,3 +13,10 @@ function connectDB() {
 }
 
 
+function isConnected() {
+
+}
+
+function createToken($id = null) {
+
+}

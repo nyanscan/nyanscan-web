@@ -8,12 +8,10 @@ include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
 require("../utils/dbAdapter.php");
 require("../utils/const.php");
 
-session_start();
-
 $errors = [];
 if (count($_POST) !== 0) {
     if (
-        (count($_POST) != 5 and count($_POST) != 6) ||
+        (count($_POST) != 6 and count($_POST) != 7) ||
         empty($_POST["username"]) ||
         empty($_POST["email"]) ||
         empty($_POST["password"]) ||
@@ -28,11 +26,24 @@ if (count($_POST) !== 0) {
         $password = trim($_POST["password"]);
         $password_v = trim($_POST["password-v"]);
         $newsLetter = !empty($_POST["newsletter"]);
+        $newsLetter = !empty($_POST["newsletter"]);
+        $birthday = $_POST["birth"];
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Format de mail invalide";
         if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $username)) $errors[] = "Le pseudo ne peux contenir que des miniscule, majuscles, chiffres ou un _ avec une longeur maximum de 20 caractéres";
         if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) $errors[] = "Le mots de passe dois contenire au minimum 8 caractéres dont 1 majuscule 1 majuscule 1 chiffres et 1 caractéres spéciale";
         if ($password !== $password_v) $errors[] = "Les motrs de passes de coresponde pas !";
+
+        $birthdayExploded = explode("-", $birthday);
+
+        if( count($birthdayExploded)!=3 || !checkdate($birthdayExploded[1], $birthdayExploded[2], $birthdayExploded[0]) ){
+            $errors[] = "Date de naissance incorrecte";
+        }else{
+            $age = (time() - strtotime($birthday))/60/60/24/365.25;
+            if($age<13 || $age>100){
+                $errors[] = "Vous êtes trop jeune ou trop vieux";
+            }
+        }
 
         $pdo = connectDB();
 
@@ -47,11 +58,12 @@ if (count($_POST) !== 0) {
 
             $password = password_hash($password, PASSWORD_DEFAULT);
 
-            $rq = $pdo->prepare("INSERT INTO " . DB_PREFIX . "USER (email, username, password, status) VALUES (:email, :username, :password, :status)");
+            $rq = $pdo->prepare("INSERT INTO " . DB_PREFIX . "USER (email, username, password, birthday, status) VALUES (:email, :username, :password, :birthday, :status)");
             $rq->execute([
                 "email" => $email,
                 "username" => $username,
                 "password" => $password,
+                "birthday" => $birthday,
                 "status" => $newsLetter ? STATUS_EMAIL_NEWS_LETTER : STATUS_NOTHING
             ]);
             header("Location: loginSucces.php");
