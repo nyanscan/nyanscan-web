@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <?php
+//    if (session_status() === PHP_SESSION_DISABLED)
     session_start();
 ?>
 <html lang="fr">

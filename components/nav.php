@@ -17,8 +17,12 @@ include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
             <div class="form-check form-switch">
                 <input id="ns-theme-toggle" class="form-check-input ns-them-check" type="checkbox" role="switch">
             </div>
-            <a class="ns-a-1" href="/auth">Se Connecter</a>
-
+            <?php
+            if (isset($_SESSION["account-id"]))
+                echo "<a class='ns-a-1' href='/auth/logout.php'>Se Deconnecter</a>";
+            else
+                echo "<a class='ns-a-1' href='/auth'>Se Connecter</a>";
+            ?>
         </div>
     </nav>
 </header>

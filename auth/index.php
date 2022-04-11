@@ -1,8 +1,44 @@
 <?php
 
 
+require("../utils/dbAdapter.php");
+
 $title = "Connexion | NyanScan";
 include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+
+$errors = [];
+
+if (count($_POST) !== 0) {
+    if (count($_POST) != 2 ||
+        empty($_POST["user"]) ||
+        empty($_POST["password"])) {
+        $errors[] = "Donnée du formulaire invalide merci de recommencer !";
+    } else {
+        $user = trim(strtolower($_POST["user"]));
+        $pwd = $_POST["password"];
+
+        if (!filter_var($user, FILTER_VALIDATE_EMAIL)) $errors[] = "Format de mail invalide";
+
+        if (count($errors) === 0) {
+            $pdo = connectDB();
+            $rq_select = $pdo->prepare("SELECT id, password, username FROM " . DB_PREFIX . "USER WHERE email=:email");
+            $rq_select->execute(["email" => $user]);
+
+            $user = $rq_select->fetchAll();
+            if (count($user) === 0 || !password_verify($pwd, $user[0]["password"])) {
+                $errors[] = "E-mail ou mot de passe invalide !";
+            } else {
+                $_SESSION["account-id"] = $user[0]["id"];
+                $_SESSION["account-username"] = $user[0]["username"];
+                header("Location: loginSucces.php");
+            }
+        }
+    }
+
+//    if (count($errors) > 0) {
+//        $_SESSION["errors"] = $errors;
+//    }
+}
 
 if (isset($_SESSION["account-id"])) {
     header("Location: /");
@@ -19,18 +55,18 @@ if (isset($_SESSION["account-id"])) {
                         </div>
                         <div class="row"><h2>Se connecter</h2></div>
                         <?php
-                        if (!empty($_SESSION["errors"])) {
+                        if (!empty($errors)) {
                             echo "<div class='row rounded mt-2 ns-b-azalea ns-text-red'>";
-                            foreach ($_SESSION["errors"] as $err) {
+                            foreach ($errors as $err) {
                                 echo "<p class='my-1 justify-content-center'>" . $err . "</p><br>";
                             }
                             echo "</div>";
-                            unset($_SESSION["errors"]);
+//                            unset($_SESSION["errors"]);
                             $d_class = 'row col-11 col-md-8 mt-2 mb-5';
                         } else $d_class = 'row col-11 col-md-8 mt-5 mb-5';
                         ?>
                         <div class="<?php echo  $d_class ?>">
-                            <form method="post" action="login.php">
+                            <form method="post">
                                 <label for="email"> Adresse e-mail :</label>
                                 <input id="email" class="form-control ns-form-pink" type="email" name="user"
                                        required="required">
