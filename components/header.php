@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-//    if (session_status() === PHP_SESSION_DISABLED)
+if (!($no_session??false))
     session_start();
 ?>
 <html lang="fr">
@@ -16,5 +16,5 @@
 
         <link rel="stylesheet" type="text/css" href="/css/nyanscan.css">
     </head>
-    <body class="min-vh-100">
+    <body class="min-vh-100 ns-theme-bg ns-theme-text">
 

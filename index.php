@@ -109,7 +109,7 @@
         </div>
     </div>
 </section>
-<section class="ns-min-vh-100 ns-violet-blue-bg px-5 d-flex flex-column align-items-center justify-content-evenly">
+<section class="ns-min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
     <h1 class="ns-text-red fw-bold">NyanScan</h1>
     <p class="text-white ns-fs-5 w-lg-25 w-75 text-center">NyanScan est un site de lecture de scan en ligne Avec son moteur de recherche complet, trouve le manga qui te plait en quelque clic !</p>
     <form class="form-inline w-lg-40 w-75 ns-fs-4">
@@ -119,7 +119,7 @@
     <a class="btn text-black ns-fs-4 ns-tickle-pink-btn" href="auth">Se connecter</a>
 </section>
 <section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
-    <h3>Tu souhaites nous rejoindres ?</h3>
+    <h3>Tu souhaites nous rejoindre ?</h3>
     <form action="" method="post" class="form-inline ns-news-form w-100 container-lg">
         <div class="row">
             <div class="d-none d-lg-block col-lg-3"></div>

@@ -56,3 +56,9 @@ function redirectIfNotConnected(){
         die();
     }
 }
+
+function redirect404() {
+    http_response_code(404);
+    include $_SERVER['DOCUMENT_ROOT'] . '/error/404.php';
+    die();
+}

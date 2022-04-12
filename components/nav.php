@@ -1,6 +1,8 @@
 <?php
-require($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
-require ($_SERVER['DOCUMENT_ROOT'] . '/utils/dbAdapter.php');
+if (!($noheader??false))
+    require($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+if (!($noFunction??false))
+    require($_SERVER['DOCUMENT_ROOT'] . '/utils/functions.php');
 ?>
 
 <header class="sticky-top">

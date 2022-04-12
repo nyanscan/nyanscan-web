@@ -5,7 +5,7 @@ $title = "Inscirption | NyanScan";
 include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
 
 
-require("../utils/dbAdapter.php");
+require("../utils/functions.php");
 require("../utils/const.php");
 
 $errors = [];
