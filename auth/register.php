@@ -72,9 +72,7 @@ if (count($_POST) !== 0) {
 }
 
 
-if (isset($_SESSION["account-id"])) {
-    header("Location: /");
-}
+redirectIfConnected();
 ?>
 
 <section id="register">

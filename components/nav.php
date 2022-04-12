@@ -1,5 +1,6 @@
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+require ($_SERVER['DOCUMENT_ROOT'] . '/utils/dbAdapter.php');
 ?>
 
 <header class="sticky-top">
@@ -18,7 +19,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
                 <input id="ns-theme-toggle" class="form-check-input ns-them-check" type="checkbox" role="switch">
             </div>
             <?php
-            if (isset($_SESSION["account-id"]))
+            if (isConnected())
                 echo "<a class='ns-a-1' href='/auth/logout.php'>Se Deconnecter</a>";
             else
                 echo "<a class='ns-a-1' href='/auth'>Se Connecter</a>";

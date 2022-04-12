@@ -30,19 +30,14 @@ if (count($_POST) !== 0) {
             } else {
                 $_SESSION["account-id"] = $user[0]["id"];
                 $_SESSION["account-username"] = $user[0]["username"];
+                $_SESSION["token"] = createToken($user[0]["id"]);
                 header("Location: loginSucces.php");
             }
         }
     }
-
-//    if (count($errors) > 0) {
-//        $_SESSION["errors"] = $errors;
-//    }
 }
 
-if (isset($_SESSION["account-id"])) {
-    header("Location: /");
-}
+redirectIfConnected();
 ?>
     <section>
         <div class="ns-f-bg ns-f-bg-auth"></div>
