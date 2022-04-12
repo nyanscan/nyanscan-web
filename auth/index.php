@@ -10,11 +10,11 @@ $errors = [];
 
 if (count($_POST) !== 0) {
     if (count($_POST) != 2 ||
-        empty($_POST["u"]) ||
+        empty($_POST["user"]) ||
         empty($_POST["password"])) {
         $errors[] = "Donnée du formulaire invalide merci de recommencer !";
     } else {
-        $user = trim(strtolower($_POST["u"]));
+        $user = trim(strtolower($_POST["user"]));
         $pwd = $_POST["password"];
 
         if (!filter_var($user, FILTER_VALIDATE_EMAIL)) $errors[] = "Format de mail invalide";
