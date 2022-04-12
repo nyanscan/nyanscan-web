@@ -51,7 +51,7 @@ if (count($_POST) !== 0) {
         $rq_select->execute(["email" => $email, "username" => $username]);
         foreach ($rq_select->fetchAll() as $user) {
             if ($user["email"] === $email) $errors[] = "Ce mail est dèja reliée à un compte";
-            if ($user["username"] === $email) $errors[] = "Ce nom d'utilisateur est dèja reliée à un compte";
+            if ($user["username"] === $username) $errors[] = "Ce nom d'utilisateur est dèja reliée à un compte";
         }
 
         if (count($errors) === 0) {
