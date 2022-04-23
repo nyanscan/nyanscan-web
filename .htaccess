@@ -1,6 +1,6 @@
+
 ErrorDocument 404 /error/404.php
 ErrorDocument 403 /error/404.php
-
 
 <FilesMatch "^\.">
 Order allow,deny

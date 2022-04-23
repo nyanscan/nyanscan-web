@@ -1,5 +1,8 @@
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+if (!($noheader??false))
+    require($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+if (!($noFunction??false))
+    require($_SERVER['DOCUMENT_ROOT'] . '/utils/functions.php');
 ?>
 
 <header class="sticky-top">
@@ -17,8 +20,12 @@ include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
             <div class="form-check form-switch">
                 <input id="ns-theme-toggle" class="form-check-input ns-them-check" type="checkbox" role="switch">
             </div>
-            <a class="ns-a-1" href="/auth">Se Connecter</a>
-
+            <?php
+            if (isConnected())
+                echo "<a class='ns-a-1' href='/auth/logout.php'>Se Deconnecter</a>";
+            else
+                echo "<a class='ns-a-1' href='/auth'>Se Connecter</a>";
+            ?>
         </div>
     </nav>
 </header>
