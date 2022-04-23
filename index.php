@@ -17,7 +17,7 @@
 <section class="ns-min-vh-100 ns-theme-bg">
     <div class="ns-min-vh-100 ns-center py-5">
         <div class="ns-scan-preview">
-            <h3>Scan les plus populaires</h3>
+            <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
             <div class="ns-scan-preview-elements">
                 <div class="ns-scan-preview-component">
                     <a href="/">
@@ -48,7 +48,7 @@
     </div>
     <div class="ns-min-vh-100 ns-center py-5">
         <div class="ns-scan-preview">
-            <h3>Les éxclu Nyan Scan</h3>
+            <h3 class="ns-scan-preview-tile">Les éxclu Nyan Scan</h3>
             <div class="ns-scan-preview-elements">
                 <div class="ns-scan-preview-component">
                     <a href="/">
@@ -79,7 +79,7 @@
     </div>
     <div class="ns-min-vh-100 ns-center py-5">
         <div class="ns-scan-preview">
-            <h3>Les coups de coeur de la rédaction</h3>
+            <h3 class="ns-scan-preview-tile">Les coups de coeur de la rédaction</h3>
             <div class="ns-scan-preview-elements">
                 <div class="ns-scan-preview-component">
                     <a href="/">

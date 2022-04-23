@@ -39,6 +39,11 @@ h3 {
     font-size: 32px;
 }
 
+.ns-scan-preview-tile {
+    --bs-text-opacity: 1;
+    color: rgba(var(--bs-black-rgb), var(--bs-text-opacity));
+}
+
 .ns-carousel {
     width: 100%;
     position: relative;
