@@ -1,10 +1,11 @@
 <?php
-require($_SERVER['DOCUMENT_ROOT'] . '/utils/functions.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/functions.php');
 
 $id = $_GET["id"] ?? "";
-
+// if no id set go on a 404 can't load none user profile
 if (!$id) redirect404();
 
+// get user from id if id is numerical or by username if id is text
 $pdo = connectDB();
 if (is_numeric($id)) {
     $req = $pdo->prepare("SELECT id, email, username, birthday, date_inserted, date_updated, password, token FROM PAE_USER WHERE id=?");
@@ -15,19 +16,24 @@ if (is_numeric($id)) {
 $req->execute([$id]);
 $user = $req->fetch();
 
+// if user not found => 404
 if (!$user) redirect404();
 
 // force id in case use username
 $id = $user["id"];
 
 session_start();
+
+// a user are in own profile page
 $is_self = isset($_SESSION["token"]) && $_SESSION["token"] === $user["token"];
+// calc age
 $age = floor((time() - strtotime($user["birthday"])) / 60 / 60 / 24 / 365.25);
 
 $edit_errors = [];
 $edit_success = false;
 
-if ($is_self && !empty($_POST["type"]) && $_POST["type"] === "edit" && $id = $_POST["id"]) {
+// edit
+if ($is_self && ($_POST["type"]??"none") === "edit" && $id = $_POST["id"]) {
     // start check edit
 
     if (
@@ -117,7 +123,7 @@ $_POST = array();
 $noFunction = true;
 $no_session = true;
 $title = $user["username"] . " | NyanScan";
-include($_SERVER['DOCUMENT_ROOT'] . '/components/nav.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/nav.php');
 
 ?>
 
@@ -338,5 +344,5 @@ if ($is_self) {
     <?php
 }
 
-include($_SERVER['DOCUMENT_ROOT'] . '/components/foot.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/foot.php');
 ?>

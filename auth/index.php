@@ -1,10 +1,10 @@
 <?php
 
 
-require("../utils/functions.php");
+require($_SERVER['DOCUMENT_ROOT'] . "/private/utils/functions.php");
 
 $title = "Connexion | NyanScan";
-include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/header.php');
 
 $errors = [];
 
@@ -79,5 +79,5 @@ redirectIfConnected();
 
 
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/footer.php');
 ?>

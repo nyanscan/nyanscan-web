@@ -1,7 +1,7 @@
 <?php
 $title = "404 | NyanScan";
 $no_session = true;
-include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/header.php');
 ?>
 
 <section id="error-404">
@@ -20,5 +20,5 @@ include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
     </div>
 </section>
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/footer.php');
 ?>
