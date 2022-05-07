@@ -14,7 +14,7 @@ function connectDB() {
 
 
 function isConnected() {
-    if(empty($_SESSION["token"]))
+    if(empty($_SESSION["token"]) || empty($_SESSION["account-id"]))
         return false;
 
     $pdo = connectDB();

@@ -1,5 +1,6 @@
 <?php
-    include($_SERVER['DOCUMENT_ROOT'] . '/components/nav.php');
+    include($_SERVER['DOCUMENT_ROOT'] . '/private/components/nav.php');
+    $scripts = ["carousel.js"]
 ?>
 
 <section class="ns-theme-bg py-5">
@@ -131,5 +132,5 @@
 </section>
 
 <?php
-include ($_SERVER['DOCUMENT_ROOT'] . '/components/foot.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/foot.php');
 ?>

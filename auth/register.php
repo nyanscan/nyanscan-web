@@ -1,17 +1,15 @@
 <?php
 
-
 $title = "Inscirption | NyanScan";
-include($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
-
-
-require("../utils/functions.php");
-require("../utils/const.php");
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/header.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/functions.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/const.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
 
 $errors = [];
 if (count($_POST) !== 0) {
     if (
-        (count($_POST) != 6 and count($_POST) != 7) ||
+        (count($_POST) != 8 and count($_POST) != 9) ||
         empty($_POST["username"]) ||
         empty($_POST["email"]) ||
         empty($_POST["password"]) ||
@@ -29,10 +27,15 @@ if (count($_POST) !== 0) {
         $newsLetter = !empty($_POST["newsletter"]);
         $birthday = $_POST["birth"];
 
+        switch (get_captcha_status()) {
+            case CAPTCHA_CODE_ERROR: $errors[] = "Captcha invalide."; break;
+            case CAPTCHA_CODE_FALSE: $errors[] = "Merci de remplire correctement le captcha."; break;
+        }
+
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Format de mail invalide";
         if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $username)) $errors[] = "Le pseudo ne peux contenir que des miniscule, majuscles, chiffres ou un _ avec une longeur maximum de 20 caractéres";
         if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) $errors[] = "Le mots de passe dois contenire au minimum 8 caractéres dont 1 majuscule 1 majuscule 1 chiffres et 1 caractéres spéciale";
-        if ($password !== $password_v) $errors[] = "Les motrs de passes de coresponde pas !";
+        if ($password !== $password_v) $errors[] = "Les mots de passes de coresponde pas !";
 
         $birthdayExploded = explode("-", $birthday);
 
@@ -73,6 +76,7 @@ if (count($_POST) !== 0) {
 
 
 redirectIfConnected();
+$scripts = ["captcha.js"]
 ?>
 
 <section id="register">
@@ -127,6 +131,13 @@ redirectIfConnected();
                                 <label for="ns-i-check-cgu" class="form-check-label">CGU</label>
                             </div>
                         </div>
+
+                        <div class="ns-fr-captcha">
+                            <?php
+                                require $_SERVER['DOCUMENT_ROOT'] . '/private/captcha.php';
+                            ?>
+                        </div>
+
                         <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">S'enregister</button>
                     </form>
                     </div>
@@ -137,5 +148,5 @@ redirectIfConnected();
     </div>
 </section>
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/footer.php');
 ?>

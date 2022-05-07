@@ -12,7 +12,7 @@ if (isset($_SESSION["account-id"])) {
 </head>
 <body>
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/components/nav.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/nav.php');
 ?>
 <?php
 if (!empty($_SESSION["errors"])) {
@@ -28,7 +28,7 @@ if (!empty($_SESSION["errors"])) {
     Votre compte à bien était créee vous pouvez vous connecter maintant en clicant ici : <a href="index.php"> Connexion </a>
 </div>
 <?php
-include ($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/footer.php');
 ?>
 </body>
 </html>

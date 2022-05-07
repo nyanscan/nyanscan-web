@@ -1,14 +1,14 @@
 <?php
 if (!($noheader??false))
-    require($_SERVER['DOCUMENT_ROOT'] . '/components/header.php');
+    require($_SERVER['DOCUMENT_ROOT'] . '/private/components/header.php');
 if (!($noFunction??false))
-    require($_SERVER['DOCUMENT_ROOT'] . '/utils/functions.php');
+    require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/functions.php');
 ?>
 
 <header class="sticky-top">
     <nav id="ns-nav" class="">
         <div class="ns-nav-part">
-            <a href="/"><img class="ns-logo" src="../res/logo-ns.png" alt="nyanscan-logo"></a>
+            <a href="/"><img class="ns-logo" src="../../res/logo-ns.png" alt="nyanscan-logo"></a>
             <a class="ns-a-1" href="/catalogue.php">Catalogue</a>
         </div>
         <div class="ns-nav-part justify-content-center">

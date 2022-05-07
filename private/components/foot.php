@@ -2,7 +2,7 @@
     <div id="ns-footer">
         <div id="ns-footer-logo">
             <a href="/" class="ns-a-clear">
-                <img class="ns-logo" src="../res/logo-ns.png" alt="nyanscan-logo">
+                <img class="ns-logo" src="../../res/logo-ns.png" alt="nyanscan-logo">
                 <div>
                     <h3>NyanScan</h3>
                     <p>Ton site de scan préféré</p>
@@ -42,5 +42,5 @@
     </div>
 </footer>
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/components/footer.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/private/components/footer.php');
 ?>
