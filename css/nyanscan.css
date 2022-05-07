@@ -21,7 +21,7 @@
     --ns-color-lavender-blush: #FEF1F2;
     --ns-color-white: #FEFEFE;
     --ns-color-black: #020202;
-
+    --ns-color-gray: #C4C4C4;
     --ns-color-theme-text: #020202;
     --ns-color-theme-bg: #ffffff;
 }
@@ -102,6 +102,13 @@ h3 {
     padding: 72px 0;
 }
 
+.ns-avatar{
+    background-color: var(--ns-color-gray);
+    height: 150px;
+    width: 150px;
+    border-radius: 15em;
+}
+
 .ns-scan-preview {
     background-color: var(--ns-color-light-red);
     border-radius: 0.5rem;
@@ -109,6 +116,24 @@ h3 {
     display: flex;
     flex-direction: column;
     padding: 20px 5%;
+}
+
+.ns-scan-preview-gray {
+    background-color: var(--ns-color-gray);
+    border-radius: 0.5rem;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 5%;
+}
+
+.ns-scan-preview-profil {
+    background-color: var(--ns-color-light-red);
+    border-radius: 0.5rem;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 5%;
 }
 
 .ns-scan-preview h3 {
@@ -143,6 +168,27 @@ h3 {
 }
 
 .ns-scan-preview-component span {
+    color: var(--ns-color-black);
+    font-size: 24px;
+    text-align: center;
+}
+
+.ns-scan-preview-component-profil {
+    /*margin: 24px 0;*/
+    width: 150px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    gap: 16px;
+}
+.ns-scan-preview-component-profil img {
+    height: 250px;
+    width: 150px;
+    object-fit: cover;
+}
+
+.ns-scan-preview-component-profil span {
     color: var(--ns-color-black);
     font-size: 24px;
     text-align: center;
@@ -221,6 +267,19 @@ h3 {
 
 .ns-form-pink:focus {
     background-color: var(--ns-color-deep-mauve);
+
+}
+
+.ns-form-danger {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background-color: var(--ns-color-paradise-pink);
+    color: var(--ns-color-lavender-blush);
+    border: none;
+}
+
+.ns-form-danger:focus {
+    background-color: var(--ns-color-paradise-pink);
 
 }
 
