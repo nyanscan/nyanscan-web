@@ -27,7 +27,7 @@ $age = floor((time() - strtotime($user["birthday"])) / 60 / 60 / 24 / 365.25);
 $edit_errors = [];
 $edit_success = false;
 
-if ($is_self && $_POST["type"] === "edit" && $id = $_POST["id"]) {
+if ($is_self && !empty($_POST["type"]) && $_POST["type"] === "edit" && $id = $_POST["id"]) {
     // start check edit
 
     if (
@@ -126,7 +126,7 @@ if ($edit_success) {
 ?>
 
     <section class="rounded bg-primary">
-        <p>Les modifications ont bien était prise en considération</p>
+        <p>Les modifications ont bien été prise en considération.</p>
     </section>
 <?php
 }
@@ -137,7 +137,7 @@ if (count($edit_errors) > 0) {
     ?>
 
     <section class="rounded bg-warning">
-        <p>Des erreurs ont survenue :</p>
+        <p>Des erreurs sont survenues :</p>
         <ul>
             <?php
                 foreach ($edit_errors as $err) {
@@ -150,80 +150,191 @@ if (count($edit_errors) > 0) {
 }
 ?>
 
-    <section class="d-flex flex-column">
-        <h3><?php echo $user["username"] ?></h3>
-        <span><?php echo $age ?> ans</span>
-        <span> Join the <?php echo $user["date_inserted"] ?></span>
-        <span> Last activity <?php echo $user["date_updated"] ?></span>
+<?php
+if (!$is_self) {
+    ?>
+    <section class="row d-flex flex-column">
+        <div class="col-md-8 d-flex">
+            <div class="col-4">
+                <div class="ns-avatar"></div>
+            </div>
+            <div class="col-8">
+                <h3><?php echo $user["username"] ?></h3>
+                <span><?php echo $age ?> ans</span>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex">
+            <span> Join on <?php echo $user["date_inserted"] ?></span>
+            <span> Last activity <?php echo $user["date_updated"] ?></span>
+        </div>
     </section>
+    <?php
+}
+
+?>
 
 <?php
 if ($is_self) {
     ?>
+        <div class="ns-min-vh-100 ns-center py-5">
+            <div class="ns-scan-preview-profil">
 
-    <section>
-        <h4>Modifier le profils</h4>
+                <section class="flex-row d-flex">
+                    <div class="col-md-8 d-flex justify-content-start">
+                        <div class="p-2">
+                            <div class="ns-avatar img-circle img-responsive"></div>
+                        </div>
+                        <div class="p-2">
+                            <h3><?php echo $user["username"] ?></h3>
+                            <span><?php echo $age ?> ans</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column justify-content-end">
+                        <div class="p-2">
+                            <span> Join on <?php echo $user["date_inserted"] ?></span>
+                        </div>
+                        <div class="p-2">
+                            <span> Last activity <?php echo $user["date_updated"] ?></span>
+                        </div>
+                    </div>
+                </section>
 
-        <?php
-        if (!empty($errors_edit)) {
-            echo "<div class='row rounded mt-2 ns-b-azalea ns-text-red'>";
-            foreach ($errors_edit as $err) {
-                echo "<p class='my-1 justify-content-center'>" . $err . "</p><br>";
-            }
-            echo "</div>";
-        }
-        ?>
+                <div class="ns-center py-5">
+                    <div class="ns-scan-preview-gray">
+                        <h4 class="ns-scan-preview-tile">Scans aimés</h4>
+                        <div class="ns-scan-preview-elements">
+                            <div class="ns-scan-preview-component-profil">
+                                <a href="/">
+                                    <img src="../res/book/love-is-war.jpg">
+                                </a>
+                                <span>Love Is War</span>
+                            </div>
+                            <div class="ns-scan-preview-component-profil">
+                                <a href="/">
+                                    <img src="../res/book/love-is-war.jpg">
+                                </a>
+                                <span>Love Is War</span>
+                            </div>
+                            <div class="ns-scan-preview-component-profil">
+                                <a href="/">
+                                    <img src="../res/book/love-is-war.jpg">
+                                </a>
+                                <span>Love Is War</span>
+                            </div>
+                            <div class="ns-scan-preview-component-profil">
+                                <a href="/">
+                                    <img src="../res/book/love-is-war.jpg">
+                                </a>
+                                <span>Love Is War</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <form method="post">
-            <h3>Inforation</h3>
-            <input class="d-none" name="type" value="edit" type="hidden">
-            <input class="d-none" name="id" value="<?php echo $id ?>" type="hidden">
-            <div class="ns-f-w-group">
-                <label for="email">Adresse Email :</label>
-                <input id="email" class="form-control ns-form-pink" type="email" name="email" required="required"
-                       value="<?php echo $user["email"] ?>">
+                <div class="ns-center py-5">
+                    <div class="ns-scan-preview-gray">
+                        <h4 class="ns-scan-preview-tile">Scans uploadés</h4>
+                        <div class="ns-scan-preview-elements">
+                            <div class="ns-scan-preview-component-profil">
+                                <a href="/">
+                                    <img src="../res/book/love-is-war.jpg">
+                                </a>
+                                <span>Love Is War</span>
+                            </div>
+                            <div class="ns-scan-preview-component-profil">
+                                <a href="/">
+                                    <img src="../res/book/love-is-war.jpg">
+                                </a>
+                                <span>Love Is War</span>
+                            </div>
+                            <div class="ns-scan-preview-component-profil">
+                                <a href="/">
+                                    <img src="../res/book/love-is-war.jpg">
+                                </a>
+                                <span>Love Is War</span>
+                            </div>
+                            <div class="ns-scan-preview-component-profil">
+                                <a href="/">
+                                    <img src="../res/book/love-is-war.jpg">
+                                </a>
+                                <span>Love Is War</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ns-center py-5">
+                    <div class="ns-scan-preview-gray">
+                        <section>
+                            <h4>Modifier le profil</h4>
+
+                            <?php
+                            if (!empty($errors_edit)) {
+                                echo "<div class='row rounded mt-2 ns-b-azalea ns-text-red'>";
+                                foreach ($errors_edit as $err) {
+                                    echo "<p class='my-1 justify-content-center'>" . $err . "</p><br>";
+                                }
+                                echo "</div>";
+                            }
+                            ?>
+
+                            <form method="post">
+                                <h3>Information</h3>
+                                <input class="d-none" name="type" value="edit" type="hidden">
+                                <input class="d-none" name="id" value="<?php echo $id ?>" type="hidden">
+                                <div class="ns-f-w-group">
+                                    <label for="email">Adresse Email :</label>
+                                    <input id="email" class="form-control ns-form-pink" type="email" name="email" required="required"
+                                           value="<?php echo $user["email"] ?>">
+                                </div>
+                                <div class="ns-f-w-group">
+                                    <label for="username">Pseudo :</label>
+                                    <input id="username" class="form-control ns-form-pink" type="text" name="username" required="required"
+                                           value="<?php echo $user["username"] ?>">
+                                </div>
+                                <div class="ns-f-w-group">
+                                    <label for="birth">Date de Naissance :</label>
+                                    <input id="birth" class="form-control ns-form-pink" type="date" name="birth" required="required"
+                                           value="<?php echo $user["birthday"] ?>">
+                                </div>
+
+                                <h5>Modifier le mot de passe</h5>
+                                <p>Si vous ne voulez pas modifier votre mot de passe merci de ne pas remplir les casse</p>
+
+                                <div class="ns-f-w-group">
+                                    <label for="password">Mot de Passe :</label>
+                                    <input id="password" class="form-control ns-form-pink" type="password" name="password">
+                                </div>
+                                <div class="ns-f-w-group">
+                                    <label for="password-v">Confirmation Mot De passe :</label>
+                                    <input id="password-v" class="form-control ns-form-pink" type="password" name="password-v">
+                                </div>
+
+                                <p>Pour des raisons de sécurité veuillez renseigner à nouveaux votre mot de passe pour toute modification
+                                    !</p>
+
+                                <div class="ns-f-w-group">
+                                    <label for="password-c">Mot de Passe actuelle :</label>
+                                    <input id="password-c" class="form-control ns-form-pink" type="password" name="password-c">
+                                </div>
+
+                                <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">Modifier</button>
+
+                            </form>
+                        </section>
+                    </div>
+                </div>
+                <div class="ns-center pb-5">
+                    <div class="ns-scan-preview-gray">
+                        <section>
+                            <h4>Zone dangereuse</h4>
+                            <p>Suppression du compte : Une fois ton compte supprimé, tu ne peux pas revenir en arrière !</p>
+                            <button class="ns-form-danger w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
+                        </section>
+                    </div>
+                </div>
             </div>
-            <div class="ns-f-w-group">
-                <label for="username">Pseudo :</label>
-                <input id="username" class="form-control ns-form-pink" type="text" name="username" required="required"
-                       value="<?php echo $user["username"] ?>">
-            </div>
-            <div class="ns-f-w-group">
-                <label for="birth">Date de Naissance :</label>
-                <input id="birth" class="form-control ns-form-pink" type="date" name="birth" required="required"
-                       value="<?php echo $user["birthday"] ?>">
-            </div>
-
-            <h5>Modifier le mot de passe</h5>
-            <p>Si vous ne voulez pas modifier votre mot de passe merci de ne pas remplire les casse</p>
-
-            <div class="ns-f-w-group">
-                <label for="password">Mot de Passe :</label>
-                <input id="password" class="form-control ns-form-pink" type="password" name="password">
-            </div>
-            <div class="ns-f-w-group">
-                <label for="password-v">Confirmation Mot De Passe :</label>
-                <input id="password-v" class="form-control ns-form-pink" type="password" name="password-v">
-            </div>
-
-            <p>Pour des raison de sécurité veuillez renseigner à nouveaux votre mots de passe pour toute modification
-                !</p>
-
-            <div class="ns-f-w-group">
-                <label for="password-c">Mot de Passe actuelle :</label>
-                <input id="password-c" class="form-control ns-form-pink" type="password" name="password-c">
-            </div>
-
-            <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">Modifier</button>
-
-        </form>
-    </section>
-
-    <section>
-        <h4>Zonne danger</h4>
-        <button type="submit">Suprimer le compte</button>
-    </section>
-
+        </div>
     <?php
 }
 
