@@ -7,7 +7,7 @@ require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/const.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
 
 $errors = [];
-if (count($_POST) !== 0) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && count($_POST) !== 0) {
     if (
         (count($_POST) != 8 and count($_POST) != 9) ||
         empty($_POST["username"]) ||
@@ -103,7 +103,7 @@ $scripts = ["captcha.js"]
                     <form class="ns-f-wrap" method="post"">
                         <div class="ns-f-w-group">
                             <label for="email">Adresse Email :</label>
-                            <input id="email" class="form-control ns-form-pink" type="email" name="email" required="required">
+                            <input id="email" class="form-control ns-form-pink" type="email" name="email" <?= $_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["email"]) ? 'value="'.$_GET["email"].'"' : '' ?> required="required">
                         </div>
                         <div class="ns-f-w-group">
                         <label for="username">Pseudo :</label>

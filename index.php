@@ -121,10 +121,10 @@
 </section>
 <section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
     <h3>Tu souhaites nous rejoindre ?</h3>
-    <form action="" method="post" class="form-inline ns-news-form w-100 container-lg">
+    <form action="auth/register.php" method="get" class="form-inline ns-news-form w-100 container-lg">
         <div class="row">
             <div class="d-none d-lg-block col-lg-3"></div>
-            <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" placeholder="Entre ton mail"></div>
+            <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton amil"></div>
             <div class="col-lg-auto ns-center"><button class="ns-news-btn" type="submit"> Rejoindre </button></div>
             <div class="d-none d-lg-block col-lg"></div>
         </div>

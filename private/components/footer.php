@@ -5,6 +5,10 @@
     foreach ($scripts ?? [] as $s) {
         echo '<script src="/js/' . $s . '"></script>';
     }
+    if (isset($more_script)) echo $more_script;
+    if (!($noToast??false)) {
+        echo '<script>loadToastSession()</script>';
+    }
     ?>
     </body>
 </html>

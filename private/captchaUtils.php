@@ -1,6 +1,6 @@
 <?php
 
-const CAPTCHA_WIDTH = 400;
+const CAPTCHA_WIDTH = 300;
 const CAPTCHA_HEIGHT = 200;
 const CAPTCHA_PIECE_SIZE = 40;
 const CAPTCHA_CELL_SIZE = 10;

@@ -186,7 +186,7 @@ if ($is_self) {
             <div class="ns-scan-preview-profil">
 
                 <section class="flex-row d-flex">
-                    <div class="col-md-8 d-flex justify-content-start">
+                    <div class="col-md-8 d-flex justify-content-start align-items-center gap-3">
                         <div class="p-2">
                             <div class="ns-avatar img-circle img-responsive"></div>
                         </div>

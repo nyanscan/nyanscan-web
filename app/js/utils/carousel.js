@@ -1,6 +1,4 @@
-const carousels = document.getElementsByClassName("ns-carousel");
-
-for (let carousel of carousels) {
+function setupCarousel(carousel) {
     const imagesDiv =  carousel.getElementsByClassName("ns-carousel-images")[0];
     const images = imagesDiv.getElementsByTagName("img");
     const image_count = images.length;

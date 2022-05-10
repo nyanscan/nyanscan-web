@@ -41,6 +41,8 @@
         <div id="ns-footer-copyright"><span class="text-black">Copyright© NyanScan 2022</span></div>
     </div>
 </footer>
+
 <?php
 include($_SERVER['DOCUMENT_ROOT'] . '/private/components/footer.php');
+
 ?>
