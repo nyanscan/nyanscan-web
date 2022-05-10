@@ -62,3 +62,8 @@ function redirect404() {
     include $_SERVER['DOCUMENT_ROOT'] . '/error/404.php';
     die();
 }
+function json_exit($code, $message, $reason) {
+    http_response_code($code);
+    echo json_encode(["code" => $code, "message" => $message, "reason" => $reason]);
+    exit();
+}
