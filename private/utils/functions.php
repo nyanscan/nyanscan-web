@@ -28,6 +28,22 @@ function isConnected() {
     return $queryPrepared->fetch();
 }
 
+function ns_get_current_user($db) {
+    if(empty($_SESSION["token"]) || empty($_SESSION["account-id"]))
+        return false;
+    $db = $db?:connectDB();
+
+    $queryPrepared = $db->prepare("SELECT id, username, email, birthday, status FROM ".DB_PREFIX."USER WHERE token=:token AND id=:id");
+
+    $queryPrepared->execute([
+        "token"=>$_SESSION["token"],
+        "id"=>$_SESSION["account-id"]
+    ]);
+
+    return $queryPrepared->fetch();
+
+}
+
 function createToken($id = null) {
     $token = md5(time()*rand(1,1320)."HF6Ty.%%l78d£");
 

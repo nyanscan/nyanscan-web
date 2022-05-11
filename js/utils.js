@@ -25,7 +25,18 @@ function create(type, id = null, parent = null, ...cla) {
     return e;
 }
 
+function createPromise(type, id = null, parent = null, ...cla) {
+    return new Promise(resolve => {
+        const e = document.createElement(type);
+        if (cla) e.classList.add(...cla);
+        if (id) e.id = id;
+        if (parent) parent.appendChild(e);
+        resolve(e);
+    });
+}
+
 function sendApiPostRequest(url, formData, callBack = null) {
+
     const ajax = new XMLHttpRequest()
     ajax.open("POST", '/api/v1/' + url, true);
 
@@ -37,6 +48,20 @@ function sendApiPostRequest(url, formData, callBack = null) {
     }
 
     ajax.send(formData);
+}
+
+function sendApiGetRequest(url,  callBack = null) {
+    const ajax = new XMLHttpRequest()
+    ajax.open("GET", '/api/v1/' + url, true);
+
+    if (callBack !== null) {
+        ajax.addEventListener("error", callBack);
+        ajax.addEventListener("abort", callBack);
+        ajax.addEventListener("timeout", callBack);
+        ajax.addEventListener("load", callBack);
+    }
+
+    ajax.send();
 }
 
 function loadingScreen(show = true) {
@@ -129,7 +154,6 @@ function setupAPIForm(btnID, uri, options = {}) {
             })
         })
     } else console.error("invalid btn or form : " + btnID)
-
 }
 
 function loadToastSession() {

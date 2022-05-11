@@ -4,6 +4,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+session_start();
+
 include __DIR__ . '/private/forumController.php';
 
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/forum.php');
@@ -26,6 +28,10 @@ function bad_method()
 function bad_request($reason = "")
 {
     json_exit(400, "Bad Request", $reason);
+}
+
+function unauthorized() {
+    json_exit(401, "Unauthorized", "Une authentification est nécessaire pour accéder à la ressource.");
 }
 
 function success($answer = "ok") {
@@ -51,10 +57,10 @@ switch ($controller) {
 
 }
 
-print_r($uri);
-print_r($method);
-print_r($function);
-print_r($query);
+//print_r($uri);
+//print_r($method);
+//print_r($function);
+//print_r($query);
 
 //default 404 error
 header("HTTP/1.1 404 Not Found");

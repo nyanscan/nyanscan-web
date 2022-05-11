@@ -24,7 +24,7 @@ if (count($_POST) !== 0) {
             $rq_select = $pdo->prepare("SELECT id, password, username FROM " . DB_PREFIX . "USER WHERE email=:email");
             $rq_select->execute(["email" => $user]);
 
-            $user = $rq_select->fetchAll();
+            $user = $rq_select->fetchAll(PDO::FETCH_ASSOC);
             if (count($user) === 0 || !password_verify($pwd, $user[0]["password"])) {
                 $errors[] = "E-mail ou mot de passe invalide !";
             } else {

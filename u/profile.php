@@ -81,7 +81,7 @@ if ($is_self && ($_POST["type"]??"none") === "edit" && $id = $_POST["id"]) {
         if ($change_mail || $change_user) {
             $rq_select = $pdo->prepare("SELECT email, username FROM " . DB_PREFIX . "USER WHERE email=:email OR username=:username LIMIT 2");
             $rq_select->execute(["email" => $email, "username" => $username]);
-            foreach ($rq_select->fetchAll() as $fu) {
+            foreach ($rq_select->fetchAll(PDO::FETCH_ASSOC) as $fu) {
                 if ($change_mail && $fu["email"] === $email) $edit_errors[] = "Ce mail est dèja reliée à un compte";
                 if ($change_user && $fu["username"] === $username) $edit_errors[] = "Ce nom d'utilisateur est dèja reliée à un compte";
             }
