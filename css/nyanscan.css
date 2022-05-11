@@ -36,7 +36,7 @@ h1 {
 }
 
 h3 {
-    font-size: 32px;
+    font-size: 30px;
 }
 
 .ns-scan-preview-tile {
@@ -98,7 +98,7 @@ h3 {
 }
 
 #error {
-    font-size: 24px;
+    font-size: 21px;
     padding: 72px 0;
 }
 
@@ -154,7 +154,7 @@ h3 {
 
 .ns-scan-preview-component {
     /*margin: 24px 0;*/
-    width: 250px;
+    width: 170px;
     display: flex;
     justify-content: center;
     align-content: center;
@@ -162,8 +162,8 @@ h3 {
     gap: 16px;
 }
 .ns-scan-preview-component img {
-    height: 400px;
-    width: 250px;
+    height: 250px;
+    width: 170px;
     object-fit: cover;
 }
 
@@ -395,8 +395,8 @@ h3 {
 #ns-footer-link > a {
     color: var(--ns-color-black);
     text-decoration: none;
-    font-size: 24px;
-    flex-basis: 200px;
+    font-size: 20px;
+    flex-basis: 150px;
     flex-grow: 1;
     flex-shrink: 4;
 }

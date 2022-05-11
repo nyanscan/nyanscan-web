@@ -26,8 +26,8 @@ $id = uniqid();
         </div>
     </div>
     <div id="captcha-error" style="display: none">
-        <strong class="ns-text-red">Une erreur est survenue</strong>
-        <p>Merci <button class="btn btn-secondary btn-sm" onClick="window.location.reload();">d'actualiser</button> la page pour ressayer si le probléme perciste merci de contacter une administateur.</p>
+        <strong class="ns-text-red">Une erreur est survenue.</strong>
+        <p>Merci <button class="btn btn-secondary btn-sm" onClick="window.location.reload();">d'actualiser</button> la page pour ressayer. Si le problème persiste, merci de contacter un administrateur.</p>
     </div>
 </div>
 

@@ -7,7 +7,7 @@ if (isset($_SESSION["account-id"])) {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Connection | NyanScan</title>
+    <title>Connexion | NyanScan</title>
     <link rel="stylesheet" type="text/css" href="../css/nyanscan.css">
 </head>
 <body>
@@ -25,7 +25,7 @@ if (!empty($_SESSION["errors"])) {
 }
 ?>
 <div>
-    Votre compte à bien était créee vous pouvez vous connecter maintant en clicant ici : <a href="index.php"> Connexion </a>
+    Votre compte a bien été créé. Vous pouvez vous connecter maintenant en cliquant ici : <a href="index.php"> Connexion </a>
 </div>
 <?php
 include($_SERVER['DOCUMENT_ROOT'] . '/private/components/footer.php');

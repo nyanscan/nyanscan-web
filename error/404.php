@@ -12,7 +12,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/private/components/header.php');
                 <div class="ns-center w-100 h-100 flex-row flex-wrap">
                     <div class="w-100 ns-center"><a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo"></a></div>
                     <h1 class="w-auto my-5 me-lg-5 w-25">404</h1>
-                    <p class="w-75 w-lg-50">Oops, la page que vours recherchez n'est poas disponible ou à été déplacé.</p>
+                    <p class="w-75 w-lg-50">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
                     <div class="w-100 ns-center"><p>Retourner à la <a href="/">page d'accueil</a></p></div>
                 </div>
             </div>

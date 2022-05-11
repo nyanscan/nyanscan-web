@@ -70,7 +70,7 @@ redirectIfConnected();
                                 <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit"> Se connecter</button>
                             </form>
                         </div>
-                        <div class="row"><p>Nouveaux sur NyanScan ? <a href="register.php">S'inscrire</a></p></div>
+                        <div class="row"><p>Nouveau sur NyanScan ? <a href="register.php">S'inscrire</a></p></div>
                     </div>
                 </div>
             </div>
