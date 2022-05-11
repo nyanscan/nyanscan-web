@@ -1,0 +1,26 @@
+POST localhost:81/api/v1/forum/topic
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="category"
+
+1
+--WebAppBoundary--
+Content-Disposition: form-data; name="title"
+
+Test topic
+--WebAppBoundary--
+Content-Disposition: form-data; name="message"
+
+contenue du meessage
+mutlti
+
+###
+GET localhost:81/api/v1/forum/category/all
+###
+GET localhost:81/api/v1/forum/category/1
+###
+GET localhost:81/api/v1/forum/category/test-cat
+###
+GET localhost:81/api/v1/forum/category/1/topics/
+###

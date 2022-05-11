@@ -52,9 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && count($_POST) !== 0) {
 
         $rq_select = $pdo->prepare("SELECT email, username FROM " . DB_PREFIX . "USER WHERE email=:email OR username=:username LIMIT 2");
         $rq_select->execute(["email" => $email, "username" => $username]);
-        foreach ($rq_select->fetchAll() as $user) {
-            if ($user["email"] === $email) $errors[] = "Ce mail est déja relié à un compte";
-            if ($user["username"] === $username) $errors[] = "Ce nom d'utilisateur est déja relié à un compte";
+        foreach ($rq_select->fetchAll(PDO::FETCH_ASSOC) as $user) {
+            if ($user["email"] === $email) $errors[] = "Ce mail est dèja reliée à un compte";
+            if ($user["username"] === $username) $errors[] = "Ce nom d'utilisateur est dèja reliée à un compte";
         }
 
         if (count($errors) === 0) {
