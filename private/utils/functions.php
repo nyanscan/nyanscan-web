@@ -1,7 +1,13 @@
 <?php
 
 require 'config.php';
+require 'DBAdapter.php';
+require 'User.php';
 
+/**
+ * @deprecated
+ * @return PDO|void
+ */
 function connectDB() {
     try {
         $pdo = new PDO(DB_DRIVER.":host=".DB_HOST.";dbname=".DB_NAME.";port=".DB_PORT, DB_USER, DB_PASSWORD);
@@ -12,22 +18,21 @@ function connectDB() {
     }
 }
 
-
-function isConnected() {
-    if(empty($_SESSION["token"]) || empty($_SESSION["account-id"]))
-        return false;
-
-    $pdo = connectDB();
-    $queryPrepared = $pdo->prepare("SELECT id FROM ".DB_PREFIX."USER WHERE token=:token AND id=:id");
-
-    $queryPrepared->execute([
-        "token"=>$_SESSION["token"],
-        "id"=>$_SESSION["account-id"]
-    ]);
-
-    return $queryPrepared->fetch();
+function getDB(): DBAdapter
+{
+    return DBAdapter::$db_adapter_instance?:new DBAdapter();
 }
 
+function isConnected(): bool
+{
+    return get_log_user()->is_connected();
+}
+
+/**
+ * @param $db
+ * @return false|mixed
+ * @deprecated
+ */
 function ns_get_current_user($db) {
     if(empty($_SESSION["token"]) || empty($_SESSION["account-id"]))
         return false;
@@ -44,8 +49,19 @@ function ns_get_current_user($db) {
 
 }
 
+
+function get_log_user(): User
+{
+    return User::$current_user?:new User();
+}
+
+/**
+ * @deprecated
+ * @param null $id
+ * @return string
+ */
 function createToken($id = null) {
-    $token = md5(time()*rand(1,1320)."HF6Ty.%%l78d£");
+    $token = md5(time()*rand(1,456)."HF6Ty.%%l78d£");
 
     if(!is_null($id)){
         $pdo = connectDB();
@@ -57,6 +73,11 @@ function createToken($id = null) {
         ]);
     }
     return $token;
+}
+
+function createMD5Token(): string
+{
+    return md5(time()*rand(1,1320)."HF6Ty.%%l78d£");
 }
 
 function redirectIfConnected(){
