@@ -54,7 +54,9 @@ function _get_messages() {};
 
 // POST
 
-function _create_message() {}
+function _create_message() {
+
+}
 
 function _create_topic() {
     $db = connectDB();
