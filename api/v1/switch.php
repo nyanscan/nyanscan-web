@@ -6,9 +6,9 @@ error_reporting(E_ALL);
 
 session_start();
 
-include __DIR__ . '/private/forumController.php';
-
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/forum.php');
+
+include __DIR__ . '/private/forumController.php';
 
 function my_error_handler()
 {
@@ -34,9 +34,9 @@ function unauthorized() {
     json_exit(401, "Unauthorized", "Une authentification est nécessaire pour accéder à la ressource.");
 }
 
-function success($answer = "ok") {
+function success($data = []) {
     http_response_code(200);
-    echo json_encode(["code" => 200, "answer" => $answer]);
+    echo json_encode(["code" => 200, "data" => $data]);
     exit();
 }
 

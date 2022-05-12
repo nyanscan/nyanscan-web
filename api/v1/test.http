@@ -16,11 +16,34 @@ contenue du meessage
 mutlti
 
 ###
+POST localhost:81/api/v1/forum/message
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="reply"
+
+3
+--WebAppBoundary--
+Content-Disposition: form-data; name="topic"
+
+1
+--WebAppBoundary--
+Content-Disposition: form-data; name="message"
+
+contenue du meessage bis ddfdf
+mutlti
+
+###
 GET localhost:81/api/v1/forum/category/all
 ###
 GET localhost:81/api/v1/forum/category/1
 ###
 GET localhost:81/api/v1/forum/category/test-cat
 ###
-GET localhost:81/api/v1/forum/category/1/topics/
+GET localhost:81/api/v1/forum/category/1/topics?limit=10&offset=1
 ###
+GET localhost:81/api/v1/forum/topic/1
+###
+GET localhost:81/api/v1/forum/message/1?full=1
+###
+GET localhost:81/api/v1/forum/messages?full=1&topic=1&author=1&limit=20&offset=0

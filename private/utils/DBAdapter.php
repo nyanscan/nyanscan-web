@@ -23,25 +23,50 @@ class DBAdapter
         return $this->pdo;
     }
 
-    public function select($table, $collum, $where, $one = false)
+    public function select($table, $collum, $where, $limit = 0, $order=null, $offset=0)
     {
-        if (count($where) > 0) {
-            $condition = array_map(function ($k) {
-                return $k . '=:' . $k;
-            }, array_keys($where));
-            $statement = "SELECT " . join(', ', $collum) . ' FROM ' . DB_PREFIX.$table . ' WHERE ' . join(' AND ', $condition);
-            if ($one) $statement .= ' LIMIT 1';
-            $req =$this->pdo->prepare($statement);
-            $req->execute($where);
+        $statement = "SELECT " . join(', ', $collum) . ' FROM ' . DB_PREFIX.$table;
+        return $this->select_set_settings($statement, $where, $limit, $order, $offset);
+    }
 
-        } else {
-            $statement = "SELECT " . join(', ', $collum) . ' FROM ' . DB_PREFIX.$table;
-            if ($one) $statement .= ' LIMIT 1';
-            $req = $this->pdo->prepare($statement);
-            $req->execute();
+    public function select_set_settings($statement, $where, $limit = 0, $order=null, $offset=0) {
+        $to_bind = [];
+        if (count($where) > 0) {
+            $condition = [];
+            foreach ($where as $k => $v) {
+                $n_k = str_replace('.', '_', $k);
+                $to_bind[$n_k] = $v;
+                $condition[] = $k . '=:' . $n_k;
+            }
+            $statement .= ' WHERE ' . join(' AND ', $condition);
         }
-        if ($one) return $req->fetch(PDO::FETCH_ASSOC);
+
+        if($order != null) $statement .= " ORDER BY " . $order;
+        if ($limit > 0) {
+            $statement .= ' LIMIT '.$limit;
+            if ($offset > 0) $statement .= ' OFFSET ' . $offset;
+        }
+
+        $req = $this->pdo->prepare($statement);
+
+        $req->execute($to_bind);
+
+        if ($limit === 1) return $req->fetch(PDO::FETCH_ASSOC);
         else return $req->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function delete($table, $where) : bool {
+        if (count($where)) return false;
+        $to_bind = [];
+        $condition = [];
+        foreach ($where as $k => $v) {
+            $n_k = str_replace('.', '_', $k);
+            $to_bind[$n_k] = $v;
+            $condition[] = $k . '=:' . $n_k;
+        }
+        $statement = "DELETE FROM " .DB_PREFIX.$table . " WHERE " . join(', ', $condition);
+        $req = $this->pdo->prepare($statement);
+        return $req->execute($to_bind);
     }
 
     public function insert($table, $data): bool
@@ -53,7 +78,7 @@ class DBAdapter
             return ':' . $k;
         }, $columnNames);
         //Construct our SQL statement
-        $sql = "INSERT INTO ".DB_PREFIX.$table." (" . implode(", ", $columnNames) . ") VALUES " . implode(", ", $rowsSQL);
+        $sql = "INSERT INTO ".DB_PREFIX.$table." (" . implode(", ", $columnNames) . ") VALUES (" . implode(", ", $rowsSQL) . ')';
         //Prepare our PDO statement.
         $pdoStatement = $this->pdo->prepare($sql);
         return $pdoStatement->execute($data);
@@ -62,16 +87,20 @@ class DBAdapter
     public function update($table, $data, $where): bool
     {
         if (count($where) > 0) {
-            $condition = array_map(function ($k) {
-                return $k . '=:' . $k;
-            }, array_keys($where));
+            $to_bind = [];
+            $condition = [];
+            foreach ($where as $k => $v) {
+                $n_k = str_replace('.', '_', $k);
+                $to_bind[$n_k] = $v;
+                $condition[] = $k . '=:' . $n_k;
+            }
             $rowsSQL = array_map(function ($k) {
                 return $k . ' = :' . $k;
             }, array_keys($data));
             $statement = "UPDATE " . DB_PREFIX.$table . " SET " . join(', ', $rowsSQL) . ' WHERE ' . join(', ', $condition);
             print_r(array_merge($data, $where));
             $req =$this->pdo->prepare($statement);
-            return $req->execute(array_merge($data, $where));
+            return $req->execute(array_merge($data, $to_bind));
         }
         return false;
     }
@@ -112,6 +141,4 @@ class DBAdapter
         //Execute our statement (i.e. insert the data).
         return $pdoStatement->execute();
     }
-
-
 }

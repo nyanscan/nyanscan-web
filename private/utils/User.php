@@ -40,7 +40,7 @@ class User
     }
 
     private function fetch_data($where) {
-        $raw = $this->db_adapter->select('USER', ['id', 'token', 'username', 'email', 'birthday', 'status'], $where, true);
+        $raw = $this->db_adapter->select('USER', ['id', 'token', 'username', 'email', 'birthday', 'status'], $where, 1);
 
         if ($raw) {
             $this->is_log = true;
@@ -57,7 +57,7 @@ class User
 
         $raw = $this->db_adapter->select('USER', ['id', 'username', 'birthday', 'status', 'password'], [
             "email" => $email
-        ], true);
+        ], 1);
 
         if (!$raw || !password_verify($password, $raw["password"])) return false;
 
@@ -85,6 +85,22 @@ class User
     public function is_current_connected(): bool
     {
         return $this->is_current_user;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
     }
 
 }

@@ -104,3 +104,15 @@ function json_exit($code, $message, $reason) {
     echo json_encode(["code" => $code, "message" => $message, "reason" => $reason]);
     exit();
 }
+
+function concatenate_array_by_prefix($array, $prefix) {
+    $final = [];
+    foreach ($array as $key => $value) {
+        $split = explode('_', $key, 2);
+        if (in_array($split[0],["reply", "author", "topic"])) {
+            if (!isset($final[$split[0]])) $final[$split[0]] = [$split[1] => $value];
+            else $final[$split[0]][$split[1]] = $value;
+        } else $final[$key] = $value;
+    }
+    return $final;
+}
