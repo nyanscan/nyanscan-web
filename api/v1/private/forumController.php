@@ -35,6 +35,7 @@ function invokeForm($method, $function, $query)
     } elseif ($method === "GET") {
         if (count($function) === 2 && $function[0] == "category") {
             if ($function[1] === "all") _get_all_category();
+            if ($function[1] === "root") _get_root_category();
             else _get_category($function[1]);
         } elseif (count($function) === 3 && $function[0] == "category" && $function[2] === "topics") {
             _get_topic_from_category($function[1], $query);
@@ -51,9 +52,34 @@ function invokeForm($method, $function, $query)
 
 // GET
 
+function _get_root_category() {
+    $raw = get_all_full_category(FORUM_PERMISSION_VIEW_ADMIN);
+    $final = [];
+    foreach ($raw as $row) {
+        $cat = $row["cat_id"];
+        if (!isset($final[$cat]))
+            $final[$cat] = ["id" => $cat, "name" => $row["cat_name"], "description" => $row["cat_description"], "topics" => []];
+        $topic = [
+            "id" => $row["topic_id"],
+            "name" => $row["topic_name"],
+            "date_inserted" => $row["topic_date_inserted"],
+            "last_message" => [
+                "id" => $row["message_id"],
+                "date_inserted" => $row["message_date_inserted"],
+                "author" => [
+                    "id" => $row["author_id"],
+                    "username" => $row["author_username"]
+                    ]
+            ]
+        ];
+        $final[$cat]["topics"][] = $topic;
+    }
+    success($final);
+}
+
 function _get_all_category()
 {
-    success(get_all_visible_category(FORUM_PERMISSION_VIEW_ADMIN));
+    success(get_all_visible_category( FORUM_PERMISSION_VIEW_ADMIN));
 }
 
 function _get_category($id)
@@ -67,9 +93,8 @@ function _get_category($id)
 function _get_topic($id)
 {
     if (empty($id)) bad_request('invalid category');
-    success(getDB()->select(TABLE_FORUM_TOPIC, ['name', 'category', 'date_inserted', 'last_message'], ["id" => $id]));
+    success(getDB()->select(TABLE_FORUM_TOPIC, ['name', 'category', 'date_inserted', 'last_message'], ["id" => $id], 1));
 }
-
 
 function _get_topic_from_category($id, $query)
 {
@@ -120,8 +145,6 @@ function _get_messages($query)
     } else success($data);
 }
 
-;
-
 // POST
 
 function _create_message()
@@ -157,8 +180,8 @@ function _create_message()
 
 function _create_topic()
 {
-    $user = get_log_user();
-    if (!$user->is_connected()) unauthorized();
+//    $user = get_log_user();
+//    if (!$user->is_connected()) unauthorized();
 
     $errors = [];
 
@@ -176,13 +199,9 @@ function _create_topic()
     if (count($errors) !== 0) bad_request($errors);
 
     getDB()->insert(TABLE_FORUM_TOPIC, ["name" => $title, "category" => $cat["id"]]);
-    $req = getDB()->get_pdo()->prepare("INSERT INTO " . DB_PREFIX . TABLE_FORUM_MESSAGE . " (author, topic, content) VALUE (:author, (SELECT id FROM PAE_FORUM_TOPIC WHERE name=:topic ORDER BY date_inserted desc LIMIT 1), :content)");
-    $req->execute([
-        "author" => $user->getId(),
-        "topic" => $title,
-        "content" => $message
-    ]);
-    //todo: last message for topic
+    $id = getDB()->select(TABLE_FORUM_TOPIC, ['id'], ["name" => $title], 1, 'date_inserted DESC')['id'];
+    getDB()->insert(TABLE_FORUM_MESSAGE, ["author" => 1, "topic" => $id, "content" => $message]);
+    update_topic_last_message($id);
     success();
 }
 
