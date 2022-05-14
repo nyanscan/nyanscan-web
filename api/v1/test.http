@@ -4,17 +4,15 @@ Content-Type: multipart/form-data; boundary=WebAppBoundary
 --WebAppBoundary
 Content-Disposition: form-data; name="category"
 
-1
+4
 --WebAppBoundary--
 Content-Disposition: form-data; name="title"
 
-Test topic
+Test topic 3.3
 --WebAppBoundary--
 Content-Disposition: form-data; name="message"
 
-contenue du meessage
-mutlti
-
+contenue du meessage dsdsd
 ###
 POST localhost:81/api/v1/forum/message
 Content-Type: multipart/form-data; boundary=WebAppBoundary
@@ -36,6 +34,8 @@ mutlti
 ###
 GET localhost:81/api/v1/forum/category/all
 ###
+GET localhost:81/api/v1/forum/category/root
+###
 GET localhost:81/api/v1/forum/category/1
 ###
 GET localhost:81/api/v1/forum/category/test-cat
@@ -46,4 +46,4 @@ GET localhost:81/api/v1/forum/topic/1
 ###
 GET localhost:81/api/v1/forum/message/1?full=1
 ###
-GET localhost:81/api/v1/forum/messages?full=1&topic=1&author=1&limit=20&offset=0
+GET localhost:81/api/v1/forum/messages?full=1&author=1&limit=20&offset=0
