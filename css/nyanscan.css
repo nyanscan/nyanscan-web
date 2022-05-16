@@ -26,6 +26,16 @@
     --ns-color-theme-bg: #ffffff;
 }
 
+ns-a {
+    cursor: pointer;
+    color: cornflowerblue;
+}
+
+ns-a:hover {
+    text-decoration: underline;
+    color: dodgerblue;
+}
+
 .ns-dark {
     --ns-color-theme-text: #FEFEFE;
     --ns-color-theme-bg: #404141;
@@ -498,10 +508,20 @@ body {
     min-height: 50vh;
 }
 
+#ns-main {
+    /*z-index: -3;*/
+}
+
 .ns-center {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.ns-profile-picture {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
 }
 
 .ns-news-input {

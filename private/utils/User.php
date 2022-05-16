@@ -5,15 +5,17 @@ class User
 
     public static $current_user = null;
 
-    private $is_log = false;
-    private $is_current_user = false;
-    private $id;
-    private $token;
-    private $db_adapter;
-    private $username;
-    private $email;
+    private bool $is_log = false;
+    private bool $is_current_user = false;
+    private int $id;
+    private string $token;
+    private DBAdapter $db_adapter;
+    private string $username;
+    private string $email;
     private $birthday;
-    private $status;
+    private int $status;
+    private $join;
+    private $last_sean;
 
     /**
      * @param string|null $user id or username of the user if null get current log user
@@ -40,7 +42,7 @@ class User
     }
 
     private function fetch_data($where) {
-        $raw = $this->db_adapter->select('USER', ['id', 'token', 'username', 'email', 'birthday', 'status'], $where, 1);
+        $raw = $this->db_adapter->select('USER', ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated'], $where, 1);
 
         if ($raw) {
             $this->is_log = true;
@@ -50,6 +52,8 @@ class User
             $this->email = $raw["email"];
             $this->birthday = $raw["birthday"];
             $this->status = $raw["status"];
+            $this->join = $raw["date_inserted"];
+            $this->last_sean = $raw["date_updated"];
         }
     }
 
@@ -101,6 +105,32 @@ class User
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getAge(): int {
+        return floor((time() - strtotime($this->birthday)) / 60 / 60 / 24 / 365.25);
+    }
+
+    public function getAPIData($self=false): array {
+        $data = [
+            "id" => $this->id,
+            "username" => $this->username,
+            "age" => $this->getAge(),
+            "join" => $this->join,
+            "last_sean" => $this->last_sean,
+        ];
+
+        if ($self) {
+            $data["email"] = $this->email;
+            $data["birthday"] = $this->birthday;
+        }
+
+        return $data;
+    }
+
+    public function getForumViewLevel(): int
+    {
+        return $this->is_connected() ? FORUM_PERMISSION_VIEW_ADMIN : FORUM_PERMISSION_VIEW_EVERYONE;
     }
 
 }

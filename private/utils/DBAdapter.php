@@ -29,7 +29,11 @@ class DBAdapter
         return $this->select_set_settings($statement, $where, $limit, $order, $offset);
     }
 
-    public function select_set_settings($statement, $where, $limit = 0, $order=null, $offset=0) {
+    public function count($table, $col, $where) {
+        return $this->select_set_settings("SELECT COUNT(" . $col . ") AS amount FROM " . DB_PREFIX.$table, $where, 1)["amount"];
+    }
+
+    public function select_set_settings($statement, $where, $limit = 0, $order=null, $offset=0, $no_where=false) {
         $to_bind = [];
         if (count($where) > 0) {
             $condition = [];
@@ -38,7 +42,10 @@ class DBAdapter
                 $to_bind[$n_k] = $v;
                 $condition[] = $k . '=:' . $n_k;
             }
-            $statement .= ' WHERE ' . join(' AND ', $condition);
+
+            $statement .= $no_where ? ' AND ' : ' WHERE ';
+            $statement .= join(' AND ', $condition);
+
         }
 
         if($order != null) $statement .= " ORDER BY " . $order;
@@ -46,7 +53,6 @@ class DBAdapter
             $statement .= ' LIMIT '.$limit;
             if ($offset > 0) $statement .= ' OFFSET ' . $offset;
         }
-
         $req = $this->pdo->prepare($statement);
 
         $req->execute($to_bind);

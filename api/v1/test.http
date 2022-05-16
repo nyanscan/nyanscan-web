@@ -47,3 +47,5 @@ GET localhost:81/api/v1/forum/topic/1
 GET localhost:81/api/v1/forum/message/1?full=1
 ###
 GET localhost:81/api/v1/forum/messages?full=1&author=1&limit=20&offset=0
+###
+GET localhost:81/api/v1/user/me
