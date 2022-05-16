@@ -2,5 +2,3 @@
 private/utils/config.php
 test/
 api/v1/test.http
-
-app/

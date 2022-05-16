@@ -60,13 +60,13 @@ function _register()
 
         switch (get_captcha_status()) {
             case CAPTCHA_CODE_ERROR: $errors[] = "Captcha invalide."; break;
-            case CAPTCHA_CODE_FALSE: $errors[] = "Merci de remplire correctement le captcha."; break;
+            case CAPTCHA_CODE_FALSE: $errors[] = "Merci de remplir correctement le captcha."; break;
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Format de mail invalide";
         if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $username)) $errors[] = "Le pseudo ne peux contenir que des miniscule, majuscles, chiffres ou un _ avec une longeur maximum de 20 caractéres";
         if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) $errors[] = "Le mots de passe dois contenire au minimum 8 caractéres dont 1 majuscule 1 majuscule 1 chiffres et 1 caractéres spéciale";
-        if ($password !== $password_v) $errors[] = "Les mots de passes de coresponde pas !";
+        if ($password !== $password_v) $errors[] = "Les mots de passes ne correspondent pas !";
 
         $birthdayExploded = explode("-", $birthday);
 

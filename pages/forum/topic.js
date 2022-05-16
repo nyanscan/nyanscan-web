@@ -19,7 +19,6 @@ export default class extends Pages {
 
     build(parent, vars) {
         super.build(parent, vars);
-
     }
 
 }

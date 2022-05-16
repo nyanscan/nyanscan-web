@@ -7,12 +7,12 @@ export default class extends Pages {
         return `
 <section id="register">
     <div class="ns-f-bg ns-f-bg-auth"></div>
-    <div class="container vh-100">
-        <div class="row vh-100">
+    <div class="container min-vh-100">
+        <div class="row min-vh-100">
             <div id="register" class="ns-theme-bg ns-theme-text rounded my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
                 <div class="container pt-5 pb-3 d-flex flex-column align-items-center justify-content-around">
                     <div class="row pb-3">
-                        <ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo"></ns-a>
+                        <ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-auth"></ns-a>
                     </div>
                     <div class="row"><h2>Créer un compte</h2></div>
                     <div id="ns-log-error" class='row rounded mt-2 ns-b-azalea ns-text-red'>
@@ -32,7 +32,7 @@ export default class extends Pages {
                         <input id="pasword" class="form-control ns-form-pink" type="password" name="password" required="required">
                         </div>
                         <div class="ns-f-w-group">
-                        <label for="password-v">Confirmation Mot De Passe :</label>
+                        <label for="password-v">Confirmation Mot de Passe :</label>
                         <input id="password-v" class="form-control ns-form-pink" type="password" name="password-v" required="required">
                         </div>
                         <div class="ns-f-w-group">
@@ -55,7 +55,7 @@ export default class extends Pages {
                         <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">S'enregister</button>
                     </form>
                     </div>
-                    <div class="row"><p>Tu as dèja un compte ? <ns-a href="/auth/login">Se connecter</ns-a></p></div>
+                    <div class="row"><p>Tu as déja un compte ? <ns-a href="/auth/login">Se connecter</ns-a></p></div>
                 </div>
             </div>
         </div>

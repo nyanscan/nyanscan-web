@@ -203,8 +203,8 @@ class Captcha extends Component {
         </div>
     </div>
     <div id="captcha-error" style="display: none">
-        <strong class="ns-text-red">Une erreur est survenue</strong>
-        <p>Merci <button class="btn btn-secondary btn-sm" onClick="window.location.reload();">d'actualiser</button> la page pour ressayer si le probléme perciste merci de contacter une administateur.</p>
+          <strong class="ns-text-red">Une erreur est survenue.</strong>
+          <p>Merci <button class="btn btn-secondary btn-sm" onClick="window.location.reload();">d'actualiser</button> la page pour ressayer. Si le problème persiste, merci de contacter un administrateur.</p>
     </div>
 </div>
 </ns-api-data-block>
@@ -257,12 +257,12 @@ class Captcha extends Component {
         const uuid = uuidv4();
         this.uuid = uuid;
         _('#captcha-id').value = uuid;
-        _('#captcha-img').src = '/captchaGet?id=' + uuid;
+        _('#captcha-img').src = '/captchaGet.php?id=' + uuid;
         const storage = _('.captcha-piece-storage', true);
         for (let i = 0; i < this.block.getField('number_piece') * 1; i++) {
             let cont = create('div', null, storage, 'captcha-piece');
             let img = create('img', null, cont);
-            img.src =  '/captchaGet?id=' + uuid;
+            img.src =  '/captchaGet.php?id=' + uuid;
             img.alt = 'captcha_piece';
         }
     }
@@ -366,6 +366,82 @@ class Captcha extends Component {
         split[index * 2 + 1] = `${y}`;
         return split.join(':');
     }
-
-
 }
+
+// const TOAST_SUCCESS = 0;
+// const TOAST_INFO = 1;
+// const TOAST_WARN = 2;
+// const TOAST_ERROR = 3;
+//
+//
+// // todo : redo
+// function loadToastSession() {
+//     const session = sessionStorage.getItem('ns-toast');
+//     if (session) {
+//         const toasts = JSON.parse(session);
+//         for (let key of Object.keys(toasts)) {
+//             createToastOPT(toasts[key], key);
+//         }
+//     }
+// }
+//
+// function createToastOPT(opt, uuid=null) {
+//     createToast(opt.title, opt.type, opt.message, opt.html || false, uuid);
+// }
+//
+// function createToast(title, type, message, html = false, uuid=null) {
+//     if (!uuid) {
+//         uuid = uuidv4();
+//         const opt = {
+//             "title": title,
+//             "type": type,
+//             "message": message
+//         }
+//         if (html) opt["html"] = true;
+//
+//         const session = JSON.parse(sessionStorage.getItem('ns-toast') || "{}");
+//         session[uuid] = opt;
+//         sessionStorage.setItem('ns-toast', JSON.stringify(session));
+//     }
+//
+//     let container = _('#ns-toast-container');
+//     if (!container) {
+//         container = create('div', 'ns-toast-container', document.body, 'ns-toast-container-style')
+//     }
+//
+//     const toast = create('div', null, container, 'ns-toast', "ns-text-black");
+//     const header = create('div', null, toast, 'ns-toast-header');
+//     const status = create('div', null, header, 'ns-toast-status');
+//     switch (type) {
+//         case TOAST_ERROR:
+//             status.style.backgroundColor = '#dc3545';
+//             break;
+//         case TOAST_INFO:
+//             status.style.backgroundColor = '#0dcaf0';
+//             break;
+//         case TOAST_WARN:
+//             status.style.backgroundColor = '#ffc107';
+//             break;
+//         case TOAST_SUCCESS:
+//         default:
+//             status.style.backgroundColor = '#198754';
+//             break;
+//     }
+//     create('strong', null, header).innerText = title;
+//     const close = create('button', null, header, 'btn-close');
+//     close.ariaLabel = 'closeLabel';
+//     close.id = uuid;
+//     close.addEventListener("click", (ev) => {
+//         ev.target.closest('.ns-toast').remove();
+//         const session = JSON.parse(sessionStorage.getItem('ns-toast') || "{}");
+//         if (session) {
+//             delete session[ev.target.id];
+//             sessionStorage.setItem('ns-toast', JSON.stringify(session));
+//         }
+//     });
+//     const footer = create('div', null, toast, 'ns-toast-footer');
+//     if (html)
+//         footer.innerHTML = message;
+//     else
+//         footer.innerText = message;
+// }

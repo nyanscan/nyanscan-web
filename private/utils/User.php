@@ -33,7 +33,7 @@ class User
             ]);
         } else {
             $this->fetch_data( is_numeric($user)? ["id"=>$user] : ["username" => $user]);
-            if(!(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) &&
+            if($this->is_log && !(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) &&
                 $this->id == $_SESSION["account-id"] && $this->token === $_SESSION["token"]) {
                 $this->is_current_user = true;
                 if (User::$current_user === null) User::$current_user = $this;

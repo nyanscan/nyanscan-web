@@ -3,6 +3,7 @@ class ApiDataBlock extends HTMLElement {
     isInit = false;
     dataLoad = false;
     isError = false;
+    error = [];
     rawData = [];
 
     static get observedAttributes() {
@@ -58,24 +59,52 @@ class ApiDataBlock extends HTMLElement {
 
     dataCallBack(event) {
         this.dataLoad = true;
-
-        if (event.type === 'load' && event.target.status >= 200 && event.target.status < 300) {
+        const code = checkApiResStatus(event);
+        if (code === API_REP_OK) {
             try {
-                this.rawData = JSON.parse(event.target.responseText)["data"];
-                this.dispatchEvent(new CustomEvent('dataLoad', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                    detail: {
-                        raw: this.rawData
-                    }
-                }));
-
+                this.rawData = getDataAPI(event);
             } catch (error) {
+                this.error = {code: -1, message: 'parseError'};
                 this.isError = true;
             }
-        } else this.isError = true;
+        } else {
+            this.isError = true;
+            if (code === API_REP_BAD) {
+                this.error = {code: event.target.status, message: getAPIErrorReason(event)};
+            } else this.error = {code: -1, message: 'ConnexionError'};
+        }
+
+        this.dispatchEvent(new CustomEvent('dataLoad', {
+            cancelable: false,
+            bubbles: true,
+            composed: false,
+            detail: {
+                isError: this.isError,
+                raw: this.rawData
+            }
+        }));
+
+        this.replaceAttrVar();
     }
+
+    replaceAttrVar() {
+        const elements = this.querySelectorAll('.ns-data-field-var');
+        const regex = /\$([^$]*)\$/g;
+        let matches;
+        for (let element of elements) {
+            for (let attr of element.getAttributeNames()) {
+                let value = element.getAttribute(attr);
+                let new_value = value;
+                while (matches = regex.exec(value)) {
+                    let filedV = this.getField(matches[1]);
+                    if (filedV) {
+                        element.setAttribute(attr, new_value.replace(matches[0], filedV));
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 window.customElements.define('ns-api-data-block', ApiDataBlock);
@@ -110,8 +139,32 @@ class ApiData extends HTMLElement {
     }
 
     setData() {
-        this.innerText = this.block.getField(this.field || '');
+        if (!this.block.isError)
+            this.innerText = this.block.getField(this.field || '');
     }
 }
 
 window.customElements.define('ns-api-data', ApiData);
+
+class NSAnchor extends HTMLElement {
+    get href() {
+        return this.getAttribute('href') || undefined;
+    }
+
+    set href(value) {
+        this.setAttribute('href', value);
+    }
+
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        this.addEventListener('click', (function (e) {
+            window.APP.changePage(this.href);
+        }).bind(this))
+    }
+}
+
+window.customElements.define('ns-a', NSAnchor);
+
+
