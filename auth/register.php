@@ -1,6 +1,6 @@
 <?php
 
-$title = "Inscirption | NyanScan";
+$title = "Inscription | NyanScan";
 include($_SERVER['DOCUMENT_ROOT'] . '/private/components/header.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/functions.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/const.php');
@@ -17,7 +17,7 @@ if (count($_POST) !== 0) {
         empty($_POST["birth"]) ||
         empty($_POST["cgu"])
     ) {
-        $errors[] = "Donnée du formulaire invalide merci de recommencer !";
+        $errors[] = "Donnée du formulaire invalide ! Merci de recommencer !";
     } else {
         $username = trim($_POST["username"]);
         $email = strtolower(trim($_POST["email"]));
@@ -29,13 +29,13 @@ if (count($_POST) !== 0) {
 
         switch (get_captcha_status()) {
             case CAPTCHA_CODE_ERROR: $errors[] = "Captcha invalide."; break;
-            case CAPTCHA_CODE_FALSE: $errors[] = "Merci de remplire correctement le captcha."; break;
+            case CAPTCHA_CODE_FALSE: $errors[] = "Merci de remplir correctement le captcha."; break;
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Format de mail invalide";
         if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $username)) $errors[] = "Le pseudo ne peux contenir que des miniscule, majuscles, chiffres ou un _ avec une longeur maximum de 20 caractéres";
         if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) $errors[] = "Le mots de passe dois contenire au minimum 8 caractéres dont 1 majuscule 1 majuscule 1 chiffres et 1 caractéres spéciale";
-        if ($password !== $password_v) $errors[] = "Les mots de passes de coresponde pas !";
+        if ($password !== $password_v) $errors[] = "Les mots de passes ne correspondent pas !";
 
         $birthdayExploded = explode("-", $birthday);
 
@@ -53,8 +53,8 @@ if (count($_POST) !== 0) {
         $rq_select = $pdo->prepare("SELECT email, username FROM " . DB_PREFIX . "USER WHERE email=:email OR username=:username LIMIT 2");
         $rq_select->execute(["email" => $email, "username" => $username]);
         foreach ($rq_select->fetchAll() as $user) {
-            if ($user["email"] === $email) $errors[] = "Ce mail est dèja reliée à un compte";
-            if ($user["username"] === $username) $errors[] = "Ce nom d'utilisateur est dèja reliée à un compte";
+            if ($user["email"] === $email) $errors[] = "Ce mail est déja relié à un compte";
+            if ($user["username"] === $username) $errors[] = "Ce nom d'utilisateur est déja relié à un compte";
         }
 
         if (count($errors) === 0) {
@@ -114,7 +114,7 @@ $scripts = ["captcha.js"]
                         <input id="pasword" class="form-control ns-form-pink" type="password" name="password" required="required">
                         </div>
                         <div class="ns-f-w-group">
-                        <label for="password-v">Confirmation Mot De Passe :</label>
+                        <label for="password-v">Confirmation Mot de Passe :</label>
                         <input id="password-v" class="form-control ns-form-pink" type="password" name="password-v" required="required">
                         </div>
                         <div class="ns-f-w-group">
@@ -141,7 +141,7 @@ $scripts = ["captcha.js"]
                         <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">S'enregister</button>
                     </form>
                     </div>
-                    <div class="row"><p>Tu as dèja un compte ? <a href="./">Se connecter</a></p></div>
+                    <div class="row"><p>Tu as déja un compte ? <a href="./">Se connecter</a></p></div>
                 </div>
             </div>
         </div>
