@@ -7,8 +7,11 @@ error_reporting(E_ALL);
 session_start();
 
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/forum.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
 
 include __DIR__ . '/private/forumController.php';
+include __DIR__ . '/private/authController.php';
+include __DIR__ . '/private/userController.php';
 
 function my_error_handler()
 {
@@ -50,11 +53,28 @@ $method = strtoupper($_SERVER["REQUEST_METHOD"]);
 
 switch ($controller) {
     case 'forum':
-        invokeForm($method, $function, $query);
+        invokeForm($method, $function, $query);break;
+    case 'auth':
+        invokeAuth($method, $function, $query); break;
+    case 'user':
+        invokeUser($method, $function, $query); break;
+    case 'captchaSettings':
+        if ($method === 'GET' && count($function) === 0) _get_captcha_settings();
         break;
     default:
         break;
 
+}
+
+
+function _get_captcha_settings() {
+    success([
+        "width" => CAPTCHA_WIDTH,
+        "height" => CAPTCHA_HEIGHT,
+        "piece_size" => CAPTCHA_PIECE_SIZE,
+        "cell_size" => CAPTCHA_CELL_SIZE,
+        "number_piece" => CAPTCHA_NUMBER_PIECE,
+    ]);
 }
 
 //print_r($uri);

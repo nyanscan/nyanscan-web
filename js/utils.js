@@ -16,7 +16,6 @@ function uuidv4() {
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 }
-
 function create(type, id = null, parent = null, ...cla) {
     const e = document.createElement(type);
     if (cla) e.classList.add(...cla);
@@ -24,7 +23,6 @@ function create(type, id = null, parent = null, ...cla) {
     if (parent) parent.appendChild(e);
     return e;
 }
-
 function createPromise(type, id = null, parent = null, ...cla) {
     return new Promise(resolve => {
         const e = document.createElement(type);
@@ -34,7 +32,6 @@ function createPromise(type, id = null, parent = null, ...cla) {
         resolve(e);
     });
 }
-
 function sendApiPostRequest(url, formData, callBack = null) {
 
     const ajax = new XMLHttpRequest()
@@ -49,7 +46,6 @@ function sendApiPostRequest(url, formData, callBack = null) {
 
     ajax.send(formData);
 }
-
 function sendApiGetRequest(url,  callBack = null) {
     const ajax = new XMLHttpRequest()
     ajax.open("GET", '/api/v1/' + url, true);
@@ -63,7 +59,6 @@ function sendApiGetRequest(url,  callBack = null) {
 
     ajax.send();
 }
-
 function loadingScreen(show = true) {
     let screen = _('#ns-loading-screen');
     if (!screen) {
@@ -74,6 +69,8 @@ function loadingScreen(show = true) {
 
     screen.style.display = show ? '' : 'none';
 }
+
+
 
 const default_option = {
     on_send: {
@@ -97,7 +94,6 @@ const default_option = {
         }
     }
 }
-
 function setupAPIForm(btnID, uri, options = {}) {
     const btn = _('#' + btnID);
     if (btn && btn.form) {
@@ -155,7 +151,7 @@ function setupAPIForm(btnID, uri, options = {}) {
         })
     } else console.error("invalid btn or form : " + btnID)
 }
-
+// todo : redo
 function loadToastSession() {
     const session = sessionStorage.getItem('ns-toast');
     if (session) {

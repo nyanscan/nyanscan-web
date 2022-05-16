@@ -109,7 +109,7 @@ function concatenate_array_by_prefix($array, $prefix) {
     $final = [];
     foreach ($array as $key => $value) {
         $split = explode('_', $key, 2);
-        if (in_array($split[0],["reply", "author", "topic"])) {
+        if (in_array($split[0],$prefix)) {
             if (!isset($final[$split[0]])) $final[$split[0]] = [$split[1] => $value];
             else $final[$split[0]][$split[1]] = $value;
         } else $final[$key] = $value;

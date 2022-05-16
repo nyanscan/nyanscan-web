@@ -24,7 +24,9 @@ const MESSAGE_FULL_REQ = "
         FROM " . DB_PREFIX . TABLE_FORUM_MESSAGE . " AS M
                  LEFT JOIN " . DB_PREFIX . TABLE_USER . " A ON A.id = M.author
                  LEFT JOIN " . DB_PREFIX . TABLE_FORUM_TOPIC . " T ON T.id = M.topic
-                 LEFT JOIN " . DB_PREFIX . TABLE_FORUM_MESSAGE . " R ON R.id = M.reply";
+                 LEFT JOIN " . DB_PREFIX . TABLE_FORUM_MESSAGE . " R ON R.id = M.reply
+                LEFT JOIN "  . DB_PREFIX . TABLE_FORUM_CATEGORY . " C On T.category = C.id
+";
 
 function invokeForm($method, $function, $query)
 {
@@ -53,7 +55,9 @@ function invokeForm($method, $function, $query)
 // GET
 
 function _get_root_category() {
-    $raw = get_all_full_category(FORUM_PERMISSION_VIEW_ADMIN);
+    $user = get_log_user();
+    $perm = $user->getForumViewLevel();
+    $raw = get_all_full_category($perm);
     $final = [];
     foreach ($raw as $row) {
         $cat = $row["cat_id"];
@@ -98,13 +102,46 @@ function _get_topic($id)
 
 function _get_topic_from_category($id, $query)
 {
-    $limit = max(0, min(50, intval($query['limit'] ?? 10)));
+    $limit = max(0, min(20, intval($query['limit'] ?? 10)));
     $offset = intval($query['offset'] ?? 0);
+    $count = $query["count"] ?? '0';
+
+    $user = get_log_user();
+    $perm = $user->getForumViewLevel();
 
     if (empty($id)) bad_request('invalid category');
 
-    success(getDB()->select(TABLE_FORUM_TOPIC, ['id', 'name', 'date_inserted', 'last_message'],
-        ["category" => $id], $limit, 'last_message DESC', $offset));
+    $category = getDB()->select(TABLE_FORUM_CATEGORY, ['name', 'description', 'permission'], ["id" => $id], 1);
+//    echo $category['permission']  & FORUM_PERMISSION_VIEW_MASK;
+    if (!$category || ($category['permission'] & FORUM_PERMISSION_VIEW_MASK) > $perm) bad_request('invalid category');
+
+    $data = [];
+
+    $data["topics"] = array_map(function ($array) {
+        return concatenate_array_by_prefix($array, ["message", "author"]);
+    } ,getDB()->select_set_settings('SELECT
+                   T.id            AS id,
+                   T.name          AS name,
+                   T.date_inserted AS date_inserted,
+                   M.id            AS message_id,
+                   M.date_inserted AS message_date_inserted,
+                   A.id            AS author_id,
+                   A.username      AS author_username
+
+            FROM PAE_FORUM_TOPIC AS T
+                     LEFT JOIN PAE_FORUM_MESSAGE AS M ON T.last_message = M.id
+                     LEFT JOIN PAE_USER A ON A.id = M.author', ["T.category" => $id], $limit, 'T.last_message DESC', $offset));
+    $data["category"] = [
+        "id" => $id,
+        "name" => $category["name"],
+        "description" => $category["description"],
+    ];
+    if ($count !== '0') {
+        if ($data["topics"]) {
+            $data["total"] = getDB()->count(TABLE_FORUM_TOPIC, 'id', ['category' => $id]);
+        } else $data["total"] = 0;
+    }
+    success($data);
 }
 
 function _get_message($id, $query)
@@ -121,28 +158,33 @@ function _get_message($id, $query)
 
 function _get_messages($query)
 {
+    $user = get_log_user();
+    $perm = $user->getForumViewLevel();
     $limit = max(1, min(50, intval($query['limit'] ?? 10)));
     $offset = intval($query['offset'] ?? 0);
-    $full = !(empty($query["full"]) || $query["full"] == '0');
     $topic = $query["topic"] ?? null;
     $author = $query["author"] ?? null;
+    $count = $query["count"] ?? '0';
 
     if ($topic === null && $author === null) bad_request("no topic or author specified");
 
     $where = [];
-    if ($author !== null) $where[$full ? 'M.author' : 'author'] = $author;
-    if ($topic !== null) $where[$full ? 'M.topic' : 'topic'] = $topic;
+    if ($author !== null) $where['M.author'] = $author;
+    if ($topic !== null) $where['M.topic'] = $topic;
 
-    $data = getDB()->select_set_settings($full ? MESSAGE_FULL_REQ : MESSAGE_SHORT_REQ, $where,
-    $limit, ($full ? 'M.date_inserted' : 'date_inserted') . ' DESC', $offset);
+    $data = getDB()->select_set_settings(MESSAGE_FULL_REQ . (" WHERE ²(C.permission & ".FORUM_PERMISSION_VIEW_MASK.") <= ".$perm), $where,
+    $limit, ('M.date_inserted') . ' DESC', $offset, true);
 
-    if ($full) {
-        $final = [];
-        foreach ($data as $d) {
-            $final[] = concatenate_array_by_prefix($d, ["replay", "author", "topic"]);
-        }
-        success($final);
-    } else success($data);
+    $final = [];
+    foreach ($data as $d) {
+        $final[] = concatenate_array_by_prefix($d, ["replay", "author", "topic"]);
+    }
+
+    if ($final && $count) {
+
+    }
+
+    success($final);
 }
 
 // POST
@@ -180,8 +222,8 @@ function _create_message()
 
 function _create_topic()
 {
-//    $user = get_log_user();
-//    if (!$user->is_connected()) unauthorized();
+    $user = get_log_user();
+    if (!$user->is_connected()) unauthorized();
 
     $errors = [];
 
@@ -191,7 +233,7 @@ function _create_topic()
 
     if (empty($category)) bad_request('invalid category');
     $cat = get_category($category);
-    if (!$cat) bad_request('invalid category');
+    if (!$cat || ($cat['permission'] & FORUM_PERMISSION_VIEW_MASK) > $user->getForumViewLevel()) bad_request('invalid category');
 
     if (strlen($title) < 5 || strlen($title) > 100) $errors["title"] = 'Le titre doit contenir au minimum 5 caractéres et au maximum 100 !';
     if (strlen($message) < 10 || strlen($message) > 2000) $errors["$message"] = 'Le $message doit contenir au minimum 10 caractéres et au maximum 2000 !';
@@ -200,15 +242,16 @@ function _create_topic()
 
     getDB()->insert(TABLE_FORUM_TOPIC, ["name" => $title, "category" => $cat["id"]]);
     $id = getDB()->select(TABLE_FORUM_TOPIC, ['id'], ["name" => $title], 1, 'date_inserted DESC')['id'];
-    getDB()->insert(TABLE_FORUM_MESSAGE, ["author" => 1, "topic" => $id, "content" => $message]);
+    getDB()->insert(TABLE_FORUM_MESSAGE, ["author" => $user->getId(), "topic" => $id, "content" => $message]);
     update_topic_last_message($id);
     success();
 }
 
 function _create_category()
 {
+    $user = get_log_user();
+    if (!$user->getForumViewLevel() < FORUM_PERMISSION_CREATE_ADMIN) unauthorized();
     $errors = [];
-    // todo permission
 
     $title = trim($_POST["title"] ?? "");
     $description = trim($_POST["description"] ?? "");
