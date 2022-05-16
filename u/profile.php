@@ -170,8 +170,8 @@ if (!$is_self) {
             </div>
         </div>
         <div class="col-md-4 d-flex">
-            <span> Rejoint le <?php echo $user["date_inserted"] ?></span>
-            <span> Dernière activité <?php echo $user["date_updated"] ?></span>
+            <span> Rejoint le : <?php echo $user["date_inserted"] ?></span>
+            <span> Dernière activité : <?php echo $user["date_updated"] ?></span>
         </div>
     </section>
     <?php
@@ -182,7 +182,7 @@ if (!$is_self) {
 <?php
 if ($is_self) {
     ?>
-        <div class="ns-min-vh-100 ns-center py-5">
+        <div class="ns-min-vh-100 ns-center py-5 ns-text-black">
             <div class="ns-scan-preview-profil">
 
                 <section class="flex-row d-flex">

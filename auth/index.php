@@ -46,7 +46,7 @@ redirectIfConnected();
                 <div id="login" class="ns-theme-bg ns-theme-text rounded my-5 align-self-center col-10 offset-1 col-md-6 offset-md-3">
                     <div class="container pt-5 pb-3 d-flex flex-column align-items-center justify-content-around">
                         <div class="row pb-3">
-                            <a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo"></a>
+                            <a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-auth"></a>
                         </div>
                         <div class="row"><h2>Se connecter</h2></div>
                         <?php
