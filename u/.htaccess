@@ -1,8 +1,0 @@
-RewriteEngine On
-
-# n'est pas un fichier regulier
-RewriteCond %{REQUEST_FILENAME} !-f
-# n'est pas un dossier qui existe
-RewriteCond %{REQUEST_FILENAME} !-d
-# on renvoie l'id qur profile0pgp
-RewriteRule ^([\w-]+)/?$ profile.php?id=$1 [L,QSA]

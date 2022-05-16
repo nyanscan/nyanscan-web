@@ -1,6 +1,4 @@
-const carousels = document.getElementsByClassName("ns-carousel");
-
-for (let carousel of carousels) {
+function setupCarousel(carousel) {
     const imagesDiv =  carousel.getElementsByClassName("ns-carousel-images")[0];
     const images = imagesDiv.getElementsByTagName("img");
     const image_count = images.length;
@@ -29,7 +27,6 @@ for (let carousel of carousels) {
 }
 
 function setCarouselActiveElements(carousel, index) {
-    console.log(carousel.nsCarouselCount + " " + carousel + " " + index);
     if (carousel.nsCarouselCount <= index) return;
 
     const imagesDiv =  carousel.getElementsByClassName("ns-carousel-images")[0];
@@ -43,14 +40,11 @@ function setCarouselActiveElements(carousel, index) {
     }
     images[index].classList.add("ns-carousel-2");
     images[index].classList.remove("ns-carousel-off");
-    if (index !== 0) {
-        images[index - 1].classList.add("ns-carousel-1");
-        images[index - 1].classList.remove("ns-carousel-off");
-    }
-    if (index + 1 < carousel.nsCarouselCount) {
-        images[index + 1].classList.add("ns-carousel-3");
-        images[index + 1].classList.remove("ns-carousel-off");
-    }
+    images[(index === 0 ? images.length : index) - 1].classList.add("ns-carousel-1");
+    images[(index === 0 ? images.length : index) - 1].classList.remove("ns-carousel-off");
+    images[(index + 1 < carousel.nsCarouselCount) ? (index + 1) : 0].classList.add("ns-carousel-3");
+    images[(index + 1 < carousel.nsCarouselCount) ? (index + 1) : 0].classList.remove("ns-carousel-off");
+
     const points = carousel.getElementsByClassName("ns-carousel-points");
     for (let point of points) {
         const points = point.children;
