@@ -7,7 +7,7 @@ if (!($no_session??false))
     <head>
         <meta charset="UTF-8">
         <title> <?php echo $title??"NyanScan"; ?> </title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1 shrink-to-fit=no">
         <link rel="icon" href="../../res/logo-ns-icon.ico">
 
 

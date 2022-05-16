@@ -170,8 +170,8 @@ if (!$is_self) {
             </div>
         </div>
         <div class="col-md-4 d-flex">
-            <span> Join on <?php echo $user["date_inserted"] ?></span>
-            <span> Last activity <?php echo $user["date_updated"] ?></span>
+            <span> Rejoint le : <?php echo $user["date_inserted"] ?></span>
+            <span> Dernière activité : <?php echo $user["date_updated"] ?></span>
         </div>
     </section>
     <?php
@@ -182,7 +182,7 @@ if (!$is_self) {
 <?php
 if ($is_self) {
     ?>
-        <div class="ns-min-vh-100 ns-center py-5">
+        <div class="ns-min-vh-100 ns-center py-5 ns-text-black">
             <div class="ns-scan-preview-profil">
 
                 <section class="flex-row d-flex">
@@ -197,10 +197,10 @@ if ($is_self) {
                     </div>
                     <div class="d-flex flex-column justify-content-end">
                         <div class="p-2">
-                            <span> Join on <?php echo $user["date_inserted"] ?></span>
+                            <span> Rejoint le <?php echo $user["date_inserted"] ?></span>
                         </div>
                         <div class="p-2">
-                            <span> Last activity <?php echo $user["date_updated"] ?></span>
+                            <span> Dernière activité <?php echo $user["date_updated"] ?></span>
                         </div>
                     </div>
                 </section>
@@ -305,18 +305,18 @@ if ($is_self) {
                                 </div>
 
                                 <h5>Modifier le mot de passe</h5>
-                                <p>Si vous ne voulez pas modifier votre mot de passe merci de ne pas remplir les casse</p>
+                                <p>Si vous ne voulez pas modifier votre mot de passe, merci de ne pas remplir les champs.</p>
 
                                 <div class="ns-f-w-group">
                                     <label for="password">Mot de Passe :</label>
                                     <input id="password" class="form-control ns-form-pink" type="password" name="password">
                                 </div>
                                 <div class="ns-f-w-group">
-                                    <label for="password-v">Confirmation Mot De passe :</label>
+                                    <label for="password-v">Confirmation :</label>
                                     <input id="password-v" class="form-control ns-form-pink" type="password" name="password-v">
                                 </div>
 
-                                <p>Pour des raisons de sécurité veuillez renseigner à nouveaux votre mot de passe pour toute modification
+                                <p>Pour des raisons de sécurité, veuillez renseigner à nouveau votre mot de passe pour toute modification
                                     !</p>
 
                                 <div class="ns-f-w-group">
