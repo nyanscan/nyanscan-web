@@ -144,7 +144,7 @@ class Index extends Pages {
         </div>
     </div>
 </section>
-<section class="ns-min-vh-100 ns-theme-bg">
+<section class="ns-min-vh-100 ns-theme-bg ns-text-black">
     <div class="ns-min-vh-50 ns-center pb-5">
         <div class="ns-scan-preview">
             <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
@@ -239,14 +239,14 @@ class Index extends Pages {
         </div>
     </div>
 </section>
-<section class="ns-min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
+<section class="min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
     <h1 class="ns-text-red fw-bold">NyanScan</h1>
     <p class="text-white ns-fs-5 w-lg-25 w-75 text-center">NyanScan est un site de lecture de scan en ligne. Avec son moteur de recherche complet, trouve le manga qui te plait en quelque clic !</p>
     <form class="form-inline w-lg-40 w-75 ns-fs-4">
         <input class="ns-search w-100 p-4" id="ns-nav-search" type="search" placeholder="Rechercher...">
     </form>
     <span class="text-white ns-fs-3 fw-bold">OU</span>
-<!-- Todo: change thsi -->
+<!-- Todo: change this -->
     <a class="btn text-black ns-fs-4 ns-tickle-pink-btn" href="auth">Se connecter</a>
 </section>
 <section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
