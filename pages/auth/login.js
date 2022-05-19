@@ -59,11 +59,18 @@ return `
     }
 
     loginResult(event) {
-
         const repType = checkApiResStatus(event);
         if (repType === API_REP_OK) {
-            this.app.user.log();
-            this.app.changePage('/');
+            const rep = getDataAPI(event);
+            console.log(rep);
+            if (rep["invalid"] !== undefined) {
+                this.app.session["mail_token"] = rep["mail_token"];
+                this.app.session["user_id"] = rep["user_id"];
+                this.app.changePage('/auth/wait-verification');
+            } else {
+                this.app.user.log();
+                this.app.changePage('/');
+            }
         }
         else {
             this.isSending = false;

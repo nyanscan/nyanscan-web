@@ -302,7 +302,7 @@ class Error404 extends Pages {
 
 const STRUCTURE = [
     {
-        re: /^(|index|home)(\.html)?$/,
+        re: /^(|index|home)$/,
         rel: "index",
     },
     {
@@ -311,16 +311,16 @@ const STRUCTURE = [
             path_var: [2],
             elements: [
                 {
-                    re: /^(|categories)(\.html)?$/,
+                    re: /^(|categories)$/,
                     rel: 'forum/categories'
                 },
                 {
-                    re: /^([0-9]+)(\.html)?$/,
+                    re: /^([0-9]+)$/,
                     rel: 'forum/category',
                     var: [{id: 1, name: 'category'}]
                 },
                 {
-                    re: /^([0-9]+)\/([0-9]+)\/?([0-9]*)(\.html)?$/,
+                    re: /^([0-9]+)\/([0-9]+)\/?([0-9]*)/,
                     rel: 'forum/topic',
                     var: [{id: 1, name: 'category'}, {id: 2, name: 'topic'}, {id: 3, name: 'page'}]
                 }
@@ -338,19 +338,27 @@ const STRUCTURE = [
             path_var: [1],
             elements: [
                 {
-                    re: /^(|login)(\.html)?$/,
+                    re: /^(|login)$/,
                     rel: 'auth/login',
                     loginLevel: LOGIN_LEVEL_DISCONNECT,
                 },
                 {
-                    re: /^login-success(\.html)?$/,
+                    re: /^wait-verification$/,
                     rel: 'auth/loginSuccess',
                     loginLevel: LOGIN_LEVEL_DISCONNECT,
                 },
                 {
-                    re: /^register(\.html)?$/,
+                    re: /^register$/,
                     rel: 'auth/register',
                     loginLevel: LOGIN_LEVEL_DISCONNECT,
+                },
+                {
+                    re: /^verification-success$/,
+                    rel: 'auth/verificationSuccess'
+                },
+                {
+                    re: /^verification-failed$/,
+                    rel: 'auth/verificationFail'
                 }
             ]
         }
@@ -417,6 +425,7 @@ class App extends EventTarget {
     caches = [];
     user;
     currentPages;
+    session = [];
 
     constructor() {
         super()
@@ -424,6 +433,7 @@ class App extends EventTarget {
         this.footer = new Footer(this);
         this.caches["index"] = Index;
         this.caches["404"] = Error404;
+        this.session = ["start", new Date()]
 
         this.titleE = _('title', true);
 
@@ -459,6 +469,8 @@ class App extends EventTarget {
 
     loadURL(url) {
         if (url.startsWith('/')) url = url.substring(1);
+        // remove .html .js and .php
+        url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
         let current_url = url;
         let current = STRUCTURE;
 

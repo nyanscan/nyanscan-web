@@ -62,7 +62,7 @@ class DBAdapter
     }
 
     public function delete($table, $where) : bool {
-        if (count($where)) return false;
+        if (count($where) === 0) return false;
         $to_bind = [];
         $condition = [];
         foreach ($where as $k => $v) {
@@ -70,7 +70,7 @@ class DBAdapter
             $to_bind[$n_k] = $v;
             $condition[] = $k . '=:' . $n_k;
         }
-        $statement = "DELETE FROM " .DB_PREFIX.$table . " WHERE " . join(', ', $condition);
+        $statement = "DELETE FROM " .DB_PREFIX.$table . " WHERE " . join(' AND ', $condition);
         $req = $this->pdo->prepare($statement);
         return $req->execute($to_bind);
     }
@@ -104,7 +104,6 @@ class DBAdapter
                 return $k . ' = :' . $k;
             }, array_keys($data));
             $statement = "UPDATE " . DB_PREFIX.$table . " SET " . join(', ', $rowsSQL) . ' WHERE ' . join(', ', $condition);
-            print_r(array_merge($data, $where));
             $req =$this->pdo->prepare($statement);
             return $req->execute(array_merge($data, $to_bind));
         }

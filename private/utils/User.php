@@ -16,6 +16,7 @@ class User
     private int $status;
     private $join;
     private $last_sean;
+    private ?string $verification_token = null;
 
     /**
      * @param string|null $user id or username of the user if null get current log user
@@ -59,7 +60,7 @@ class User
 
     public function login($email, $password) : bool {
 
-        $raw = $this->db_adapter->select('USER', ['id', 'username', 'birthday', 'status', 'password'], [
+        $raw = $this->db_adapter->select(TABLE_USER, ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'password'], [
             "email" => $email
         ], 1);
 
@@ -67,17 +68,32 @@ class User
 
         $this->id = $raw['id'];
 
-        $this->token = createMD5Token();
-        $this->db_adapter->update("USER", ["token" => $this->token], ["id" => $this->id]);
-
+        $this->token =$raw["token"];
         $this->username = $raw["username"];
-        $this->email = $email;
         $this->birthday = $raw["birthday"];
         $this->status = $raw["status"];
+        $this->join = $raw["date_inserted"];
+        $this->last_sean = $raw["date_updated"];
+        $this->email = $email;
 
-        $_SESSION["account-id"] = $this->id;
-        $_SESSION["account-username"] = $this->username;
-        $_SESSION["token"] = $this->token;
+        if ($this->is_verified()) {
+            $this->token = createMD5Token();
+            $this->db_adapter->update("USER", ["token" => $this->token], ["id" => $this->id]);
+            $_SESSION["account-id"] = $this->id;
+            $_SESSION["account-username"] = $this->username;
+            $_SESSION["token"] = $this->token;
+        } else {
+            $r = $this->db_adapter->select(TABLE_VERIFICATION, ["id"], ["user_id" => $this->id], 1);
+            if ($r)
+                $this->verification_token = $r["id"];
+            else {
+                // created token and send mail
+                $this->verification_token = createMD5Token();
+                $token_2 = createMD5Token();
+                $this->db_adapter->insert(TABLE_VERIFICATION, ["id" => $this->verification_token, "user_id" => $this->id, "token" => $token_2]);
+                send_verification_mail($token_2, $this->id, $this->email, $this->username);
+            }
+        }
         return true;
     }
 
@@ -131,6 +147,14 @@ class User
     public function getForumViewLevel(): int
     {
         return $this->is_connected() ? FORUM_PERMISSION_VIEW_ADMIN : FORUM_PERMISSION_VIEW_EVERYONE;
+    }
+
+    public function is_verified(): bool {
+        return ($this->status & STATUS_EMAIL_VERIFIED) > 0;
+    }
+
+    public function get_verification_token() : ?string {
+        return $this->verification_token;
     }
 
 }
