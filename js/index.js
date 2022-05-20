@@ -144,7 +144,7 @@ class Index extends Pages {
         </div>
     </div>
 </section>
-<section class="ns-min-vh-100 ns-theme-bg">
+<section class="ns-min-vh-100 ns-theme-bg ns-text-black">
     <div class="ns-min-vh-50 ns-center pb-5">
         <div class="ns-scan-preview">
             <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
@@ -239,14 +239,14 @@ class Index extends Pages {
         </div>
     </div>
 </section>
-<section class="ns-min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
+<section class="min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
     <h1 class="ns-text-red fw-bold">NyanScan</h1>
     <p class="text-white ns-fs-5 w-lg-25 w-75 text-center">NyanScan est un site de lecture de scan en ligne. Avec son moteur de recherche complet, trouve le manga qui te plait en quelque clic !</p>
     <form class="form-inline w-lg-40 w-75 ns-fs-4">
         <input class="ns-search w-100 p-4" id="ns-nav-search" type="search" placeholder="Rechercher...">
     </form>
     <span class="text-white ns-fs-3 fw-bold">OU</span>
-<!-- Todo: change thsi -->
+<!-- Todo: change this -->
     <a class="btn text-black ns-fs-4 ns-tickle-pink-btn" href="auth">Se connecter</a>
 </section>
 <section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
@@ -302,7 +302,7 @@ class Error404 extends Pages {
 
 const STRUCTURE = [
     {
-        re: /^(|index|home)(\.html)?$/,
+        re: /^(|index|home)$/,
         rel: "index",
     },
     {
@@ -311,16 +311,16 @@ const STRUCTURE = [
             path_var: [2],
             elements: [
                 {
-                    re: /^(|categories)(\.html)?$/,
+                    re: /^(|categories)$/,
                     rel: 'forum/categories'
                 },
                 {
-                    re: /^([0-9]+)(\.html)?$/,
+                    re: /^([0-9]+)$/,
                     rel: 'forum/category',
                     var: [{id: 1, name: 'category'}]
                 },
                 {
-                    re: /^([0-9]+)\/([0-9]+)\/?([0-9]*)(\.html)?$/,
+                    re: /^([0-9]+)\/([0-9]+)\/?([0-9]*)/,
                     rel: 'forum/topic',
                     var: [{id: 1, name: 'category'}, {id: 2, name: 'topic'}, {id: 3, name: 'page'}]
                 }
@@ -338,19 +338,27 @@ const STRUCTURE = [
             path_var: [1],
             elements: [
                 {
-                    re: /^(|login)(\.html)?$/,
+                    re: /^(|login)$/,
                     rel: 'auth/login',
                     loginLevel: LOGIN_LEVEL_DISCONNECT,
                 },
                 {
-                    re: /^login-success(\.html)?$/,
+                    re: /^wait-verification$/,
                     rel: 'auth/loginSuccess',
                     loginLevel: LOGIN_LEVEL_DISCONNECT,
                 },
                 {
-                    re: /^register(\.html)?$/,
+                    re: /^register$/,
                     rel: 'auth/register',
                     loginLevel: LOGIN_LEVEL_DISCONNECT,
+                },
+                {
+                    re: /^verification-success$/,
+                    rel: 'auth/verificationSuccess'
+                },
+                {
+                    re: /^verification-failed$/,
+                    rel: 'auth/verificationFail'
                 }
             ]
         }
@@ -417,6 +425,7 @@ class App extends EventTarget {
     caches = [];
     user;
     currentPages;
+    session = [];
 
     constructor() {
         super()
@@ -424,6 +433,7 @@ class App extends EventTarget {
         this.footer = new Footer(this);
         this.caches["index"] = Index;
         this.caches["404"] = Error404;
+        this.session = ["start", new Date()]
 
         this.titleE = _('title', true);
 
@@ -459,6 +469,8 @@ class App extends EventTarget {
 
     loadURL(url) {
         if (url.startsWith('/')) url = url.substring(1);
+        // remove .html .js and .php
+        url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
         let current_url = url;
         let current = STRUCTURE;
 

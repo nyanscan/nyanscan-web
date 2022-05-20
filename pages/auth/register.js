@@ -92,7 +92,10 @@ export default class extends Pages {
     registerResult(event) {
         const repType = checkApiResStatus(event);
         if (repType === API_REP_OK) {
-            this.app.changePage('/auth/login-success');
+            const rep = getDataAPI(event);
+            this.app.session["mail_token"] = rep["mail_token"];
+            this.app.session["user_id"] = rep["user_id"];
+            this.app.changePage('/auth/wait-verification');
         }
         else {
             this.isSending = false;

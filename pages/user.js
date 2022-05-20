@@ -33,30 +33,30 @@ export default class extends Pages {
                         </div>
                     </div>
                 </section>
-
-                <div class="ns-center py-5">
-                    <div class="ns-scan-preview-gray">
+                
+                <div class="ns-center py-5 ns-text-white">
+                    <div class="ns-section-block ns-b-purple-gradient">
                         <h4 class="ns-scan-preview-tile">Scans aimés</h4>
                         <div class="ns-scan-preview-elements">
-                            <div class="ns-scan-preview-component-profil">
+                            <div class="ns-scan-preview-component">
                                 <a href="/">
                                     <img src="../../res/book/love-is-war.jpg">
                                 </a>
                                 <span>Love Is War</span>
                             </div>
-                            <div class="ns-scan-preview-component-profil">
+                            <div class="ns-scan-preview-component">
                                 <a href="/">
                                     <img src="../../res/book/love-is-war.jpg">
                                 </a>
                                 <span>Love Is War</span>
                             </div>
-                            <div class="ns-scan-preview-component-profil">
+                            <div class="ns-scan-preview-component">
                                 <a href="/">
                                     <img src="../../res/book/love-is-war.jpg">
                                 </a>
                                 <span>Love Is War</span>
                             </div>
-                            <div class="ns-scan-preview-component-profil">
+                            <div class="ns-scan-preview-component">
                                 <a href="/">
                                     <img src="../../res/book/love-is-war.jpg">
                                 </a>
@@ -66,29 +66,29 @@ export default class extends Pages {
                     </div>
                 </div>
 
-                <div class="ns-center py-5">
-                    <div class="ns-scan-preview-gray">
-                        <h4 class="ns-scan-preview-tile">Scans uploadés</h4>
+                <div class="ns-center py-5 ns-text-white">
+                    <div class="ns-section-block ns-b-purple-gradient">
+                        <h4>Scans uploadés</h4>
                         <div class="ns-scan-preview-elements">
-                            <div class="ns-scan-preview-component-profil">
+                            <div class="ns-scan-preview-component">
                                 <a href="/">
                                     <img src="../../res/book/love-is-war.jpg">
                                 </a>
                                 <span>Love Is War</span>
                             </div>
-                            <div class="ns-scan-preview-component-profil">
+                            <div class="ns-scan-preview-component">
                                 <a href="/">
                                     <img src="../../res/book/love-is-war.jpg">
                                 </a>
                                 <span>Love Is War</span>
                             </div>
-                            <div class="ns-scan-preview-component-profil">
+                            <div class="ns-scan-preview-component">
                                 <a href="/">
                                     <img src="../../res/book/love-is-war.jpg">
                                 </a>
                                 <span>Love Is War</span>
                             </div>
-                            <div class="ns-scan-preview-component-profil">
+                            <div class="ns-scan-preview-component">
                                 <a href="/">
                                     <img src="../../res/book/love-is-war.jpg">
                                 </a>
@@ -101,10 +101,10 @@ export default class extends Pages {
         if (this.isSelf)
             html += `
 
-                <div class="ns-center py-5">
-                    <div class="ns-scan-preview-gray">
+                <div class="ns-center py-5 ns-text-white ">
+                    <div class="ns-section-block ns-b-purple-gradient">
                         <section>
-                            <h4>Modifier le profil</h4>
+                            <h3>Modifier le profil</h3>
 <!--                            <?php-->
 <!--                            if (!empty($errors_edit)) {-->
 <!--                                echo "<div class='row rounded mt-2 ns-b-azalea ns-text-red'>";-->
@@ -115,23 +115,22 @@ export default class extends Pages {
 <!--                            }-->
 <!--                            ?>-->
 
-                            <form method="post" id="ns-profile-edit">
-                                <h3>Information</h3>
+                            <form method="post" id="ns-profile-edit" class="my-3">
                                 <input class="d-none" name="type" value="edit" type="hidden">
                                 <input class="d-none" name="id" value="<?php echo $id ?>" type="hidden">
                                 <div class="ns-f-w-group">
                                     <label for="email">Adresse Email :</label>
-                                    <input id="email" class="ns-data-field-var form-control ns-form-pink" type="email" name="email" required="required"
+                                    <input id="email" class="ns-data-field-var form-control ns-form-deep-mauve" type="email" name="email" required="required"
                                            value="$email$">
                                 </div>
                                 <div class="ns-f-w-group">
                                     <label for="username">Pseudo :</label>
-                                    <input id="username" class="ns-data-field-var form-control ns-form-pink" type="text" name="username" required="required"
+                                    <input id="username" class="ns-data-field-var form-control ns-form-deep-mauve" type="text" name="username" required="required"
                                            value="$username$">
                                 </div>
                                 <div class="ns-f-w-group">
                                     <label for="birth">Date de Naissance :</label>
-                                    <input id="birth" class="ns-data-field-var form-control ns-form-pink" type="date" name="birth" required="required"
+                                    <input id="birth" class="ns-data-field-var form-control ns-form-deep-mauve" type="date" name="birth" required="required"
                                            value="$birthday$">
                                 </div>
 
@@ -140,11 +139,11 @@ export default class extends Pages {
 
                                 <div class="ns-f-w-group">
                                     <label for="password">Mot de Passe :</label>
-                                    <input id="password" class="form-control ns-form-pink" type="password" name="password">
+                                    <input id="password" class="form-control ns-form-deep-mauve" type="password" name="password">
                                 </div>
                                 <div class="ns-f-w-group">
                                     <label for="password-v">Confirmation :</label>
-                                    <input id="password-v" class="form-control ns-form-pink" type="password" name="password-v">
+                                    <input id="password-v" class="form-control ns-form-deep-mauve" type="password" name="password-v">
                                 </div>
 
                                 <p>Pour des raisons de sécurité, veuillez renseigner à nouveau votre mot de passe pour toute modification
@@ -152,21 +151,21 @@ export default class extends Pages {
 
                                 <div class="ns-f-w-group">
                                     <label for="password-c">Mot de Passe actuelle :</label>
-                                    <input id="password-c" class="form-control ns-form-pink" type="password" name="password-c">
+                                    <input id="password-c" class="form-control ns-form-deep-mauve" type="password" name="password-c">
                                 </div>
 
-                                <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">Modifier</button>
+                                <button class="form-control ns-form-deep-mauve w-100 w-md-50 mx-auto mt-4" type="submit">Modifier</button>
 
                             </form>
                         </section>
                     </div>
                 </div>
-                <div class="ns-center pb-5">
-                    <div class="ns-scan-preview-gray">
+                <div class="ns-center pb-5 ns-text-white">
+                    <div class="ns-section-block ns-b-purple-gradient">
                         <section>
-                            <h4>Zone dangereuse</h4>
+                            <h3>Zone dangereuse</h3>
                             <p>Suppression du compte : Une fois ton compte supprimé, tu ne peux pas revenir en arrière !</p>
-                            <button class="ns-form-danger w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
+                            <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
                         </section>
                     </div>
                 </div>`

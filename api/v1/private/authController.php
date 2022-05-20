@@ -4,6 +4,7 @@ function invokeAuth($method, $function, $query)
 {
     if (count($function) === 1) {
         if ($method === "GET" && $function[0] === "logout") _logout();
+        if ($method === "GET" && $function[0] === "verification") _verification($query);
         elseif ($method === "POST") {
             if ($function[0] === "login") _log();
             elseif ($function[0] === "register") _register();
@@ -11,6 +12,21 @@ function invokeAuth($method, $function, $query)
     }
 }
 
+
+function _verification($query) {
+    $token = $query["t"]??null;
+    $user = $query["user"]??null;
+
+    if ($token === null || $user === null) bad_request('invalid query');
+    $req = getDB()->get_pdo()->prepare('SELECT V.token as token, U.email as email, U.username as username FROM '.DB_PREFIX.TABLE_VERIFICATION.' as V JOIN '.DB_PREFIX.TABLE_USER.' U ON U.id = V.user_id WHERE V.user_id=:user_id AND V.id=:id LIMIT 1');
+    $req->execute(['id' => $token, 'user_id' => $user]);
+    $r = $req->fetch(PDO::FETCH_ASSOC);
+    if ($r) {
+        send_verification_mail($r["token"], $user, $r["email"], $r["username"]);
+        success();
+    } else bad_request();
+
+}
 
 function _logout()
 {
@@ -33,6 +49,13 @@ function _log()
     if (!$username || !$pwd || !filter_var($username, FILTER_VALIDATE_EMAIL) || !$user->login($username, $pwd))
         bad_request('E-mail ou mot de passe invalide !');
 
+    if (!$user->is_verified()) {
+        success([
+            "invalid" => "not_verified",
+            "user_id" => $user->getId(),
+            "mail_token" => $user->get_verification_token()
+        ]);
+    }
     success();
 }
 
@@ -93,7 +116,12 @@ function _register()
                 "birthday" => $birthday,
                 "status" => $newsLetter ? STATUS_EMAIL_NEWS_LETTER : STATUS_NOTHING
             ]);
-            success();
+            $user = get_log_user();
+            $user->login($email, $password);
+            success([
+                "user_id" => $user->getId(),
+                "mail_token" => $user->get_verification_token()
+            ]);
         }
     }
     bad_request($errors);

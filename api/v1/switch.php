@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 session_start();
 
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/forum.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/mailer.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
 
 include __DIR__ . '/private/forumController.php';
