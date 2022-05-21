@@ -16,3 +16,8 @@ const TABLE_FORUM_TOPIC = 'FORUM_TOPIC';
 const TABLE_FRIEND = 'FRIEND';
 const TABLE_USER = 'USER';
 const TABLE_VERIFICATION = 'VERIFICATION';
+const TABLE_PICTURE = 'PICTURE';
+const TABLE_PROJECT = 'PROJECT';
+
+const PICTURE_PATH = '/home/nyanscan/picture/';
+const LOGO_ALPHA_PATH = '/home/nyanscan/res/logo-alpha.png';

@@ -3,6 +3,8 @@
 require 'config.php';
 require 'DBAdapter.php';
 require 'User.php';
+require 'Picture.php';
+require 'const.php';
 
 /**
  * @deprecated
@@ -74,4 +76,35 @@ function concatenate_array_by_prefix($array, $prefix) {
         } else $final[$key] = $value;
     }
     return $final;
+}
+
+function download_file_from_post($from_name, $dest_path, $max_size=500000)  {
+    if (empty($_FILES[$from_name])) return -1;
+    if ($_FILES[$from_name]["size"] > $max_size) return  -2;
+
+    $extend = strtolower(pathinfo(basename($_FILES[$from_name]['name']), PATHINFO_EXTENSION));
+    $id = uniqid();
+    $target_file = $dest_path . $id . '.' . $extend;
+    if (move_uploaded_file($_FILES[$from_name]['tmp_name'], $target_file)) {
+        return $target_file;
+    } return -3;
+}
+
+function download_image_from_post($from_name, $type=[], $max_size=500000)  {
+    $d_path = download_file_from_post($from_name, PICTURE_PATH . 'download_tmp/');
+    if (is_numeric($d_path) && intval($d_path) < 0) {
+        return $d_path;
+    }
+    $check = getimagesize($d_path);
+    $format = PICTURE_FORMAT_NONE;
+    switch ($check[2]) {
+        case IMAGETYPE_PNG: $format = PICTURE_FORMAT_PNG; break;
+        case IMAGETYPE_WEBP: $format = PICTURE_FORMAT_WEBP; break;
+        case IMAGETYPE_JPEG: $format = PICTURE_FORMAT_JPG; break;
+        case IMAGETYPE_GIF: $format = PICTURE_FORMAT_GIF; break;
+    }
+    if (!empty($type) && !in_array($format, $type)) $format = PICTURE_FORMAT_NONE;
+    $pic = new Picture();
+    $pic -> create($d_path, $format, true);
+    return $pic;
 }

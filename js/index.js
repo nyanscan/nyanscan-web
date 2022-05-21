@@ -70,8 +70,11 @@ class Header extends Component {
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive"> <!--ns-nav-part -->
                 <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                    <li class="nav-item">
+                    <li class="nav-item me-5">
                         <ns-a  class="ns-a-1" href="/forum">Forum</ns-a>
+                    </li>
+                    <li class="nav-item">
+                        <ns-a  class="ns-a-1" href="/publish">Publier</ns-a>
                     </li>
                 </ul>
                 <form class="justify-content-center form-inline w-75">
@@ -362,6 +365,10 @@ const STRUCTURE = [
                 }
             ]
         }
+    },
+    {
+        re: /^publish$/,
+        rel: "reading/publish"
     }
 ]
 
