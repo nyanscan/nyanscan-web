@@ -276,33 +276,6 @@ class Index extends Pages {
     }
 }
 
-class Error404 extends Pages {
-
-    get raw() {
-        return `
-        <section id="error-404">
-    <div class="ns-f-bg ns-f-bg-err"></div>
-    <div class="container vh-100">
-        <div class="row vh-100">
-            <div id="error" class="ns-theme-bg ns-theme-text rounded-3 my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
-                <div class="ns-center w-100 h-100 flex-row flex-wrap">
-                    <div class="w-100 ns-center py-2"><ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-404"></a></div>
-                    <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
-                    <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
-                    <div class="w-100 ns-center py-2"><p>Retourner à la <ns-aa href="/">page d'accueil</ns-aa></p></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>`
-    }
-
-    constructor(app) {
-        super(app, false, false, false);
-    }
-
-}
-
 const STRUCTURE = [
     {
         re: /^(|index|home)$/,
@@ -331,9 +304,21 @@ const STRUCTURE = [
         }
     },
     {
-        re: /^(user|u|profil|profile)\/([a-zA-Z0-9]+)$/,
-        rel: "user",
-        var: [{id: 2, name: 'user'}]
+        re: /^(user|u|profil|profile)\/([a-zA-Z0-9]+)(\/.*)?$/,
+        var: [{id: 2, name: 'user'}],
+        child: {
+            path_var: [3],
+            elements: [
+                {
+                    re: /^$/,
+                    rel: "user"
+                },
+                {
+                    re: /^(projet|project)$/,
+                    rel: "reading/userProject"
+                }
+            ]
+        }
     },
     {
         re: /^auth(\/.*)?$/,
@@ -368,185 +353,12 @@ const STRUCTURE = [
     },
     {
         re: /^publish$/,
-        rel: "reading/publish"
+        rel: "reading/publish",
+        loginLevel: LOGIN_LEVEL_CONNECT,
     }
 ]
 
-class User {
-    app;
-    isLog;
-    data;
-
-    get profile_picture() {
-        return '/res/profile.webp';
-    }
-
-    constructor(app) {
-        this.app = app;
-        this.isLog = false;
-    }
-
-    log() {
-        sendApiGetRequest('user/me', (function (ev) {
-            if (checkApiResStatus(ev) === API_REP_OK) {
-                this.isLog = true;
-                this.data = getDataAPI(ev);
-                this.app.dispatchEvent(new CustomEvent('log', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                }))
-
-            }
-        }).bind(this))
-    }
-
-    get loginLevel() {
-        return this.isLog ? LOGIN_LEVEL_CONNECT : LOGIN_LEVEL_DISCONNECT;
-    }
-
-    logout(redirectLogin) {
-        sendApiGetRequest('auth/logout', (function (ev) {
-            if (checkApiResStatus(ev) === API_REP_OK) {
-                this.isLog = false;
-                this.data = [];
-                this.app.dispatchEvent(new CustomEvent('logout', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                }))
-                if (redirectLogin) this.app.changePage('/auth/')
-
-            }
-        }).bind(this))
-    }
-}
-
-class App extends EventTarget {
-
-    header;
-    footer;
-    index;
-    actualURL;
-    titleE;
-    caches = [];
-    user;
-    currentPages;
-    session = [];
-
-    constructor() {
-        super()
-        this.header = new Header(this);
-        this.footer = new Footer(this);
-        this.caches["index"] = Index;
-        this.caches["404"] = Error404;
-        this.session = ["start", new Date()]
-
-        this.titleE = _('title', true);
-
-        this.user = new User(this);
-        this.user.log();
-
-        this.actualURL = location.pathname.substring(1);
-        this.loadURL(this.actualURL);
-
-    }
-
-    async load_module(name) {
-        if (this.caches[name] === undefined) {
-            const module = await import(`/pages/${name}.js`);
-            this.caches[name] = module.default;
-        }
-        return this.caches[name];
-    }
-
-    changePage(url) {
-        this.actualURL = url;
-        if (url.startsWith('/')) url = url.substring(1);
-        window.history.pushState("", "", '/' + url);
-        this.loadURL(this.actualURL);
-        // if (url.startsWith('/')) {
-        //     this.actualURL = url;
-        //     this.loadURL(this.actualURL);
-        // } else {
-        //
-        // }
-        //
-    }
-
-    loadURL(url) {
-        if (url.startsWith('/')) url = url.substring(1);
-        // remove .html .js and .php
-        url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
-        let current_url = url;
-        let current = STRUCTURE;
-
-        let finalP = undefined;
-        let finalV = {};
-        let finalLoginLevel = 0;
-
-        big_loop: while (current !== null) {
-            for (let obj of current) {
-                let matches = current_url.match(obj.re);
-                if (matches) {
-                    if (obj.rel) {
-                        finalP = obj.rel;
-                        if (obj.loginLevel !== undefined) finalLoginLevel = obj.loginLevel;
-                        if (obj.var) {
-                            obj.var.forEach(value => {
-                                finalV[value.name] = matches[value.id];
-                            })
-                        }
-                        break big_loop;
-                    } else if (obj.child) {
-                        if (obj.child.path_var) {
-                            current_url = matches[obj.child.path_var];
-                            if (current_url === undefined) current_url = "";
-                            if (current_url.startsWith('/')) current_url = current_url.substring(1);
-                        }
-                        current = obj.child.elements;
-                        continue big_loop;
-                    }
-                }
-            }
-            current = null;
-        }
-        if (finalP === undefined) {
-            this.do404();
-            return;
-        }
-        if (finalLoginLevel) {
-            const currentLevel = this.user.loginLevel;
-            if (finalLoginLevel !== currentLevel) {
-                finalP = 'index';
-                window.history.pushState("", "", '/');
-            }
-        }
-        this.load_module(finalP).then(page => this.loadPage(new page(this), finalV));
-    }
-
-    do404() {
-        this.load_module('404').then(page => this.loadPage(new page(this), []));
-    }
-
-
-    loadPage(page, vars) {
-        const content = document.querySelector("#ns-main");
-        page.build(content, vars);
-        this.setTitle(page.title);
-        this.currentPages = page;
-    }
-
-    setTitle(title) {
-        this.titleE.innerText = title;
-    }
-
-    fatalError() {
-
-    }
-}
-
-export const APP = new App();
+export const APP = new Application(Header, Footer, Index, Error404, STRUCTURE, '');
 window.APP = APP;
 
 

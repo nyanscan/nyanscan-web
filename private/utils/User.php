@@ -157,4 +157,8 @@ class User
         return $this->verification_token;
     }
 
+    public function get_permission_level() : int {
+        return PERMISSION_ADMIN;
+    }
+
 }

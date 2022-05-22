@@ -13,6 +13,7 @@ require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
 include __DIR__ . '/private/forumController.php';
 include __DIR__ . '/private/authController.php';
 include __DIR__ . '/private/userController.php';
+include __DIR__ . '/private/projectController.php';
 
 function my_error_handler()
 {
@@ -62,6 +63,8 @@ switch ($controller) {
     case 'captchaSettings':
         if ($method === 'GET' && count($function) === 0) _get_captcha_settings();
         break;
+    case 'project':
+        invokeProject($method, $function, $query); break;
     default:
         break;
 

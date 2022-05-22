@@ -61,7 +61,7 @@ class Picture
 
     public function create(string $base_patch, string $format, bool $delete_origin = false, ?int $author=null, ?string $title = null) : bool {
         if ($this->isLoad) return false;
-        $this->id = $format . uniqid("", true);
+        $this->id = $format . uniqidReal(23);
         $this->author = $author;
         $this->title =  $title;
         $this->format =  $format;

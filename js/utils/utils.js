@@ -115,6 +115,55 @@ function importTemplate(template, vars) {
     return clone;
 }
 
+class User {
+    app;
+    isLog;
+    data;
+
+    get profile_picture() {
+        return '/res/profile.webp';
+    }
+
+    constructor(app) {
+        this.app = app;
+        this.isLog = false;
+    }
+
+    log() {
+        sendApiGetRequest('user/me', (function (ev) {
+            if (checkApiResStatus(ev) === API_REP_OK) {
+                this.isLog = true;
+                this.data = getDataAPI(ev);
+                this.app.dispatchEvent(new CustomEvent('log', {
+                    cancelable: false,
+                    bubbles: true,
+                    composed: false,
+                }))
+
+            }
+        }).bind(this))
+    }
+
+    get loginLevel() {
+        return this.isLog ? LOGIN_LEVEL_CONNECT : LOGIN_LEVEL_DISCONNECT;
+    }
+
+    logout(redirectLogin) {
+        sendApiGetRequest('auth/logout', (function (ev) {
+            if (checkApiResStatus(ev) === API_REP_OK) {
+                this.isLog = false;
+                this.data = [];
+                this.app.dispatchEvent(new CustomEvent('logout', {
+                    cancelable: false,
+                    bubbles: true,
+                    composed: false,
+                }))
+                if (redirectLogin) this.app.changePage('/auth/')
+
+            }
+        }).bind(this))
+    }
+}
 class Component {
     app;
     type;
@@ -137,7 +186,6 @@ class Component {
     }
 
 }
-
 class Pages extends Component {
 
     app;
@@ -180,7 +228,150 @@ class Pages extends Component {
     }
 
 }
+class Error404 extends Pages {
 
+    get raw() {
+        return `
+        <section id="error-404">
+    <div class="ns-f-bg ns-f-bg-err"></div>
+    <div class="container vh-100">
+        <div class="row vh-100">
+            <div id="error" class="ns-theme-bg ns-theme-text rounded-3 my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
+                <div class="ns-center w-100 h-100 flex-row flex-wrap">
+                    <div class="w-100 ns-center py-2"><ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-404"></a></div>
+                    <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
+                    <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
+                    <div class="w-100 ns-center py-2"><p>Retourner à la <ns-aa href="/">page d'accueil</ns-aa></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>`
+    }
+
+    constructor(app) {
+        super(app, false, false, false);
+    }
+
+}
+class Application extends EventTarget {
+    header;
+    footer;
+    index;
+    actualURL;
+    titleE;
+    caches = [];
+    user;
+    currentPages;
+    session = [];
+    prefix;
+    structure;
+
+    constructor(header, footer, index, err404, structure, prefix='') {
+        super()
+        this.prefix = prefix;
+        this.structure = structure;
+        this.header = new header(this);
+        this.footer = new footer(this);
+        this.caches["index"] = index;
+        this.caches["404"] = err404;
+        this.session = ["start", new Date()]
+
+        this.titleE = _('title', true);
+
+        this.user = new User(this);
+        this.user.log();
+
+        this.actualURL = location.pathname.substring(1 + this.prefix.length);
+        this.loadURL(this.actualURL);
+    }
+
+    async load_module(name) {
+        if (this.caches[name] === undefined) {
+            const module = await import(`/pages/${name}.js`);
+            this.caches[name] = module.default;
+        }
+        return this.caches[name];
+    }
+
+    changePage(url) {
+        this.actualURL = url;
+        if (url.startsWith('/')) url = url.substring(1);
+        window.history.pushState("", "", (this.prefix ? `/${this.prefix}/` : '/') + url);
+        this.loadURL(this.actualURL);
+    }
+
+    loadURL(url) {
+        if (url.startsWith('/')) url = url.substring(1);
+        // remove .html .js and .php
+        url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
+        let current_url = url;
+        let current = this.structure;
+
+        let finalP = undefined;
+        let finalV = {};
+        let finalLoginLevel = 0;
+
+        big_loop: while (current !== null) {
+            for (let obj of current) {
+                let matches = current_url.match(obj.re);
+                if (matches) {
+                    if (obj.var) {
+                        obj.var.forEach(value => {
+                            finalV[value.name] = matches[value.id];
+                        })
+                    }
+                    if (obj.rel) {
+                        finalP = obj.rel;
+                        if (obj.loginLevel !== undefined) finalLoginLevel = obj.loginLevel;
+                        break big_loop;
+                    } else if (obj.child) {
+                        if (obj.child.path_var) {
+                            current_url = matches[obj.child.path_var];
+                            if (current_url === undefined) current_url = "";
+                            if (current_url.startsWith('/')) current_url = current_url.substring(1);
+                        }
+                        current = obj.child.elements;
+                        continue big_loop;
+                    }
+                }
+            }
+            current = null;
+        }
+        if (finalP === undefined) {
+            this.do404();
+            return;
+        }
+        if (finalLoginLevel) {
+            const currentLevel = this.user.loginLevel;
+            if (finalLoginLevel !== currentLevel) {
+                finalP = 'index';
+                window.history.pushState("", "", this.prefix ? `/${this.prefix}/` : '/');
+            }
+        }
+        this.load_module(finalP).then(page => this.loadPage(new page(this), finalV));
+    }
+
+    do404() {
+        this.load_module('404').then(page => this.loadPage(new page(this), []));
+    }
+
+    loadPage(page, vars) {
+        const content = document.querySelector("#ns-main");
+        page.build(content, vars);
+        this.setTitle(page.title);
+        this.currentPages = page;
+    }
+
+    setTitle(title) {
+        this.titleE.innerText = title;
+    }
+
+    fatalError() {
+
+    }
+
+}
 class Captcha extends Component {
 
     block;
@@ -445,3 +636,31 @@ class Captcha extends Component {
 //     else
 //         footer.innerText = message;
 // }
+
+function image_id_to_patch(id) {
+    const format = id.substr(0, 1);
+    const ext = '.' + ({'w': 'webp', 'p': 'png', 'j': 'jpg', 'g': 'gif', 'n': ''}[format]);
+    return `/picture/${id.substr(0, 5)}/${id.substr(5)}${ext}`
+}
+
+function project_status_to_html($status) {
+    switch ($status) {
+        case '0': return '<span class="project-status-wait">Attente de vérification</span>'; break;
+        case '1': return '<span class="project-status-denied">Rejeté</span>'; break;
+        case '2': return '<span class="project-status-accept">Accepté en attente de contenue</span>'; break;
+        case '3': return '<span class="project-status-publish">Publié</span>'; break;
+        default: return '';
+    }
+}
+
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
