@@ -87,30 +87,46 @@ function _fetch_user_projects($userId)
 
 function _admin_fetch_projects()
 {
-    // todo check perm
-    // todo offset and limit
-    success(getDB()->select(TABLE_PROJECT,
-        ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
-        [],
-        0, "date_inserted DESC"));
+    if (!is_moderator()) forbidden();
+
+    $limit = min(200, max(0, intval($query["limit"]??0)));
+    $offset = max(0, intval($query["offset"]??0));
+
+    $order = $query["order"]??null;
+    $order_reverse = isset($query["reverse"]) && !$query["reverse"] == '0';
+
+    $col = ['id', 'author', 'picture', 'title', 'description', 'reading_direction', 'format', 'status', 'date_inserted'];
+
+    $order_v = null;
+    if ($order) {
+        if (in_array($order,$col)) $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
+    }
+
+    $data = [];
+
+
+    $data["element"] = getDB()->select(TABLE_PROJECT, $col, [], $limit, $order_v, $offset);
+    $data["total_count"] = getDB()->count(TABLE_PROJECT, 'id');
+
+    success($data);
 }
 
 function _change_status_project() {
-    // todo permission
+    if (!is_moderator()) forbidden();
     $status = $_POST["status"]??null;
-    $project = $_POST["project"]??null;
+    $projectID = $_POST["project"]??null;
     $reason = $_POST["reason"]??null;
     if ($reason === null) $reason = "";
 
-    if ($status === null || !is_numeric($status) && intval($status) < 0 || $status > PROJECT_STATUS_PUBLISHED) {
+    if (!is_numeric($status) || intval($status) < 0 || $status > PROJECT_STATUS_PUBLISHED) {
         bad_request("wrong status");
     }
 
-    $project = getDB()->select(TABLE_PROJECT, ['id', 'author', 'title'], ["id" => $project], 1);
+    $project = getDB()->select(TABLE_PROJECT, ['id', 'author', 'title'], ["id" => $projectID], 1);
     if (!$project) bad_request("wrong project");
     if (strlen($reason) > 255) bad_request("La raison ne dois pas deepasser les 255 caractéres");
 
-    getDB()->update(TABLE_PROJECT, ["status" => $status], ["id" => $project]);
+    getDB()->update(TABLE_PROJECT, ["status" => $status], ["id" => $projectID]);
 
     // send mail
     $text_status = "";
@@ -121,7 +137,7 @@ function _change_status_project() {
         case PROJECT_STATUS_PUBLISHED: $text_status = "Publié"; break;
     }
 
-    if ($project["user"]) {
+    if ($project["author"]) {
         $user = getDB()->select(TABLE_USER, ['username', 'email'], ['id' => $project["author"]], 1);
         if ($user) send_project_status_change_mail($text_status, $project['title'], $user["email"], $user["username"]);
     }

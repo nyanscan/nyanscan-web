@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+
+
+* {
+    padding: 0;
+    margin: 0;
+    border-collapse: collapse;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --ns-color-violet-blue: #540D6E;
+    --ns-color-purpureus: #9241AF;
+    --ns-color-midnight: #7B1E7A;
+    --ns-color-deep-fushia: #BF61BD;
+    --ns-color-deep-mauve: #DA86D9;
+    --ns-color-paradise-pink: #EE4266;
+    --ns-color-tickle-me-pink: #FF85A1;
+    --ns-color-light-red: #F7CAD0;
+    --ns-color-light-red-rgb: 247, 202, 208;
+    --ns-color-lavender-blush: #FEF1F2;
+    --ns-color-white: #FEFEFE;
+    --ns-color-black: #020202;
+    --ns-color-gray: #C4C4C4;
+    --ns-color-theme-text: #020202;
+    --ns-color-theme-bg: #ffffff;
+}
+
+.ns-dark {
+    --ns-color-theme-text: #FEFEFE;
+    --ns-color-theme-bg: #404141;
+}
+
+ns-a {
+    cursor: pointer;
+    color: cornflowerblue;
+}
+
+ns-a:hover {
+    text-decoration: underline;
+    color: dodgerblue;
+}
+
+.ns-modal-container {
+    height: 100vh;
+    width: 100%;
+    background-color: rgba(50, 50, 50, 0.8);
+    position: fixed;
+    z-index: 1111;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ns-modal-inside-container {
+    padding: 3rem;
+    display: inline-block;
+    background-color: #fefefe;
+    border: 1px solid #888;
+    min-width: 40%;
+}
+
+.ns-modal-close {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.ns-modal-btn-container {
+    width: 100%;
+    display: flex;
+    gap: .5rem;
+}
+
+.ns-modal-btn-container button {
+    padding: .5rem 20px;
+    flex: auto;
+    border: none;
+    cursor: pointer;
+    opacity: 0.9;
+    font-size: 20px;
+}
+
+.ns-modal-btn-container button:hover {
+    opacity: 1;
+}
+
+.project-status-wait {
+    color: var(--bs-warning);
+}
+
+.project-status-denied {
+    color: var(--bs-danger);
+}
+
+.project-status-accept {
+    color: var(--bs-info);
+}
+
+.project-status-publish {
+    color: var(--bs-success);
+}

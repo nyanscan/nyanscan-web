@@ -14,6 +14,7 @@ include __DIR__ . '/private/forumController.php';
 include __DIR__ . '/private/authController.php';
 include __DIR__ . '/private/userController.php';
 include __DIR__ . '/private/projectController.php';
+include __DIR__ . '/private/adminController.php';
 
 function my_error_handler()
 {
@@ -24,6 +25,11 @@ function my_error_handler()
 }
 
 header("Content-Type: application/json");
+
+function is_moderator() : bool{
+    $user = get_log_user();
+    return $user->is_connected() && $user->get_permission_level() >= PERMISSION_MODERATOR;
+}
 
 function bad_method()
 {
@@ -37,6 +43,10 @@ function bad_request($reason = "")
 
 function unauthorized() {
     json_exit(401, "Unauthorized", "Une authentification est nécessaire pour accéder à la ressource.");
+}
+
+function forbidden() {
+    json_exit(403, "Forbidden", "Forbidden");
 }
 
 function success($data = []) {
@@ -65,6 +75,8 @@ switch ($controller) {
         break;
     case 'project':
         invokeProject($method, $function, $query); break;
+    case 'admin':
+        invokeAdmin($method, $function, $query); break;
     default:
         break;
 

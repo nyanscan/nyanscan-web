@@ -2,6 +2,7 @@ const COMPONENT_TYPE_HEADER = 0;
 const COMPONENT_TYPE_FOOTER = 1;
 const COMPONENT_TYPE_PAGE = 2;
 const COMPONENT_TYPE_FLOAT = 3;
+const COMPONENT_TYPE_MODAL = 4;
 
 const API_REP_OK = 1;
 const API_REP_BAD = 0;
@@ -226,7 +227,6 @@ class Pages extends Component {
         } else document.querySelector("footer").innerHTML = '';
         parent.innerHTML = this.getHTML(vars);
     }
-
 }
 class Error404 extends Pages {
 
@@ -266,6 +266,7 @@ class Application extends EventTarget {
     session = [];
     prefix;
     structure;
+    modal;
 
     constructor(header, footer, index, err404, structure, prefix='') {
         super()
@@ -278,12 +279,46 @@ class Application extends EventTarget {
         this.session = ["start", new Date()]
 
         this.titleE = _('title', true);
+        this.modal = _('#ns-modal');
+        try {
+            this.setupModal();
+        } catch (err) {}
 
         this.user = new User(this);
         this.user.log();
 
         this.actualURL = location.pathname.substring(1 + this.prefix.length);
         this.loadURL(this.actualURL);
+    }
+
+    setupModal() {
+        this.modal.display = "none";
+        this.modal.addEventListener("click", ev => {
+            if (ev.target.classList.contains("ns-modal-container")) ev.target.style.display = "none";
+        }, {capture: true});
+        _('#ns-modal-main-close').addEventListener("click", (function (ev) {
+            ev.preventDefault();
+            this.modal.style.display = "none";
+        }).bind(this))
+    }
+
+    openModal(modal) {
+        console.log(modal);
+        if (modal.type !== COMPONENT_TYPE_MODAL) return;
+        const container = _('#ns-modal-container');
+        container.innerHTML = '';
+        modal.build(container);
+        for (let btn of container.querySelectorAll('.ns-modal-cancel-btn')) {
+            btn.addEventListener("click", (function (ev) {
+                ev.preventDefault();
+                this.modal.style.display = "none";
+            }).bind(this))
+        }
+        this.modal.style.display = 'flex';
+    }
+
+    closeModal() {
+        this.modal.style.display = 'none';
     }
 
     async load_module(name) {
