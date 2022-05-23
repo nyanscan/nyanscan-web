@@ -53,30 +53,23 @@ class ModalEditStatus extends Component {
 export default class extends SimpleTablePages {
 
     COLUMN = [
-        {name: 'id', display: 'ID', force: true, default: 'null', isDefault: true, isPrimary: true},
+        {name: 'project', display: 'Projet', force: true, default: 'null', isDefault: true},
+        {name: 'volume', display: 'Tome', force: true, default: 'null', isDefault: true},
         {name: 'author', display: 'Auteur', force: false, default: 'null', isDefault: true, href: ''},
         {name: 'picture', display: 'Vignette', force: false, default: 'null', isDefault: true, href: ''},
         {name: 'title', display: 'Titre', force: false, default: 'null', isDefault: true},
-        {name: 'description', display: 'Description', force: false, default: 'null'},
-        {name: 'reading_direction', display: 'Sens De lecture', force: false, default: '0', needCallback: true},
-        {name: 'format', display: 'Format', force: false, default: '0', needCallback: true},
+        {name: 'data', display: 'Data', force: false, default: 'null', isDefault: true,  isPrimary: true},
         {name: 'status', display: 'Status', force: false, default: '0', needCallback: true,  isDefault: true},
-        {name: 'date_inserted', display: 'Créé le', force: false, default: 'never'}
+        {name: 'date_inserted', display: 'Créé le', force: false, default: 'never', isDefault: true}
     ];
 
     constructor(app) {
         super(app);
-        this.setTable(new AdminTable(app, 'project', this.COLUMN, 'project/all', this.collCallback.bind(this)));
+        this.setTable(new AdminTable(app, 'project', this.COLUMN, 'project/volumes-all', this.collCallback.bind(this)));
     }
 
     collCallback(name, e, value, rowData) {
         switch (name) {
-            case 'reading_direction':
-                e.innerText = value === '1' ? 'japonais' : 'Classqique';
-                break;
-            case 'format':
-                e.innerText = value === '1' ? 'Série' : 'Oneshot';
-                break;
             case 'status':
                 e.innerHTML = project_status_to_html(value);
                 break;
@@ -92,17 +85,16 @@ export default class extends SimpleTablePages {
                     btn.addEventListener('click', this.openChangeStatusModal.bind(this, rowData['id']));
                     create('i', null, btn, 'bi', 'bi-pencil');
                 });
-                createPromise('ns-a', null, group, 'btn', 'btn-success', 'btn-sm').then((btn) => {
-                    btn.ariaLabel = 'View';
-                    btn.setAttribute('data-bs-toggle', 'tooltip');
-                    btn.title = 'Voir les tomes';
-                    btn.href = '/volume/' + rowData['id'];
-                    create('i', null, btn, 'bi', 'bi-eye');
-                });
                 break;
         }
     }
 
+
+    build(parent, vars) {
+        super.build(parent, vars);
+        if (vars["project"])
+            this.admTable.vars = 'project=' + vars["project"];
+    }
 
     openChangeStatusModal(id) {
         this.app.openModal(new ModalEditStatus(this.app, id));

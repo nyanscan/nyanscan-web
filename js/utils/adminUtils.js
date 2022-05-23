@@ -3,6 +3,7 @@ class AdminTable extends Component {
     baseURL;
     colum;
     id;
+    vars = '';
 
     idCol;
 
@@ -21,7 +22,6 @@ class AdminTable extends Component {
     selectAmount;
     columSettings;
     totalAmountSpan;
-
     colCallback;
 
     get raw() {
@@ -223,7 +223,7 @@ class AdminTable extends Component {
     update() {
         let path = this.baseURL + '?';
         // const limit = 50;
-        // if (this.args) path += this.args + '&';
+        if (this.vars) path += this.vars + '&';
         path += 'limit=' + this.amountView;
         path += '&offset=' + (this.amountView * this.page);
         // if (this.search_v) path += '&mac=' + this.search_v;

@@ -763,3 +763,86 @@ body {
     width: 150px;
     height: 150px;
 }
+
+.ns-reading-head {
+    width: 100%;
+    background-color: #ec6a87;
+    background-image: url("/res/baner-alice.jpg");
+    position: relative;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.ns-reading-head h1 {
+    color: black;
+    font-size: 64px;
+    text-shadow: 0 0 5px var(--ns-color-tickle-me-pink) ;
+}
+
+
+.ns-reading-head h2 {
+    color: black;
+    font-size: 48px;
+    text-shadow: 0 0 5px var(--ns-color-tickle-me-pink) ;
+}
+
+.ns-reading-view-contain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 5rem 0 1rem 0;
+}
+
+.ns-reading-progress {
+    width: 50%;
+    height: 5px;
+    background-color: var(--ns-color-theme-invert-bg);
+    display: flex;
+    justify-content: end;
+    border-radius: 25px;
+}
+.classic .ns-reading-progress {
+    justify-content: start;
+}
+
+.ns-reading-progress-in{
+    border-radius: 25px;
+    background: linear-gradient(to right, #c5405d, var(--ns-color-paradise-pink)) !important;
+    transition: all;
+}
+
+#ns-reading-image {
+    margin: 1rem 0;
+    height: max(1000px, 90vh);
+}
+
+.ns-reading-nav {
+    width: 50%;
+    margin: 1rem auto 1rem auto;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.classic .ns-reading-nav {
+    flex-direction: row-reverse;
+}
+
+.ns-reading-nav button {
+    background-color: var(--ns-color-tickle-me-pink);
+    padding: .3rem .8rem;
+    color: #020202;
+    border-radius: 1rem;
+    outline: none;
+    border: none;
+    font-size: 24px;
+}
+
+.ns-reading-nav button:hover {
+    opacity: .8;
+}
+

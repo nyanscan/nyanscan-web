@@ -129,6 +129,7 @@ export default class extends Pages {
         } else if ($repStatus === API_REP_BAD) {
             const err = getAPIErrorReason(event);
             this.errorBlock.innerHTML = '';
+            this.errorBlock.style.display = 'block';
             for (let errElement of err) {
                 createPromise('p', null, this.errorBlock).then(e => e.innerText = errElement);
             }

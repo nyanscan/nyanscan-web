@@ -66,7 +66,8 @@ function json_exit($code, $message, $reason) {
     exit();
 }
 
-function concatenate_array_by_prefix($array, $prefix) {
+function concatenate_array_by_prefix($array, $prefix): array
+{
     $final = [];
     foreach ($array as $key => $value) {
         $split = explode('_', $key, 2);
@@ -78,7 +79,7 @@ function concatenate_array_by_prefix($array, $prefix) {
     return $final;
 }
 
-function download_file_from_post($from_name, $dest_path, $max_size=500000)  {
+function download_file_from_post($from_name, $dest_path, $max_size=5e5)  {
     if (empty($_FILES[$from_name])) return -1;
     if ($_FILES[$from_name]["size"] > $max_size) return  -2;
 
@@ -90,23 +91,76 @@ function download_file_from_post($from_name, $dest_path, $max_size=500000)  {
     } return -3;
 }
 
-function download_image_from_post($from_name, $type=[], $max_size=500000)  {
-    $d_path = download_file_from_post($from_name, PICTURE_PATH . 'download_tmp/');
+function download_image_from_post($from_name, $type=[], $max_size=5e5)  {
+    $d_path = download_file_from_post($from_name, PICTURE_PATH . 'download_tmp/', $max_size);
     if (is_numeric($d_path) && intval($d_path) < 0) {
         return $d_path;
     }
     $check = getimagesize($d_path);
+    if (!$check) return -4;
     $format = PICTURE_FORMAT_NONE;
     switch ($check[2]) {
         case IMAGETYPE_PNG: $format = PICTURE_FORMAT_PNG; break;
         case IMAGETYPE_WEBP: $format = PICTURE_FORMAT_WEBP; break;
         case IMAGETYPE_JPEG: $format = PICTURE_FORMAT_JPG; break;
         case IMAGETYPE_GIF: $format = PICTURE_FORMAT_GIF; break;
+        default: return -4;
     }
     if (!empty($type) && !in_array($format, $type)) $format = PICTURE_FORMAT_NONE;
     $pic = new Picture();
     $pic -> create($d_path, $format, true);
     return $pic;
+}
+
+function download_volume_from_post($from_name, $max_size=5e8) {
+    set_time_limit(1200);
+    $d_path = download_file_from_post($from_name, VOLUME_PATH . 'download_tmp/', $max_size);
+    if (is_numeric($d_path) && intval($d_path) < 0) {
+        return $d_path;
+    }
+    print_r($d_path);
+    $data = [
+        "pages" => []
+    ];
+    $pager_count = 0;
+    try {
+        $document = new Imagick();
+
+        $document->setResolution(40, 40);
+
+        for($i = 0; $i < 200; $i++) {
+
+            $document->readImage($d_path . '[' . $i . ']' );
+            if (!$document->valid()) {
+                if ($i === 0) return -4;
+                break;
+            }
+
+            $uuid = uniqidReal(24);
+            print_r($uuid);
+            $data["pages"][] = $uuid;
+            $dir = substr($uuid,  0,3);
+            if (!file_exists(VOLUME_PATH . $dir)) {
+                mkdir(VOLUME_PATH . $dir, 0775);
+            }
+            $document->setImageCompressionQuality(80);
+            $document->writeImage(VOLUME_PATH . $dir .  '/' . substr($uuid, 3) . '.jpg');
+            $pager_count++;
+        }
+        $document->destroy();
+        return $data;
+    } catch (ImagickException $e) {
+        if ($e->getCode() !== 1) {
+            $data["error"] = true;
+        }
+        print_r($pager_count);
+        print_r($e->getMessage());
+    } finally {
+        unlink($d_path);
+    }
+    $data["count"] =  $pager_count;
+    if (isset($data["error"])) return -4;
+    return $data;
 }
 
 function uniqidReal($lenght = 13) {

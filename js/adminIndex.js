@@ -8,7 +8,20 @@ class Footer extends Component {
 
 class Header extends Component {
     get raw() {
-        return ``;
+        return `
+<header class="sticky-top">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="px-5 d-flex flex-row gap-5 w-100">
+            <n-a class="c-nav-link" aria-current="page" href="/" aria-label="home" title="Home"><i class="bi bi-house"></i></n-a>
+            <n-a class="c-nav-link" href="/project" aria-label="switch" title="Switch"><i class="bi bi-book"></i></n-a>
+            <ns-a class="c-nav-link" href="/volume" aria-label="device" title="Device"><i class="bi bi-file-earmark-break"></i></ns-a>
+            <ns-a class="c-nav-link" href="/image" aria-label="user" title="User"><i class="bi bi-image"></i></ns-a>
+            <ns-a class="c-nav-link" href="/user" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
+          
+        </div>
+    </nav>
+</header>
+        `;
     }
 
     getHTML() {
@@ -37,6 +50,14 @@ class Index extends Pages {
                 <i class="bi bi-book"></i>
                 <ns-api-data field="project">0</ns-api-data>
                 <h3>Projet</h3>
+            </ns-a>
+        </div>
+        <div class="box">
+            <span></span>
+            <ns-a class="content" href="volume">
+                <i class="bi bi-file-earmark-break"></i>
+                <ns-api-data field="volume">0</ns-api-data>
+                <h3>Volumes</h3>
             </ns-a>
         </div>
         <div class="box" style="--color-one: #70ad4c; --color-two: #65d11d">
@@ -77,6 +98,11 @@ const STRUCTURE = [
     {
         re: '^project$',
         rel: "admin/project"
+    },
+    {
+        re: /^volume(?:\/(.*))?$/,
+        var: [{id: 1, name: 'project'}],
+        rel: "admin/volume"
     }
 ]
 

@@ -10,7 +10,9 @@ function invokeProject($method, $function, $query)
         if ($function[0] === 'user' && count($function) === 2)
             _fetch_user_projects($function[1]);
         elseif ($function[0] === 'all') _admin_fetch_projects();
+        elseif ($function[0] === 'volumes-all') _admin_fetch_volume();
         elseif (count($function) === 1) _fetch_project($function[0]);
+        elseif (count($function) === 2) _fetch_volume($function[0], $function[1]);
     } else bad_method();
 }
 
@@ -66,6 +68,7 @@ function _new_project()
             ]);
         }
     }
+    if (count($error) > 0) bad_request($error);
     success();
 }
 
@@ -100,6 +103,36 @@ function _fetch_project($id) {
 
 }
 
+function _fetch_volume($project, $tome) {
+    $req = getDB()->get_pdo()->prepare("SELECT     project,
+    volume,
+    P.author as author,
+    V.picture as volume_picture,
+    P.picture as project_picture,
+    data,
+    P.title as project_title,
+    V.title as volume_title,
+    page_count,
+    P.status as project_status,
+    V.status as volume_status,
+    V.date_inserted as volume_date_inserted,
+    description,
+    reading_direction,
+    format FROM PAE_VOLUME AS V LEFT JOIN PAE_PROJECT P ON V.project = P.id WHERE V.project=:project AND V.volume=:volume LIMIT 1");
+    $req->execute(["project" => $project, "volume" => $tome]);
+    $data = $req->fetch(PDO::FETCH_ASSOC);
+
+    if ($data["project_status"] != PROJECT_STATUS_PUBLISHED || $data["volume_picture"] != PROJECT_STATUS_PUBLISHED){
+        $user = get_log_user();
+        if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $data["author"])) forbidden();
+    }
+
+    $json = file_get_contents(VOLUME_PATH . 'header_data/' . $data["data"] . '.json');
+    $data["data"] = json_decode($json, true);
+
+    success($data);
+}
+
 function _admin_fetch_projects()
 {
     if (!is_moderator()) forbidden();
@@ -116,12 +149,36 @@ function _admin_fetch_projects()
     if ($order) {
         if (in_array($order,$col)) $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
     }
-
     $data = [];
-
 
     $data["element"] = getDB()->select(TABLE_PROJECT, $col, [], $limit, $order_v, $offset);
     $data["total_count"] = getDB()->count(TABLE_PROJECT, 'id');
+
+    success($data);
+}
+
+function _admin_fetch_volume() {
+    if (!is_moderator()) forbidden();
+
+    $limit = min(200, max(0, intval($query["limit"]??0)));
+    $offset = max(0, intval($query["offset"]??0));
+
+    $order = $query["order"]??null;
+    $order_reverse = isset($query["reverse"]) && !$query["reverse"] == '0';
+
+    $project = $query["project"]??"";
+    $where = [];
+    if ($project) $where["project"] = $project;
+
+    $col = ['project', 'volume', 'picture', 'data', 'author', 'title', 'page_count', 'status', 'date_inserted'];
+    $order_v = null;
+    if ($order) {
+        if (in_array($order,$col)) $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
+    }
+
+    $data = [];
+    $data["element"] = getDB()->select(TABLE_VOLUME, $col, $where, $limit, $order_v, $offset);
+    $data["total_count"] = getDB()->count(TABLE_VOLUME, 'data', $where);
 
     success($data);
 }
@@ -163,8 +220,95 @@ function _new_volume() {
     $user = get_log_user();
     if (!$user->is_connected()) unauthorized();
 
+    print_r($_POST);
+    print_r($_FILES);
+
     $title = $_POST["title"] ?? null;
     $volume = $_POST["volume"] ?? null;
     $project = $_POST["project"] ?? null;
+//    $page_count = $_POST["page_count"] ?? null;
+
+    $error = [];
+
+    if ($title === null || strlen($title) < 1 || strlen($title) > 100) $error[] = "Titre invalide !";
+    if (!is_numeric($volume) || $volume < 0) $error[] = "Le volume n'est pas valide";
+//    if (!is_numeric($page_count) || $page_count < 0) $error[] = "Le nombre de page n'est pas valide";
+    if (!isset($_FILES["picture"])) $error[] = "Une vignnette est requise";
+    if (!isset($_FILES["pdf"])) $error[] = "Un fichier pdf est requis";
+
+    $data_project = (!isset($volume) || !is_numeric($volume)) ? null : getDB()->select(TABLE_PROJECT, ['id', 'author', 'status'], ['id' => $project], 1);
+
+    if (!$data_project) $error[] = "Le project est invalide";
+
+    if (count($error) === 0) {
+        if ($user->get_permission_level() < PERMISSION_MODERATOR && ['author'] != $user->getId()) unauthorized();
+        if ($data_project["status"] != PROJECT_STATUS_ACCEPTED_NO_CONTENT  && $data_project["status"] != PROJECT_STATUS_PUBLISHED) $error[] = "Le project n'est pas validé";
+        if (getDB()->select(TABLE_VOLUME, ['project'], ['project' => $data_project['id'], 'volume' => $volume], 1)) $error[] = "Ce volume existe dèja";
+    }
+    if (count($error) > 0) bad_request($error);
+    $doc = [];
+    $img = download_image_from_post("picture", [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 500_000);
+    if (is_numeric($img)) {
+        switch ($img) {
+            case -1:
+                $error[] = "Pas de vignette";
+                break;
+            case -2:
+                $error[] = "Vignette trop lourde max 500Ko";
+                break;
+            case -3:
+                json_exit(500, "Uploading error", "unknown");
+                break;
+            default:
+                $error[] = "Format Vignette invalide";
+        }
+    } else {
+        $img->resize(180, 240);
+        $img->set_author($user->getId());
+        $img->set_title("Image pour le volume " . substr($title, 0, 24) . '...');
+        $img->add_logo();
+
+        $doc = download_volume_from_post('pdf');
+        if (is_numeric($doc)) {
+            switch ($doc) {
+                case -1:
+                    $error[] = "Pas de pdf";
+                    break;
+                case -2:
+                    $error[] = "pdf trop lourde max 500Mo";
+                    break;
+                case -3:
+                    json_exit(500, "Uploading error", "unknown");
+                    break;
+                default:
+                    $error[] = "Fichier pdf invalide";
+            }
+        } else {
+            $img->save();
+        }
+    }
+
+    if (count($error) > 0) bad_request($error);
+
+    $data_uuid = uniqidReal(24);
+
+    $json = json_encode($doc);
+
+    if (!file_put_contents(VOLUME_PATH . 'header_data/' . $data_uuid . '.json' , $json)) json_error(500, "save_data_error", "unknown");
+
+    $v_data = [
+        "project" => $project,
+        "volume" => $volume,
+        "picture" => $img->get_id(),
+        "data" => $data_uuid,
+        "author" => $user->getId(),
+        "title" => $title,
+        "page_count" => $doc["count"],
+        "status" => PROJECT_STATUS_WAIT_VERIFICATION
+    ];
+
+    getDB()->insert(TABLE_VOLUME, $v_data);
+    success();
+
 
 }

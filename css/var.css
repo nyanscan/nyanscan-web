@@ -25,11 +25,15 @@
     --ns-color-gray: #C4C4C4;
     --ns-color-theme-text: #020202;
     --ns-color-theme-bg: #ffffff;
+    --ns-color-theme-inverttext: #FEFEFE;
+    --ns-color-theme-invert-bg: #404141;
 }
 
 .ns-dark {
     --ns-color-theme-text: #FEFEFE;
     --ns-color-theme-bg: #404141;
+    --ns-color-theme-inverttext: #020202;
+    --ns-color-theme-invert-bg: #ffffff;
 }
 
 ns-a {

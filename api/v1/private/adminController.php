@@ -12,7 +12,8 @@ function _admin_stats() {
     success([
         "project" => getDB()->count(TABLE_PROJECT, "id"),
         "picture" => getDB()->count(TABLE_PICTURE, "id"),
-        "user" => getDB()->count(TABLE_USER, "id")
+        "user" => getDB()->count(TABLE_USER, "id"),
+        "volume" => getDB()->count(TABLE_VOLUME, "data")
     ]);
 
 }

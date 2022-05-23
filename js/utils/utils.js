@@ -13,7 +13,7 @@ const LOGIN_LEVEL_CONNECT = 1;
 
 
 function _(query, mono=false) {
-    if (query.startsWith('#')) mono = true;
+    if (query.startsWith('#') && !query.includes(' ')) mono = true;
     if (mono) return document.querySelector(query);
     return document.querySelectorAll(query);
 }

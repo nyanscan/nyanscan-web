@@ -369,6 +369,11 @@ const STRUCTURE = [
                 {
                     re: /^(edit)$/,
                     rel: 'reading/addChapter'
+                },
+                {
+                    re: /^([0-9]+)(?:\/([0-9]+))?$/,
+                    rel: 'reading/reader',
+                    var: [{id: 1, name: 'volume'}, {id: 2, name: 'page'}]
                 }
             ]
         }
