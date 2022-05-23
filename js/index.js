@@ -355,6 +355,23 @@ const STRUCTURE = [
         re: /^publish$/,
         rel: "reading/publish",
         loginLevel: LOGIN_LEVEL_CONNECT,
+    },
+    {
+        re: /^p\/([0-9]+)(?:\/(.*))?$/,
+        var: [{id: 1, name: 'project'}],
+        child: {
+            path_var: [2],
+            elements: [
+                {
+                    re: /^(|view)$/,
+                    rel: 'reading/project'
+                },
+                {
+                    re: /^(edit)$/,
+                    rel: 'reading/addChapter'
+                }
+            ]
+        }
     }
 ]
 

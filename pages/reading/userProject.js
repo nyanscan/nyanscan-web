@@ -14,7 +14,7 @@ export default class extends Pages {
             html += `
     <div>
         <span>Status: ${project_status_to_html(project.status)}</span>
-        <ns-a>Edit</ns-a>
+        <ns-a href="/p/${project["id"]}/edit">Edit</ns-a>
     </div>
             `;
         }
@@ -65,7 +65,5 @@ export default class extends Pages {
                 })
             }
         } else this.app.changePage('/');
-
     }
-
 }

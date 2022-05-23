@@ -5,10 +5,12 @@ function invokeProject($method, $function, $query)
     if ($method === "POST") {
         if ($function[0] === 'create') _new_project();
         if ($function[0] === 'validation') _change_status_project();
+        if ($function[0] === 'volume') _new_volume();
     } elseif ($method === "GET") {
         if ($function[0] === 'user' && count($function) === 2)
             _fetch_user_projects($function[1]);
         elseif ($function[0] === 'all') _admin_fetch_projects();
+        elseif (count($function) === 1) _fetch_project($function[0]);
     } else bad_method();
 }
 
@@ -85,6 +87,19 @@ function _fetch_user_projects($userId)
     }
 }
 
+function _fetch_project($id) {
+    $project = getDB()->select(TABLE_PROJECT, ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
+        ["id" => $id], 1);
+
+    if ($project["status"] != PROJECT_STATUS_PUBLISHED) {
+        $user = get_log_user();
+        if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $project["author"])) forbidden();
+    }
+
+    success($project);
+
+}
+
 function _admin_fetch_projects()
 {
     if (!is_moderator()) forbidden();
@@ -142,4 +157,14 @@ function _change_status_project() {
         if ($user) send_project_status_change_mail($text_status, $project['title'], $user["email"], $user["username"]);
     }
     success();
+}
+
+function _new_volume() {
+    $user = get_log_user();
+    if (!$user->is_connected()) unauthorized();
+
+    $title = $_POST["title"] ?? null;
+    $volume = $_POST["volume"] ?? null;
+    $project = $_POST["project"] ?? null;
+
 }
