@@ -5,7 +5,7 @@ export default class extends Pages {
     getBookTemplate(project) {
         let html = `  
 <div>
-    <img src="${image_id_to_patch(project["picture"])}" alt="${project["title"]}">
+    <ns-a href="/p/${project["id"]}"><img src="${image_id_to_patch(project["picture"])}" alt="${project["title"]}"></ns-a> 
     <div>  
         <span>${ escapeHtml(project["title"])}</span>
     </div>         

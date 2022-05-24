@@ -53,7 +53,7 @@ function _new_project()
                     break;
             }
         } else {
-            $img->resize(180, 240);
+            $img->resize(444, 630);
             $img->set_author($user->getId());
             $img->set_title("Image pour le projet " . substr($title, 0, 24) . '...');
             $img->add_logo();
@@ -285,7 +285,7 @@ function _new_volume() {
                 $error[] = "Format Vignette invalide";
         }
     } else {
-        $img->resize(180, 240);
+        $img->resize(444, 630);
         $img->set_author($user->getId());
         $img->set_title("Image pour le volume " . substr($title, 0, 24) . '...');
         $img->add_logo();

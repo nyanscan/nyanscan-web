@@ -151,7 +151,7 @@ class Picture
         }
 
         $thumb=imagecreatetruecolor($n_width,$n_height);
-        imagecopyresized($thumb,$this->resource, 0,0,0,0,$new_width,$new_height,$width,$height);
+        imagecopyresampled($thumb,$this->resource, 0,0,0,0,$new_width,$new_height,$width,$height);
         imagedestroy($this->resource);
         $this->resource = $thumb;
         return true;
