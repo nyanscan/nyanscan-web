@@ -34,7 +34,7 @@ class User
             ]);
         } else {
             $this->fetch_data( is_numeric($user)? ["id"=>$user] : ["username" => $user]);
-            if($this->is_log && !(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) &&
+            if($this->is_log && $this->token !== null && !(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) &&
                 $this->id == $_SESSION["account-id"] && $this->token === $_SESSION["token"]) {
                 $this->is_current_user = true;
                 if (User::$current_user === null) User::$current_user = $this;
@@ -48,13 +48,13 @@ class User
         if ($raw) {
             $this->is_log = true;
             $this->id = $raw["id"];
-            $this->token =$raw["token"];
+            $this->token =$raw["token"]??null;
             $this->username = $raw["username"];
             $this->email = $raw["email"];
             $this->birthday = $raw["birthday"];
             $this->status = $raw["status"];
             $this->join = $raw["date_inserted"];
-            $this->last_sean = $raw["date_updated"];
+            $this->last_sean = $raw["date_updated"]??$this->join;
         }
     }
 
@@ -68,12 +68,12 @@ class User
 
         $this->id = $raw['id'];
 
-        $this->token =$raw["token"];
+        $this->token =$raw["token"]??null;
         $this->username = $raw["username"];
         $this->birthday = $raw["birthday"];
         $this->status = $raw["status"];
         $this->join = $raw["date_inserted"];
-        $this->last_sean = $raw["date_updated"];
+        $this->last_sean = $raw["date_updated"]??$this->join;
         $this->email = $email;
 
         if ($this->is_verified()) {

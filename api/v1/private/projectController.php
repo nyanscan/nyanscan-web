@@ -11,6 +11,7 @@ function invokeProject($method, $function, $query)
             _fetch_user_projects($function[1]);
         elseif ($function[0] === 'all') _admin_fetch_projects();
         elseif ($function[0] === 'volumes-all') _admin_fetch_volume();
+        elseif (count($function) === 2 && $function[1] === 'volumes') _fetch_project_with_volumes($function[0]);
         elseif (count($function) === 1) _fetch_project($function[0]);
         elseif (count($function) === 2) _fetch_volume($function[0], $function[1]);
     } else bad_method();
@@ -93,6 +94,7 @@ function _fetch_user_projects($userId)
 function _fetch_project($id) {
     $project = getDB()->select(TABLE_PROJECT, ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
         ["id" => $id], 1);
+    if (!$project) bad_method();
 
     if ($project["status"] != PROJECT_STATUS_PUBLISHED) {
         $user = get_log_user();
@@ -101,6 +103,26 @@ function _fetch_project($id) {
 
     success($project);
 
+}
+
+function _fetch_project_with_volumes($id) {
+    $project = getDB()->select(TABLE_PROJECT, ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
+        ["id" => $id], 1);
+    if (!$project) bad_method();
+
+
+    $where = ["project" => $id];
+    if ($project["status"] != PROJECT_STATUS_PUBLISHED) {
+        $user = get_log_user();
+        if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $project["author"])) forbidden();
+    } else {
+//        $where["status"] = PROJECT_STATUS_PUBLISHED;
+    }
+
+    $volumes = getDB()->select(TABLE_VOLUME, ['volume', 'picture', 'title', 'page_count', 'status'], $where);
+    $project["volumes"] = $volumes;
+
+    success($project);
 }
 
 function _fetch_volume($project, $tome) {
@@ -205,7 +227,7 @@ function _change_status_project() {
     switch ($status) {
         case PROJECT_STATUS_WAIT_VERIFICATION: $text_status = "Attente de vérification"; break;
         case PROJECT_STATUS_REJECT: $text_status = "Rejeté"; break;
-        case PROJECT_STATUS_ACCEPTED_NO_CONTENT: $text_status = "Accepté en attente de contenu"; break;
+        case PROJECT_STATUS_ACCEPTED_NO_CONTENT: $text_status = "Accepté en attente de contenue"; break;
         case PROJECT_STATUS_PUBLISHED: $text_status = "Publié"; break;
     }
 
