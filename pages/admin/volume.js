@@ -12,7 +12,7 @@ class ModalEditStatus extends Component {
         <select id="nsa-mdoal-ps" name="status" class="form-select">
             <option value="0">Attente de vérification</option>   
             <option value="1" >Rejeté</option>   
-            <option value="2" selected>Accepté en attente de contenue</option>   
+            <option value="2" selected>Accepté en attente de contenu</option>   
             <option value="3">Publié</option>   
         </select>     
     </div>

@@ -53,7 +53,7 @@ class AdminTable extends Component {
                 <tr id="${this.id}-admin-thead">
                 </tr>
             </thead>
-            <tbody id="${this.id}-admin-tbody">
+            <tbody id="${this.id}-admin-tbody" class="ns-monospaced">
 
             </tbody>
         </table>

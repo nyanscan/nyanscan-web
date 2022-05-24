@@ -7,6 +7,7 @@ export default class extends Pages {
     maxPage = 1;
     pages = [];
     view;
+    haveStickyHeader = false;
 
     progress;
 
@@ -19,9 +20,9 @@ export default class extends Pages {
         <h2><ns-api-data field="volume_title"></ns-api-data><</h2>
     </div>
     <div  class="ns-reading-view-contain">
-        <div class="ns-reading-progress"><span class="ns-reading-progress-in"></span></div>
+        <div class="ns-reading-progress"><span class="ns-reading-progress-hover">10</span> <span class="ns-reading-progress-in"></span></div>
         <img id="ns-reading-image" src="">
-        <div class="ns-reading-progress"><span class="ns-reading-progress-in"></span></div>
+        <div class="ns-reading-progress"><span class="ns-reading-progress-hover">10</span> <span class="ns-reading-progress-in"></span></div>
         <div class="ns-reading-nav">
             <button id="ns-reading-next">Suivant</button>
             <button id="ns-reading-previous">Précédent</button>
@@ -44,6 +45,40 @@ export default class extends Pages {
         this.view = _('#ns-reading-image');
         _('#ns-reading-next').addEventListener('click', this.changePage.bind(this, true));
         _('#ns-reading-previous').addEventListener('click', this.changePage.bind(this, false));
+        this.bindKeyListener = this.keyListener.bind(this);
+        document.addEventListener('keydown',  this.bindKeyListener);
+        for (let pr of _('.ns-reading-progress')) {
+            pr.addEventListener('mousemove', this.progressHover.bind(this, pr));
+            pr.addEventListener('click', this.progressHoverClick.bind(this, pr));
+        }
+    }
+
+    progressHover(pr, event) {
+        if (event.pageX >= pr.offsetLeft && event.pageX <=pr.offsetLeft + pr.offsetWidth) {
+            const x = this.directionJP ? pr.offsetWidth - (event.pageX - pr.offsetLeft) : (event.pageX - pr.offsetLeft);
+            const p = Math.ceil(x / pr.offsetWidth * this.maxPage);
+            const tool = pr.querySelector('.ns-reading-progress-hover');
+            tool.innerText = p;
+            tool.style.left = `${(event.pageX - pr.offsetLeft) - 20}px`;
+        }
+    }
+
+    progressHoverClick(pr, event) {
+        const x = this.directionJP ? pr.offsetWidth - (event.pageX - pr.offsetLeft) : (event.pageX - pr.offsetLeft);
+        const p = Math.ceil(x / pr.offsetWidth * this.maxPage) - 1;
+        if (p !== this.page) {
+            this.page = p;
+            this.update();
+        }
+    }
+
+    keyListener(event) {
+        if(event.keyCode === 37) {
+            this.changePage(this.directionJP);
+        }
+        else if(event.keyCode === 39) {
+            this.changePage(!this.directionJP);
+        }
     }
 
     setup() {
@@ -51,7 +86,8 @@ export default class extends Pages {
             this.app.do404();
         }
         else  {
-            if (this.data.rawData['reading_direction'] === '2') _('.ns-reading-view-contain').forEach(value => value.classList.add('classic'));
+            this.directionJP = this.data.rawData['reading_direction'] === '1';
+            if (!this.directionJP) _('.ns-reading-view-contain').forEach(value => value.classList.add('classic'));
             this.maxPage = this.data.rawData["page_count"];
             this.pages = this.data.rawData["data"]["pages"];
             this.page = Math.min(this.maxPage, this.page);
@@ -84,6 +120,11 @@ export default class extends Pages {
         this.view.src = `volume/${currentIMG.substr(0, 3)}/${currentIMG.substr(3)}.jpg`
 
         window.history.pushState("", "",  `${(this.app.prefix ? `/${this.app.prefix}/` : '/')}p/${this.project}/${this.volume}/${this.page}`);
+    }
+
+    destroy() {
+        super.destroy();
+        document.removeEventListener('keydown',  this.bindKeyListener);
     }
 
     constructor(app) {

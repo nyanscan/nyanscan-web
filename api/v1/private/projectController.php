@@ -205,7 +205,7 @@ function _change_status_project() {
     switch ($status) {
         case PROJECT_STATUS_WAIT_VERIFICATION: $text_status = "Attente de vérification"; break;
         case PROJECT_STATUS_REJECT: $text_status = "Rejeté"; break;
-        case PROJECT_STATUS_ACCEPTED_NO_CONTENT: $text_status = "Accepté en attente de contenue"; break;
+        case PROJECT_STATUS_ACCEPTED_NO_CONTENT: $text_status = "Accepté en attente de contenu"; break;
         case PROJECT_STATUS_PUBLISHED: $text_status = "Publié"; break;
     }
 

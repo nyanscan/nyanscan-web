@@ -1,5 +1,7 @@
 export default class extends Pages {
 
+    title = 'Créer un projet | NyanScan'
+
     publishForm;
     previewCanvas;
     previewCTX;

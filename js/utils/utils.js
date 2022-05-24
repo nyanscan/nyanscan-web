@@ -186,6 +186,10 @@ class Component {
         parent.innerHTML = this.getHTML();
     }
 
+    destroy() {
+
+    }
+
 }
 class Pages extends Component {
 
@@ -255,6 +259,7 @@ class Error404 extends Pages {
 
 }
 class Application extends EventTarget {
+    haveSticky = true;
     header;
     footer;
     index;
@@ -303,7 +308,6 @@ class Application extends EventTarget {
     }
 
     openModal(modal) {
-        console.log(modal);
         if (modal.type !== COMPONENT_TYPE_MODAL) return;
         const container = _('#ns-modal-container');
         container.innerHTML = '';
@@ -392,10 +396,22 @@ class Application extends EventTarget {
     }
 
     loadPage(page, vars) {
+        if (this.currentPages) this.currentPages.destroy();
         const content = document.querySelector("#ns-main");
         page.build(content, vars);
         this.setTitle(page.title);
+        this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader );
         this.currentPages = page;
+    }
+
+    setHeaderSticky(value) {
+        const header = _('header', true);
+        const haveStick = header.classList.contains('sticky-top');
+        if (value ^ haveStick) {
+            if (value) header.classList.add('sticky-top');
+            else header.classList.remove('sticky-top');
+        }
+
     }
 
     setTitle(title) {
@@ -682,7 +698,7 @@ function project_status_to_html($status) {
     switch ($status) {
         case '0': return '<span class="project-status-wait">Attente de vérification</span>'; break;
         case '1': return '<span class="project-status-denied">Rejeté</span>'; break;
-        case '2': return '<span class="project-status-accept">Accepté en attente de contenue</span>'; break;
+        case '2': return '<span class="project-status-accept">Accepté en attente de contenu</span>'; break;
         case '3': return '<span class="project-status-publish">Publié</span>'; break;
         default: return '';
     }

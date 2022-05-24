@@ -799,14 +799,45 @@ body {
 
 .ns-reading-progress {
     width: 50%;
-    height: 5px;
+    height: 8px;
     background-color: var(--ns-color-theme-invert-bg);
     display: flex;
     justify-content: end;
     border-radius: 25px;
+    position: relative;
+    cursor: pointer;
 }
 .classic .ns-reading-progress {
     justify-content: start;
+}
+
+.ns-reading-progress:hover .ns-reading-progress-hover {
+    visibility: visible;
+}
+
+.ns-reading-progress-hover {
+    position: absolute;
+    visibility: hidden;
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    background-color: var(--ns-color-deep-fushia);
+    color: var(--ns-color-white);
+    border-radius: .5rem;
+    align-items: center;
+    justify-content: center;
+    bottom: calc(100% + 5px);
+}
+
+.ns-reading-progress-hover::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--ns-color-deep-fushia) transparent transparent transparent;
 }
 
 .ns-reading-progress-in{

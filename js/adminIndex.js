@@ -12,8 +12,8 @@ class Header extends Component {
 <header class="sticky-top">
     <nav class="navbar navbar-dark bg-dark">
         <div class="px-5 d-flex flex-row gap-5 w-100">
-            <n-a class="c-nav-link" aria-current="page" href="/" aria-label="home" title="Home"><i class="bi bi-house"></i></n-a>
-            <n-a class="c-nav-link" href="/project" aria-label="switch" title="Switch"><i class="bi bi-book"></i></n-a>
+            <ns-a class="c-nav-link" aria-current="page" href="/" aria-label="home" title="Home"><i class="bi bi-house"></i></ns-a>
+            <ns-a class="c-nav-link" href="/project" aria-label="switch" title="Switch"><i class="bi bi-book"></i></ns-a>
             <ns-a class="c-nav-link" href="/volume" aria-label="device" title="Device"><i class="bi bi-file-earmark-break"></i></ns-a>
             <ns-a class="c-nav-link" href="/image" aria-label="user" title="User"><i class="bi bi-image"></i></ns-a>
             <ns-a class="c-nav-link" href="/user" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
