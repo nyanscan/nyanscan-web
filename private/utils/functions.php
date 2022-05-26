@@ -91,7 +91,7 @@ function download_file_from_post($from_name, $dest_path, $max_size=5e5)  {
     } return -3;
 }
 
-function download_image_from_post($from_name, $type=[], $max_size=5e5)  {
+function download_image_from_post($from_name, $type=[], $max_size=1e6)  {
     $d_path = download_file_from_post($from_name, PICTURE_PATH . 'download_tmp/', $max_size);
     if (is_numeric($d_path) && intval($d_path) < 0) {
         return $d_path;
@@ -173,4 +173,10 @@ function uniqidReal($lenght = 13) {
         throw new Exception("no cryptographically secure random function available");
     }
     return substr(bin2hex($bytes), 0, $lenght);
+}
+
+function is_dir_empty($dir): ?bool
+{
+    if (!is_readable($dir)) return null;
+    return (count(scandir($dir)) == 2);
 }

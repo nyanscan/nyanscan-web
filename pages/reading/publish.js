@@ -64,7 +64,7 @@ export default class extends Pages {
                 <div class="form-text">Synopsis de l'oeuvre et/ou informations la concernant. (max 2000 char)</div>
             </div>
         </div>
-        <div>
+        <div>       
             <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit"> Valider </button>
         </div>
     </form>
@@ -95,11 +95,11 @@ export default class extends Pages {
     }
 
     imagePreviewChange(event) {
-        console.log(event);
         if(this.pictureInput.files) {
             const file = this.pictureInput.files[0];
             if (file.type === 'image/png' || file.type === 'image/jpeg') {
-                if (file.size <= 500_000) {
+                console.log(file.size);
+                if (file.size <= 1e6) {
                     window.URL = window.URL || window.webkitURL;
                     this.pictureURL = window.URL.createObjectURL(file);
                     this.previewImage.src = this.pictureURL;

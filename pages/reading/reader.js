@@ -128,9 +128,11 @@ export default class extends Pages {
 
     keyListener(event) {
         if(event.keyCode === 37) {
+            event.preventDefault();
             this.changePage(this.directionJP);
         }
         else if(event.keyCode === 39) {
+            event.preventDefault();
             this.changePage(!this.directionJP);
         }
     }

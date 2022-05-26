@@ -32,7 +32,6 @@ class ModalEditStatus extends Component {
     build(parent) {
         super.build(parent);
         _('#nsa-modal-pform').addEventListener('submit', this.sendRequest.bind(this));
-
     }
 
     constructor(app, id) {
@@ -48,6 +47,52 @@ class ModalEditStatus extends Component {
             loadingScreen(false);
         })
     }
+}
+
+class ModalDeleteVolume extends Component {
+
+    project;
+    volume;
+    send = false;
+
+    get raw() {
+        return `
+<form id="nsa-modal-pform">
+    <h3>Suprimer le tome n° ${this.volume} du project ${this.project} ? </h3>
+    <div class="alert alert-danger">
+       ATTENTION suprimer un volume entraine la supression de tous les fichiers des pages du volume !!!
+    </div>
+    <div class="fpp-modal-btn-container">
+        <button type="button" class="ns-modal-cancel-btn bg-secondary"> Annuler </button>
+        <button id="nsa-modal-vdelete" type="button" class="bg-danger"> Supprimer </button>
+    </div>
+</form>`;
+    }
+
+    build(parent) {
+        super.build(parent);
+        _('#nsa-modal-vdelete').addEventListener('click', this.sendRequest.bind(this));
+    }
+
+    constructor(app, project, volume) {
+        super(app, COMPONENT_TYPE_MODAL);
+        this.project = project;
+        this.volume = volume;
+    }
+
+    sendRequest(event) {
+        event.preventDefault();
+        // security double send
+        if (this.send) return;
+        this.send = true;
+        loadingScreen(true);
+        this.app.closeModal();
+        sendApiDeleteRequest(`project/${this.project}/${this.volume}`, (e) => {
+            loadingScreen(false);
+            //todo toast
+        })
+    }
+
 }
 
 export default class extends SimpleTablePages {
@@ -85,6 +130,14 @@ export default class extends SimpleTablePages {
                     btn.addEventListener('click', this.openChangeStatusModal.bind(this, rowData['id']));
                     create('i', null, btn, 'bi', 'bi-pencil');
                 });
+                createPromise('button', null, group, 'btn', 'btn-danger', 'btn-sm').then((btn) => {
+                    btn.ariaLabel = 'Delete';
+                    btn.setAttribute('data-bs-toggle', 'tooltip');
+                    btn.title = 'Suprimer le volume';
+                    btn.type = "button";
+                    btn.addEventListener('click', this.openDeleteModal.bind(this, rowData['project'], rowData["volume"]));
+                    create('i', null, btn, 'bi', 'bi-trash');
+                });
                 break;
         }
     }
@@ -98,6 +151,10 @@ export default class extends SimpleTablePages {
 
     openChangeStatusModal(id) {
         this.app.openModal(new ModalEditStatus(this.app, id));
+    }
+
+    openDeleteModal(project, id) {
+        this.app.openModal(new ModalDeleteVolume(this.app, project, id));
     }
 
 }

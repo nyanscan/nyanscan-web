@@ -31,6 +31,11 @@ function is_moderator() : bool{
     return $user->is_connected() && $user->get_permission_level() >= PERMISSION_MODERATOR;
 }
 
+function is_admin() : bool {
+    $user = get_log_user();
+    return $user->is_connected() && $user->get_permission_level() >= PERMISSION_ADMIN;
+}
+
 function bad_method()
 {
     json_exit(405, "Method Not Allowed", "Only accept POST");
@@ -79,7 +84,6 @@ switch ($controller) {
         invokeAdmin($method, $function, $query); break;
     default:
         break;
-
 }
 
 
@@ -93,11 +97,5 @@ function _get_captcha_settings() {
     ]);
 }
 
-//print_r($uri);
-//print_r($method);
-//print_r($function);
-//print_r($query);
-
-//default 404 error
 header("HTTP/1.1 404 Not Found");
 exit();

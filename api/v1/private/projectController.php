@@ -14,6 +14,8 @@ function invokeProject($method, $function, $query)
         elseif (count($function) === 2 && $function[1] === 'volumes') _fetch_project_with_volumes($function[0]);
         elseif (count($function) === 1) _fetch_project($function[0]);
         elseif (count($function) === 2) _fetch_volume($function[0], $function[1]);
+    } elseif ($method === "DELETE") {
+        if (count($function) === 2) _delete_volume($function[0], $function[1]);
     } else bad_method();
 }
 
@@ -39,7 +41,7 @@ function _new_project()
     if ($description === null || strlen($title) < 1 || strlen($title) > 2000) $error[] = "Description trop longue (2000) ou inexistante !";
 
     if (empty($error)) {
-        $img = download_image_from_post("picture", [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 500_000);
+        $img = download_image_from_post("picture", [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 1e6);
         if (is_numeric($img)) {
             switch ($img) {
                 case -1:
@@ -238,6 +240,30 @@ function _change_status_project() {
     success();
 }
 
+function _delete_volume($project, $tome) {
+    if (!is_admin()) unauthorized();
+
+    $volume = getDB()->select(TABLE_VOLUME, ["data"], ["project" => $project, "volume" => $tome], 1);
+    if ($volume) {
+
+        getDB()->delete(TABLE_VOLUME, ["project" => $project, "volume" => $tome]);
+        $json = file_get_contents(VOLUME_PATH . 'header_data/' . $volume["data"] . '.json');
+        $data = json_decode($json, true);
+
+        foreach ($data["pages"] as $page) {
+            $dir = VOLUME_PATH . substr($page, 0, 3);
+            $files =  '/' . $dir . substr($page, 3) . '.jpg';
+            if (file_exists($files)) {
+                unlink($files);
+            }
+            if (file_exists($dir) && is_dir_empty($dir)) {
+                rmdir($dir);
+            }
+        }
+        success();
+    } else bad_request("no volume " . $volume . " for project " . $project);
+}
+
 function _new_volume() {
     $user = get_log_user();
     if (!$user->is_connected()) unauthorized();
@@ -269,7 +295,7 @@ function _new_volume() {
     }
     if (count($error) > 0) bad_request($error);
     $doc = [];
-    $img = download_image_from_post("picture", [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 500_000);
+    $img = download_image_from_post("picture", [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 1e6);
     if (is_numeric($img)) {
         switch ($img) {
             case -1:

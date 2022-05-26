@@ -37,23 +37,20 @@ function createPromise(type, id = null, parent = null, ...cla) {
 }
 
 function sendApiPostRequest(url, formData, callBack = null) {
-
-    const ajax = new XMLHttpRequest()
-    ajax.open("POST", '/api/v1/' + url, true);
-
-    if (callBack !== null) {
-        ajax.addEventListener("error", callBack);
-        ajax.addEventListener("abort", callBack);
-        ajax.addEventListener("timeout", callBack);
-        ajax.addEventListener("load", callBack);
-    }
-
-    ajax.send(formData);
+    sendApiRequest("POST", url, callBack, formData);
 }
 
 function sendApiGetRequest(url,  callBack = null) {
+    sendApiRequest("GET", url, callBack);
+}
+
+function sendApiDeleteRequest(url,  callBack = null) {
+    sendApiRequest("DELETE", url, callBack);
+}
+
+function sendApiRequest(method, url, callBack, sendItem=undefined) {
     const ajax = new XMLHttpRequest()
-    ajax.open("GET", '/api/v1/' + url, true);
+    ajax.open(method, '/api/v1/' + url, true);
 
     if (callBack !== null) {
         ajax.addEventListener("error", callBack);
@@ -62,7 +59,9 @@ function sendApiGetRequest(url,  callBack = null) {
         ajax.addEventListener("load", callBack);
     }
 
-    ajax.send();
+    if (sendItem !== undefined)
+        ajax.send(sendItem);
+    else ajax.send();
 }
 
 function checkApiResStatus(event) {
