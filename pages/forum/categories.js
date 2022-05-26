@@ -5,16 +5,32 @@ export default class extends Pages {
     get raw() {
         return `
 <section class="ns-theme-bg ns-theme-text">
+    <div>
+        <ns-a href="/" class="ns-a-clear">
+        
+        </ns-a>
+    </div>
+    <div class="ns-forum-banner"></div>
+    <div class="ns-forum-center ms-3">
+        <div class="p-4 justify-content-start">
+            <h2>Forum</h2>
+        </div>
+    </div>
+    
+    <div class="ns-center d-flex">
+        <hr class="ns-line">
+    </div>
+    
     <ns-api-data-block id="category-container-data" href="forum/category/root">
-        <div id="category-container" class="d-flex flex-column gap-5">
+        <div id="category-container" class="d-flex flex-column gap-5 ns-center py-5">
 
         </div>
     </ns-api-data-block>
     <template id="category-template">
-        <div>
-            <ns-a href="/forum/$id$" class="ns-template-var-attr">
+        <div class="ns-categ-topic">
+            <ns-a href="/forum/$id$" class="ns-template-var-attr ps-2 ns-a-categ ns-forum-categ-title">
                 <h3>
-                    <ns-api-data field="$id$.name" class="ns-template-var-attr"></ns-api-data>
+                    <ns-api-data field="$id$.name" class="ns-template-var-attr "></ns-api-data>
                 </h3>
                 <p>
                     <ns-api-data field="$id$.description" class="ns-template-var-attr"></ns-api-data>
@@ -26,7 +42,7 @@ export default class extends Pages {
         </div>
     </template>
     <template id="category-template-topic">
-        <ns-a href="/forum/$id$/$topic$" class="ns-template-var-attr">
+        <ns-a href="/forum/$id$/$topic$" class="ns-template-var-attr ns-categ-subject mb-3 ns-a-categ ns-b-purple-gradient">
             <h4>
                 <ns-api-data field="$id$.topics.$topic$.name" class="ns-template-var-attr"></ns-api-data>
             </h4>
@@ -34,7 +50,7 @@ export default class extends Pages {
                 <ns-api-data field="$id$.topics.$topic$.date_inserted" class="ns-template-var-attr"></ns-api-data>
             </small>
             <div>
-                LAST:
+                Dernière activité:
                 <small>
                     <ns-api-data field="$id$.topics.$topic$.last_message.author.username"
                                  class="ns-template-var-attr"></ns-api-data>
@@ -44,7 +60,7 @@ export default class extends Pages {
                                  class="ns-template-var-attr"></ns-api-data>
                 </small>
             </div>
-        </div>
+        </ns-a>
     </template>
 </section>`
     }

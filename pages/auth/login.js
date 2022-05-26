@@ -22,7 +22,7 @@ return `
                             <label for="email"> Adresse e-mail :</label>
                             <input id="email" class="form-control ns-form-pink" type="email" required="required">
                             <label for="mdp">Mot De Passe :</label>
-                            <input id="mdp" class="form-control ns-form-pink" type="password"required="required">
+                            <input id="mdp" class="form-control ns-form-pink" type="password" required="required">
                             <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit"> Se connecter</button>
                         </form>
                     </div>
