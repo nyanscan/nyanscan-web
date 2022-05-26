@@ -60,6 +60,33 @@ function success($data = []) {
     exit();
 }
 
+function internal_error() {
+    json_exit(500, "Internal Server Error", "Internal Server Error");
+}
+
+
+function admin_fetch($table, $col, $query, $primary) {
+    if (!isConnected()) unauthorized();
+    if (!is_moderator()) forbidden();
+
+    $limit = min(200, max(0, intval($query["limit"]??0)));
+    $offset = max(0, intval($query["offset"]??0));
+
+    $order = $query["order"]??null;
+    $order_reverse = isset($query["reverse"]) && !$query["reverse"] == '0';
+
+    $order_v = null;
+
+    if ($order) {
+        if (in_array($order,$col)) $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
+    }
+    $data = [];
+
+    $data["element"] = getDB()->select($table, $col, [], $limit, $order_v, $offset);
+    $data["total_count"] = getDB()->count($table, $primary);
+    success($data);
+}
+
 register_shutdown_function('my_error_handler');
 
 $uri = explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));

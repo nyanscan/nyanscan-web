@@ -9,8 +9,8 @@ function invokeProject($method, $function, $query)
     } elseif ($method === "GET") {
         if ($function[0] === 'user' && count($function) === 2)
             _fetch_user_projects($function[1]);
-        elseif ($function[0] === 'all') _admin_fetch_projects();
-        elseif ($function[0] === 'volumes-all') _admin_fetch_volume();
+        elseif ($function[0] === 'all') _admin_fetch_projects($query);
+        elseif ($function[0] === 'volumes-all') _admin_fetch_volume($query);
         elseif (count($function) === 2 && $function[1] === 'volumes') _fetch_project_with_volumes($function[0]);
         elseif (count($function) === 1) _fetch_project($function[0]);
         elseif (count($function) === 2) _fetch_volume($function[0], $function[1]);
@@ -157,54 +157,12 @@ function _fetch_volume($project, $tome) {
     success($data);
 }
 
-function _admin_fetch_projects()
-{
-    if (!is_moderator()) forbidden();
-
-    $limit = min(200, max(0, intval($query["limit"]??0)));
-    $offset = max(0, intval($query["offset"]??0));
-
-    $order = $query["order"]??null;
-    $order_reverse = isset($query["reverse"]) && !$query["reverse"] == '0';
-
-    $col = ['id', 'author', 'picture', 'title', 'description', 'reading_direction', 'format', 'status', 'date_inserted'];
-
-    $order_v = null;
-    if ($order) {
-        if (in_array($order,$col)) $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
-    }
-    $data = [];
-
-    $data["element"] = getDB()->select(TABLE_PROJECT, $col, [], $limit, $order_v, $offset);
-    $data["total_count"] = getDB()->count(TABLE_PROJECT, 'id');
-
-    success($data);
+function _admin_fetch_projects($query) {
+    admin_fetch(TABLE_PROJECT, ['id', 'author', 'picture', 'title', 'description', 'reading_direction', 'format', 'status', 'date_inserted'], $query, 'id');
 }
 
-function _admin_fetch_volume() {
-    if (!is_moderator()) forbidden();
-
-    $limit = min(200, max(0, intval($query["limit"]??0)));
-    $offset = max(0, intval($query["offset"]??0));
-
-    $order = $query["order"]??null;
-    $order_reverse = isset($query["reverse"]) && !$query["reverse"] == '0';
-
-    $project = $query["project"]??"";
-    $where = [];
-    if ($project) $where["project"] = $project;
-
-    $col = ['project', 'volume', 'picture', 'data', 'author', 'title', 'page_count', 'status', 'date_inserted'];
-    $order_v = null;
-    if ($order) {
-        if (in_array($order,$col)) $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
-    }
-
-    $data = [];
-    $data["element"] = getDB()->select(TABLE_VOLUME, $col, $where, $limit, $order_v, $offset);
-    $data["total_count"] = getDB()->count(TABLE_VOLUME, 'data', $where);
-
-    success($data);
+function _admin_fetch_volume($query) {
+    admin_fetch(TABLE_PROJECT, ['project', 'volume', 'picture', 'data', 'author', 'title', 'page_count', 'status', 'date_inserted'], $query, 'data');
 }
 
 function _change_status_project() {

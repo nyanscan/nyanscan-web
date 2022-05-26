@@ -374,7 +374,11 @@ body {
     justify-content: center;
 }
 
-.ns-adm-table-settings-pagination > * {
+.ns-table-refresh {
+    border-radius: .5rem;
+}
+
+.ns-adm-table-settings-pagination > *, .ns-table-refresh {
     padding: 0 1rem;
     height: 100%;
     background-color: #2C3034;
@@ -386,7 +390,7 @@ body {
 .ns-adm-table-settings-pagination > *:disabled {
     color: #888888;
 }
-.ns-adm-table-settings-pagination > button:hover {
+.ns-adm-table-settings-pagination > button:hover, .ns-table-refresh:hover {
     opacity: .8;
 }
 .ns-adm-table-settings-pagination > *:disabled:hover {

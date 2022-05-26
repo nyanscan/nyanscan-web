@@ -139,7 +139,12 @@ class User {
                     bubbles: true,
                     composed: false,
                 }))
-
+            } else {
+                this.app.dispatchEvent(new CustomEvent('logout', {
+                    cancelable: false,
+                    bubbles: true,
+                    composed: false,
+                }))
             }
         }).bind(this))
     }
@@ -333,6 +338,7 @@ class Application extends EventTarget {
     }
 
     changePage(url) {
+        if (url === undefined || url === null) url = '';
         this.actualURL = url;
         if (url.startsWith('/')) url = url.substring(1);
         window.history.pushState("", "", (this.prefix ? `/${this.prefix}/` : '/') + url);
@@ -713,4 +719,16 @@ function escapeHtml(text) {
     };
 
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+function pickHex(color1, color2, weight) {
+    let w1 = weight;
+    let w2 = 1. - w1;
+    return [Math.round(color1[0] * w1 + color2[0] * w2),
+        Math.round(color1[1] * w1 + color2[1] * w2),
+        Math.round(color1[2] * w1 + color2[2] * w2)];
+}
+
+function hexColorToCSSColor(color) {
+    return `rgb(${color[0]},${color[1]},${color[2]})`
 }

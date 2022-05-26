@@ -43,6 +43,7 @@ class AdminTable extends Component {
         </nav>
 <!--        <a href="/device_view_edit" class="device-view-settings-add"><i class="bi bi-plus-circle"></i> Create</a>-->
         <div class="ns-adm-table-total-amount"><span id="${this.id}-table-total-amount"></span></div>
+        <button type="button" aria-label="refresh" title="Actualiser" id="${this.id}-table-refresh" class="ns-table-refresh"><i class="bi bi-arrow-clockwise"></i></button>
     </div>
     <div id="${this.id}-table-colum" class="ns-adm-table-settings-col">
 
@@ -84,7 +85,10 @@ class AdminTable extends Component {
         this.columSettings = _('#' + this.id + '-table-colum');
         this.pagination = _('.' + this.id + '-table-pagination');
         this.selectAmount = _('#' + this.id + '-table-select-amount');
-
+        _('#' + this.id + '-table-refresh').addEventListener('click', ((e) => {
+            e.preventDefault();
+            this.refersh();
+        }).bind(this))
         this.block.addEventListener('dataLoad', this.setup.bind(this));
         this.setupColumnBtn();
         this.setupPagination();
@@ -220,6 +224,10 @@ class AdminTable extends Component {
         this.update();
     }
 
+    refersh() {
+        this.block.refresh();
+    }
+
     update() {
         let path = this.baseURL + '?';
         // const limit = 50;
@@ -256,5 +264,9 @@ class SimpleTablePages extends Pages {
         this.admTable.build(_('#ns-simple-adm-table'));
     }
 
+
+    refersh() {
+        this.admTable.refersh();
+    }
 
 }

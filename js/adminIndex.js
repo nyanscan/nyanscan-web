@@ -16,7 +16,7 @@ class Header extends Component {
             <ns-a class="c-nav-link" href="/project" aria-label="switch" title="Switch"><i class="bi bi-book"></i></ns-a>
             <ns-a class="c-nav-link" href="/volume" aria-label="device" title="Device"><i class="bi bi-file-earmark-break"></i></ns-a>
             <ns-a class="c-nav-link" href="/image" aria-label="user" title="User"><i class="bi bi-image"></i></ns-a>
-            <ns-a class="c-nav-link" href="/user" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
+            <ns-a class="c-nav-link" href="/users" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
           
         </div>
     </nav>
@@ -70,7 +70,7 @@ class Index extends Pages {
         </div>
         <div class="box" style="--color-one: #4C6CAD; --color-two: #1D59D1">
             <span></span>
-            <ns-a class="content">
+            <ns-a class="content" href="/users">
                 <i class="bi bi-person"></i>
                 <ns-api-data field="user">0</ns-api-data>
                 <h3>Utilisateurs</h3>
@@ -96,13 +96,17 @@ const STRUCTURE = [
         rel: "index"
     },
     {
-        re: '^project$',
+        re: /^project$/,
         rel: "admin/project"
     },
     {
         re: /^volume(?:\/(.*))?$/,
         var: [{id: 1, name: 'project'}],
         rel: "admin/volume"
+    },
+    {
+        re: /^users$/,
+        rel: "admin/users"
     }
 ]
 
