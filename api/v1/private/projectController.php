@@ -177,7 +177,7 @@ function _admin_fetch_projects($query) {
 }
 
 function _admin_fetch_volume($query) {
-    admin_fetch(TABLE_PROJECT, ['project', 'volume', 'picture', 'data', 'author', 'title', 'page_count', 'status', 'date_inserted'], $query, 'data');
+    admin_fetch(TABLE_VOLUME, ['project', 'volume', 'picture', 'data', 'author', 'title', 'page_count', 'status', 'date_inserted'], $query, 'data');
 }
 
 function _change_status_project() {
@@ -220,7 +220,9 @@ function _delete_volume($project, $tome) {
     if ($volume) {
 
         getDB()->delete(TABLE_VOLUME, ["project" => $project, "volume" => $tome]);
-        $json = file_get_contents(VOLUME_PATH . 'header_data/' . $volume["data"] . '.json');
+        $json_path = VOLUME_PATH . 'header_data/' . $volume["data"] . '.json';
+        if (!file_exists($json_path)) return:
+        $json = file_get_contents($json_path);
         $data = json_decode($json, true);
 
         foreach ($data["pages"] as $page) {
@@ -233,6 +235,7 @@ function _delete_volume($project, $tome) {
                 rmdir($dir);
             }
         }
+        unlink($json_path);
         success();
     } else bad_request("no volume " . $volume . " for project " . $project);
 }
