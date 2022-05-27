@@ -20,7 +20,7 @@ function _(query, mono=false) {
 
 function create(type, id = null, parent = null, ...cla) {
     const e = document.createElement(type);
-    if (cla) e.classList.add(...cla);
+    if (cla.length > 0) e.classList.add(...cla);
     if (id) e.id = id;
     if (parent) parent.appendChild(e);
     return e;
@@ -731,4 +731,10 @@ function pickHex(color1, color2, weight) {
 
 function hexColorToCSSColor(color) {
     return `rgb(${color[0]},${color[1]},${color[2]})`
+}
+
+function arrayPop(array, key) {
+    const e = array[key];
+    if (e !== undefined) delete (array[key]);
+    return e;
 }

@@ -15,6 +15,7 @@ include __DIR__ . '/private/authController.php';
 include __DIR__ . '/private/userController.php';
 include __DIR__ . '/private/projectController.php';
 include __DIR__ . '/private/adminController.php';
+include __DIR__ . '/private/searchController.php';
 
 function my_error_handler()
 {
@@ -109,6 +110,8 @@ switch ($controller) {
         invokeProject($method, $function, $query); break;
     case 'admin':
         invokeAdmin($method, $function, $query); break;
+    case 'search':
+        invokeSearch($method, $function, $query); break;
     default:
         break;
 }

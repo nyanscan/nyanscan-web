@@ -38,13 +38,15 @@
 
 ns-a {
     cursor: pointer;
-    color: cornflowerblue;
+    /*color: cornflowerblue;*/
 }
 
-ns-a:hover {
-    text-decoration: underline;
-    color: dodgerblue;
-}
+/*ns-a:hover {*/
+/*    text-decoration: underline;*/
+/*    color: dodgerblue;*/
+/*}*/
+
+
 
 .ns-modal-container {
     height: 100vh;

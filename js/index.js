@@ -55,6 +55,13 @@ class Footer extends Component {
 }
 
 class Header extends Component {
+
+    lastSearchTime = 0;
+    lastSearchValue = '';
+    searchForm;
+    searchInput;
+    searchRes;
+
     get raw() {
         return `
 <header class="sticky-top">
@@ -69,7 +76,7 @@ class Header extends Component {
                 </svg>
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive"> <!--ns-nav-part -->
-                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <ul class="navbar-nav mb-2 mb-md-0">
                     <li class="nav-item me-5">
                         <ns-a  class="ns-a-1" href="/forum">Forum</ns-a>
                     </li>
@@ -77,8 +84,13 @@ class Header extends Component {
                         <ns-a  class="ns-a-1" href="/publish">Publier</ns-a>
                     </li>
                 </ul>
-                <form class="justify-content-center form-inline w-75">
+                <form id="ns-search" class="justify-content-center mx-auto form-inline w-75 ns-form-search">
                     <input class="ns-search" id="ns-nav-search" type="search" placeholder="Rechercher...">
+                    <div class="ns-search-result">
+                        <ul>
+                            
+                        </ul>
+                    </div>
                 </form>
                 <div class="form-check form-switch">
                     <input id="ns-theme-toggle" class="form-check-input ns-them-check" type="checkbox" role="switch">
@@ -121,6 +133,13 @@ class Header extends Component {
         super.build(parent);
         registerToggle(_('#ns-theme-toggle'));
         this.updateLogStatus();
+
+        this.searchForm = _('#ns-search');
+        this.searchInput = _('#ns-nav-search');
+        this.searchRes = _('#ns-nav-search + .ns-search-result > ul', true);
+
+        this.searchInput.addEventListener('input', this.search.bind(this));
+
     }
 
     constructor(app) {
@@ -129,9 +148,49 @@ class Header extends Component {
         app.addEventListener('logout', this.updateLogStatus.bind(this));
     }
 
+    search() {
+        const v = this.searchInput.value.trim();
+        console.log(v);
+        if (v.length === 0) {
+            this.lastSearchValue = '';
+            this.searchRes.innerHTML = '';
+        } else if (v !== this.lastSearchValue) {
+            this.lastSearchValue = v;
+            sendApiGetRequest(`search?v=${v}&short=1`, this.searchResult.bind(this));
+        }
+    }
+
+    searchResult(e) {
+        if (checkApiResStatus(e) === API_REP_OK) {
+            const data = getDataAPI(e);
+            this.searchRes.innerHTML = '';
+
+            for (const cat of [{id: 'user', display: "Membre", href: '/u/', field: 'username'}, {id: 'project', display: 'Projet', href: '/p/', field: 'title'}]) {
+                if (data[cat.id] !== undefined && data[cat.id].length > 0) {
+                    const li = create('li', null, this.searchRes, 'ns-search-category');
+                    createPromise('span', null, li).then(e => e.innerText = cat.display);
+                    const ul = create('ul', null, li);
+                    for (const el of data[cat.id]) {
+                        const elli = create('li', null, ul);
+                        createPromise('ns-a', null, elli).then(e => {
+                            e.innerText = el[cat.field];
+                            e.href = cat.href + el['id'];
+                        })
+                    }
+                }
+            }
+        }
+    }
 }
 
+
+
 class Index extends Pages {
+
+    data;
+    fame;
+    last;
+    love;
 
     get raw() {
         return `
@@ -148,99 +207,107 @@ class Index extends Pages {
     </div>
 </section>
 <section class="ns-min-vh-100 ns-theme-bg ns-text-black">
-    <div class="ns-min-vh-50 ns-center pb-5">
-        <div class="ns-scan-preview">
-            <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
-            <div class="ns-scan-preview-elements">
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="ns-min-vh-50 ns-center pb-5">
-        <div class="ns-scan-preview">
-            <h3 class="ns-scan-preview-tile">Les exclu NyanScan</h3>
-            <div class="ns-scan-preview-elements">
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
+    <ns-api-data-block id="ns-index-data" href="project/index">
+        <div class="ns-min-vh-50 ns-center pb-5">
+            <div class="ns-scan-preview">
+                <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
+                <div class="overflow-scroll w-100">
+                    <div id="ns-index-fame" class="ns-scan-preview-elements">
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="ns-min-vh-50 ns-center pb-5">
-        <div class="ns-scan-preview">
-            <h3 class="ns-scan-preview-tile">Les coups de cœur de la rédaction</h3>
-            <div class="ns-scan-preview-elements">
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
+        <div class="ns-min-vh-50 ns-center pb-5">
+            <div class="ns-scan-preview">
+                <h3 class="ns-scan-preview-tile">Derniére publication</h3>
+                <div class="overflow-scroll w-100">
+                    <div id="ns-index-last" class="ns-scan-preview-elements">
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="ns-min-vh-50 ns-center pb-5">
+            <div class="ns-scan-preview">
+                <h3 class="ns-scan-preview-tile">Les coups de cœur de la rédaction</h3>
+                <div class="overflow-scroll w-100">
+                    <div class="ns-scan-preview-elements" id="ns-index-love">
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ns-api-data-block>
 </section>
 <section class="min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
     <h1 class="ns-text-red fw-bold">NyanScan</h1>
@@ -254,7 +321,7 @@ class Index extends Pages {
 </section>
 <section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
     <h3>Tu souhaites nous rejoindre ?</h3>
-    <form action="auth/register.php" method="get" class="form-inline ns-news-form w-100 container-lg">
+    <form id="ns-index-join" class="form-inline ns-news-form w-100 container-lg">
         <div class="row">
             <div class="d-none d-lg-block col-lg-3"></div>
             <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton amil"></div>
@@ -269,6 +336,40 @@ class Index extends Pages {
     build(parent, vars) {
         super.build(parent, vars);
         setupCarousel(_('.ns-carousel', true));
+
+        this.data = _('#ns-index-data');
+        const join = _('#ns-index-join');
+        if (join) join.addEventListener('submit', ((e) => {
+            console.log(e);
+            e.preventDefault();
+            window.APP.session['register_email'] = join.querySelector('.ns-news-input').value;
+            window.APP.changePage('/auth/register');
+        }))
+
+        if (this.data.dataLoad) this.updateSelection();
+        this.data.addEventListener('dataLoad', this.updateSelection.bind(this));
+    }
+
+    updateSelection() {
+        if (this.data.isError) return;
+
+        for (const rawDataKey in this.data.rawData) {
+            const e = _('#ns-index-' + rawDataKey);
+            if (e) {
+                e.innerHTML = '';
+                for (let item of this.data.rawData[rawDataKey]) {
+                    const box = create('div', null, e, 'ns-scan-preview-component');
+                    const ns_a = create('ns-a', null, box);
+                    ns_a.href = '/p/' + item['id'];
+                    const img = create('img', null, ns_a);
+                    img.src = image_id_to_patch(item['picture']);
+                    const span = create('span', null, box)
+                    span.innerText = item['title'];
+
+                }
+            }
+        }
+
     }
 
     constructor(app) {
@@ -371,7 +472,7 @@ const STRUCTURE = [
                     rel: 'reading/addChapter'
                 },
                 {
-                    re: /^([0-9]+)(?:\/([0-9]+))?$/,
+                    re: /^([0-9]+)(?:\/([0-9]+)?)?$/,
                     rel: 'reading/reader',
                     var: [{id: 1, name: 'volume'}, {id: 2, name: 'page'}]
                 }

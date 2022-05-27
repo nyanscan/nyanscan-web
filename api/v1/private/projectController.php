@@ -11,12 +11,27 @@ function invokeProject($method, $function, $query)
             _fetch_user_projects($function[1]);
         elseif ($function[0] === 'all') _admin_fetch_projects($query);
         elseif ($function[0] === 'volumes-all') _admin_fetch_volume($query);
+        elseif ($function[0] === 'index') fetch_index();
         elseif (count($function) === 2 && $function[1] === 'volumes') _fetch_project_with_volumes($function[0]);
         elseif (count($function) === 1) _fetch_project($function[0]);
         elseif (count($function) === 2) _fetch_volume($function[0], $function[1]);
     } elseif ($method === "DELETE") {
         if (count($function) === 2) _delete_volume($function[0], $function[1]);
     } else bad_method();
+}
+
+function fetch_index() {
+    $data = [];
+    // todo: change
+    $data["last"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
+    $data["fame"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
+    $data["love"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
+
+    shuffle($data["fame"]);
+    shuffle($data["love"]);
+
+    success($data);
+
 }
 
 function _new_project()
