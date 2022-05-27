@@ -1,5 +1,4 @@
 <?php
-require 'const.php';
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/functions.php');
 
 function create_category($title, $description, $view_level, $create_level)

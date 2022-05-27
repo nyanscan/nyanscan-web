@@ -2,6 +2,7 @@ const COMPONENT_TYPE_HEADER = 0;
 const COMPONENT_TYPE_FOOTER = 1;
 const COMPONENT_TYPE_PAGE = 2;
 const COMPONENT_TYPE_FLOAT = 3;
+const COMPONENT_TYPE_MODAL = 4;
 
 const API_REP_OK = 1;
 const API_REP_BAD = 0;
@@ -12,14 +13,14 @@ const LOGIN_LEVEL_CONNECT = 1;
 
 
 function _(query, mono=false) {
-    if (query.startsWith('#')) mono = true;
+    if (query.startsWith('#') && !query.includes(' ')) mono = true;
     if (mono) return document.querySelector(query);
     return document.querySelectorAll(query);
 }
 
 function create(type, id = null, parent = null, ...cla) {
     const e = document.createElement(type);
-    if (cla) e.classList.add(...cla);
+    if (cla.length > 0) e.classList.add(...cla);
     if (id) e.id = id;
     if (parent) parent.appendChild(e);
     return e;
@@ -36,23 +37,20 @@ function createPromise(type, id = null, parent = null, ...cla) {
 }
 
 function sendApiPostRequest(url, formData, callBack = null) {
-
-    const ajax = new XMLHttpRequest()
-    ajax.open("POST", '/api/v1/' + url, true);
-
-    if (callBack !== null) {
-        ajax.addEventListener("error", callBack);
-        ajax.addEventListener("abort", callBack);
-        ajax.addEventListener("timeout", callBack);
-        ajax.addEventListener("load", callBack);
-    }
-
-    ajax.send(formData);
+    sendApiRequest("POST", url, callBack, formData);
 }
 
 function sendApiGetRequest(url,  callBack = null) {
+    sendApiRequest("GET", url, callBack);
+}
+
+function sendApiDeleteRequest(url,  callBack = null) {
+    sendApiRequest("DELETE", url, callBack);
+}
+
+function sendApiRequest(method, url, callBack, sendItem=undefined) {
     const ajax = new XMLHttpRequest()
-    ajax.open("GET", '/api/v1/' + url, true);
+    ajax.open(method, '/api/v1/' + url, true);
 
     if (callBack !== null) {
         ajax.addEventListener("error", callBack);
@@ -61,7 +59,9 @@ function sendApiGetRequest(url,  callBack = null) {
         ajax.addEventListener("load", callBack);
     }
 
-    ajax.send();
+    if (sendItem !== undefined)
+        ajax.send(sendItem);
+    else ajax.send();
 }
 
 function checkApiResStatus(event) {
@@ -115,6 +115,60 @@ function importTemplate(template, vars) {
     return clone;
 }
 
+class User {
+    app;
+    isLog;
+    data;
+
+    get profile_picture() {
+        return '/res/profile.webp';
+    }
+
+    constructor(app) {
+        this.app = app;
+        this.isLog = false;
+    }
+
+    log() {
+        sendApiGetRequest('user/me', (function (ev) {
+            if (checkApiResStatus(ev) === API_REP_OK) {
+                this.isLog = true;
+                this.data = getDataAPI(ev);
+                this.app.dispatchEvent(new CustomEvent('log', {
+                    cancelable: false,
+                    bubbles: true,
+                    composed: false,
+                }))
+            } else {
+                this.app.dispatchEvent(new CustomEvent('logout', {
+                    cancelable: false,
+                    bubbles: true,
+                    composed: false,
+                }))
+            }
+        }).bind(this))
+    }
+
+    get loginLevel() {
+        return this.isLog ? LOGIN_LEVEL_CONNECT : LOGIN_LEVEL_DISCONNECT;
+    }
+
+    logout(redirectLogin) {
+        sendApiGetRequest('auth/logout', (function (ev) {
+            if (checkApiResStatus(ev) === API_REP_OK) {
+                this.isLog = false;
+                this.data = [];
+                this.app.dispatchEvent(new CustomEvent('logout', {
+                    cancelable: false,
+                    bubbles: true,
+                    composed: false,
+                }))
+                if (redirectLogin) this.app.changePage('/auth/')
+
+            }
+        }).bind(this))
+    }
+}
 class Component {
     app;
     type;
@@ -136,8 +190,11 @@ class Component {
         parent.innerHTML = this.getHTML();
     }
 
-}
+    destroy() {
 
+    }
+
+}
 class Pages extends Component {
 
     app;
@@ -178,9 +235,199 @@ class Pages extends Component {
         } else document.querySelector("footer").innerHTML = '';
         parent.innerHTML = this.getHTML(vars);
     }
+}
+class Error404 extends Pages {
+
+    get raw() {
+        return `
+        <section id="error-404">
+    <div class="ns-f-bg ns-f-bg-err"></div>
+    <div class="container vh-100">
+        <div class="row vh-100">
+            <div id="error" class="ns-theme-bg ns-theme-text rounded-3 my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
+                <div class="ns-center w-100 h-100 flex-row flex-wrap">
+                    <div class="w-100 ns-center py-2"><ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-404"></a></div>
+                    <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
+                    <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
+                    <div class="w-100 ns-center py-2"><p>Retourner à la <ns-aa href="/">page d'accueil</ns-aa></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>`
+    }
+
+    constructor(app) {
+        super(app, false, false, false);
+    }
 
 }
+class Application extends EventTarget {
+    haveSticky = true;
+    header;
+    footer;
+    index;
+    actualURL;
+    titleE;
+    caches = [];
+    user;
+    currentPages;
+    session = [];
+    prefix;
+    structure;
+    modal;
 
+    constructor(header, footer, index, err404, structure, prefix='') {
+        super()
+        this.prefix = prefix;
+        this.structure = structure;
+        this.header = new header(this);
+        this.footer = new footer(this);
+        this.caches["index"] = index;
+        this.caches["404"] = err404;
+        this.session = ["start", new Date()]
+
+        this.titleE = _('title', true);
+        this.modal = _('#ns-modal');
+        try {
+            this.setupModal();
+        } catch (err) {}
+
+        this.user = new User(this);
+        this.user.log();
+
+        this.actualURL = location.pathname.substring(1 + this.prefix.length);
+        this.loadURL(this.actualURL);
+    }
+
+    setupModal() {
+        this.modal.display = "none";
+        this.modal.addEventListener("click", ev => {
+            if (ev.target.classList.contains("ns-modal-container")) ev.target.style.display = "none";
+        }, {capture: true});
+        _('#ns-modal-main-close').addEventListener("click", (function (ev) {
+            ev.preventDefault();
+            this.modal.style.display = "none";
+        }).bind(this))
+    }
+
+    openModal(modal) {
+        if (modal.type !== COMPONENT_TYPE_MODAL) return;
+        const container = _('#ns-modal-container');
+        container.innerHTML = '';
+        modal.build(container);
+        for (let btn of container.querySelectorAll('.ns-modal-cancel-btn')) {
+            btn.addEventListener("click", (function (ev) {
+                ev.preventDefault();
+                this.modal.style.display = "none";
+            }).bind(this))
+        }
+        this.modal.style.display = 'flex';
+    }
+
+    closeModal() {
+        this.modal.style.display = 'none';
+    }
+
+    async load_module(name) {
+        if (this.caches[name] === undefined) {
+            const module = await import(`/pages/${name}.js`);
+            this.caches[name] = module.default;
+        }
+        return this.caches[name];
+    }
+
+    changePage(url) {
+        if (url === undefined || url === null) url = '';
+        this.actualURL = url;
+        if (url.startsWith('/')) url = url.substring(1);
+        window.history.pushState("", "", (this.prefix ? `/${this.prefix}/` : '/') + url);
+        this.loadURL(this.actualURL);
+    }
+
+    loadURL(url) {
+        if (url.startsWith('/')) url = url.substring(1);
+        // remove .html .js and .php
+        url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
+        let current_url = url;
+        let current = this.structure;
+
+        let finalP = undefined;
+        let finalV = {};
+        let finalLoginLevel = 0;
+
+        big_loop: while (current !== null) {
+            for (let obj of current) {
+                let matches = current_url.match(obj.re);
+                if (matches) {
+                    if (obj.var) {
+                        obj.var.forEach(value => {
+                            finalV[value.name] = matches[value.id];
+                        })
+                    }
+                    if (obj.rel) {
+                        finalP = obj.rel;
+                        if (obj.loginLevel !== undefined) finalLoginLevel = obj.loginLevel;
+                        break big_loop;
+                    } else if (obj.child) {
+                        if (obj.child.path_var) {
+                            current_url = matches[obj.child.path_var];
+                            if (current_url === undefined) current_url = "";
+                            if (current_url.startsWith('/')) current_url = current_url.substring(1);
+                        }
+                        current = obj.child.elements;
+                        continue big_loop;
+                    }
+                }
+            }
+            current = null;
+        }
+        if (finalP === undefined) {
+            this.do404();
+            return;
+        }
+        if (finalLoginLevel) {
+            const currentLevel = this.user.loginLevel;
+            if (finalLoginLevel !== currentLevel) {
+                finalP = 'index';
+                window.history.pushState("", "", this.prefix ? `/${this.prefix}/` : '/');
+            }
+        }
+        this.load_module(finalP).then(page => this.loadPage(new page(this), finalV));
+    }
+
+    do404() {
+        this.load_module('404').then(page => this.loadPage(new page(this), []));
+    }
+
+    loadPage(page, vars) {
+        if (this.currentPages) this.currentPages.destroy();
+        const content = document.querySelector("#ns-main");
+        page.build(content, vars);
+        this.setTitle(page.title);
+        this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader );
+        this.currentPages = page;
+    }
+
+    setHeaderSticky(value) {
+        const header = _('header', true);
+        const haveStick = header.classList.contains('sticky-top');
+        if (value ^ haveStick) {
+            if (value) header.classList.add('sticky-top');
+            else header.classList.remove('sticky-top');
+        }
+
+    }
+
+    setTitle(title) {
+        this.titleE.innerText = title;
+    }
+
+    fatalError() {
+
+    }
+
+}
 class Captcha extends Component {
 
     block;
@@ -445,3 +692,49 @@ class Captcha extends Component {
 //     else
 //         footer.innerText = message;
 // }
+
+function image_id_to_patch(id) {
+    const format = id.substr(0, 1);
+    const ext = '.' + ({'w': 'webp', 'p': 'png', 'j': 'jpg', 'g': 'gif', 'n': ''}[format]);
+    return `/picture/${id.substr(0, 5)}/${id.substr(5)}${ext}`
+}
+
+function project_status_to_html($status) {
+    switch ($status) {
+        case '0': return '<span class="project-status-wait">Attente de vérification</span>'; break;
+        case '1': return '<span class="project-status-denied">Rejeté</span>'; break;
+        case '2': return '<span class="project-status-accept">Accepté en attente de contenu</span>'; break;
+        case '3': return '<span class="project-status-publish">Publié</span>'; break;
+        default: return '';
+    }
+}
+
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+function pickHex(color1, color2, weight) {
+    let w1 = weight;
+    let w2 = 1. - w1;
+    return [Math.round(color1[0] * w1 + color2[0] * w2),
+        Math.round(color1[1] * w1 + color2[1] * w2),
+        Math.round(color1[2] * w1 + color2[2] * w2)];
+}
+
+function hexColorToCSSColor(color) {
+    return `rgb(${color[0]},${color[1]},${color[2]})`
+}
+
+function arrayPop(array, key) {
+    const e = array[key];
+    if (e !== undefined) delete (array[key]);
+    return e;
+}

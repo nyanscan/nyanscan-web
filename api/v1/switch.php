@@ -13,6 +13,9 @@ require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
 include __DIR__ . '/private/forumController.php';
 include __DIR__ . '/private/authController.php';
 include __DIR__ . '/private/userController.php';
+include __DIR__ . '/private/projectController.php';
+include __DIR__ . '/private/adminController.php';
+include __DIR__ . '/private/searchController.php';
 
 function my_error_handler()
 {
@@ -23,6 +26,16 @@ function my_error_handler()
 }
 
 header("Content-Type: application/json");
+
+function is_moderator() : bool{
+    $user = get_log_user();
+    return $user->is_connected() && $user->get_permission_level() >= PERMISSION_MODERATOR;
+}
+
+function is_admin() : bool {
+    $user = get_log_user();
+    return $user->is_connected() && $user->get_permission_level() >= PERMISSION_ADMIN;
+}
 
 function bad_method()
 {
@@ -38,10 +51,41 @@ function unauthorized() {
     json_exit(401, "Unauthorized", "Une authentification est nécessaire pour accéder à la ressource.");
 }
 
+function forbidden() {
+    json_exit(403, "Forbidden", "Forbidden");
+}
+
 function success($data = []) {
     http_response_code(200);
     echo json_encode(["code" => 200, "data" => $data]);
     exit();
+}
+
+function internal_error() {
+    json_exit(500, "Internal Server Error", "Internal Server Error");
+}
+
+
+function admin_fetch($table, $col, $query, $primary) {
+    if (!isConnected()) unauthorized();
+    if (!is_moderator()) forbidden();
+
+    $limit = min(200, max(0, intval($query["limit"]??0)));
+    $offset = max(0, intval($query["offset"]??0));
+
+    $order = $query["order"]??null;
+    $order_reverse = isset($query["reverse"]) && !$query["reverse"] == '0';
+
+    $order_v = null;
+
+    if ($order) {
+        if (in_array($order,$col)) $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
+    }
+    $data = [];
+
+    $data["element"] = getDB()->select($table, $col, [], $limit, $order_v, $offset);
+    $data["total_count"] = getDB()->count($table, $primary);
+    success($data);
 }
 
 register_shutdown_function('my_error_handler');
@@ -62,9 +106,14 @@ switch ($controller) {
     case 'captchaSettings':
         if ($method === 'GET' && count($function) === 0) _get_captcha_settings();
         break;
+    case 'project':
+        invokeProject($method, $function, $query); break;
+    case 'admin':
+        invokeAdmin($method, $function, $query); break;
+    case 'search':
+        invokeSearch($method, $function, $query); break;
     default:
         break;
-
 }
 
 
@@ -78,11 +127,5 @@ function _get_captcha_settings() {
     ]);
 }
 
-//print_r($uri);
-//print_r($method);
-//print_r($function);
-//print_r($query);
-
-//default 404 error
 header("HTTP/1.1 404 Not Found");
 exit();
