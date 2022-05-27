@@ -168,7 +168,9 @@ export default class extends Pages {
                         <section>
                             <h3>Zone dangereuse</h3>
                             <p>Suppression du compte : Une fois ton compte supprimé, tu ne peux pas revenir en arrière !</p>
-                            <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
+                            <div class ="ns-center">
+                                <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
+                            </div>
                         </section>
                     </div>
                 </div>`
