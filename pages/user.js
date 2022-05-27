@@ -26,6 +26,9 @@ export default class extends Pages {
                     </div>
                     <div class="d-flex flex-column justify-content-end">
                         <div class="p-2">
+                            <ns-a  href="user/${this.user}/projet">Voir les projets</ns-a>
+                        </div>
+                        <div class="p-2">
                             <span> Rejoint le <ns-api-data field="join"></ns-api-data></span>
                         </div>
                         <div class="p-2">

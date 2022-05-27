@@ -96,7 +96,11 @@ class ApiDataBlock extends HTMLElement {
                 let value = element.getAttribute(attr);
                 let new_value = value;
                 while (matches = regex.exec(value)) {
-                    let filedV = this.getField(matches[1]);
+                    let filedV = '';
+                    if (matches[1].startsWith('%picture%.')) {
+                        filedV = image_id_to_patch(this.getField(matches[1].substr(10)));
+                    }
+                    else filedV = this.getField(matches[1]);
                     if (filedV) {
                         element.setAttribute(attr, new_value.replace(matches[0], filedV));
                     }

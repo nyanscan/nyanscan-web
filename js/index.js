@@ -57,6 +57,13 @@ class Footer extends Component {
 }
 
 class Header extends Component {
+
+    lastSearchTime = 0;
+    lastSearchValue = '';
+    searchForm;
+    searchInput;
+    searchRes;
+
     get raw() {
         return `
             <nav id="mainNav" class="navbar navbar-expand-md">
@@ -91,8 +98,13 @@ class Header extends Component {
                         <!--Search bar-->
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                             <il>
-                                <form class="justify-content-center form-inline w-75 ms-2">
+                                <form id="ns-search" class="justify-content-center form-inline w-75 ms-2">
                                     <input class="ns-search" id="ns-nav-search" type="search" placeholder="Rechercher...">
+                                     <div class="ns-search-result">
+                                        <ul>
+
+                                        </ul>
+                                    </div>
                                 </form>
                             </il>
                         </ul>
@@ -144,6 +156,13 @@ class Header extends Component {
         super.build(parent);
         registerToggle(_('#ns-theme-toggle'));
         this.updateLogStatus();
+
+        this.searchForm = _('#ns-search');
+        this.searchInput = _('#ns-nav-search');
+        this.searchRes = _('#ns-nav-search + .ns-search-result > ul', true);
+
+        this.searchInput.addEventListener('input', this.search.bind(this));
+
     }
 
     constructor(app) {
@@ -152,9 +171,49 @@ class Header extends Component {
         app.addEventListener('logout', this.updateLogStatus.bind(this));
     }
 
+    search() {
+        const v = this.searchInput.value.trim();
+        console.log(v);
+        if (v.length === 0) {
+            this.lastSearchValue = '';
+            this.searchRes.innerHTML = '';
+        } else if (v !== this.lastSearchValue) {
+            this.lastSearchValue = v;
+            sendApiGetRequest(`search?v=${v}&short=1`, this.searchResult.bind(this));
+        }
+    }
+
+    searchResult(e) {
+        if (checkApiResStatus(e) === API_REP_OK) {
+            const data = getDataAPI(e);
+            this.searchRes.innerHTML = '';
+
+            for (const cat of [{id: 'user', display: "Membre", href: '/u/', field: 'username'}, {id: 'project', display: 'Projet', href: '/p/', field: 'title'}]) {
+                if (data[cat.id] !== undefined && data[cat.id].length > 0) {
+                    const li = create('li', null, this.searchRes, 'ns-search-category');
+                    createPromise('span', null, li).then(e => e.innerText = cat.display);
+                    const ul = create('ul', null, li);
+                    for (const el of data[cat.id]) {
+                        const elli = create('li', null, ul);
+                        createPromise('ns-a', null, elli).then(e => {
+                            e.innerText = el[cat.field];
+                            e.href = cat.href + el['id'];
+                        })
+                    }
+                }
+            }
+        }
+    }
 }
 
+
+
 class Index extends Pages {
+
+    data;
+    fame;
+    last;
+    love;
 
     get raw() {
         return `
@@ -171,99 +230,107 @@ class Index extends Pages {
     </div>
 </section>
 <section class="ns-min-vh-100 ns-theme-bg ns-text-black">
-    <div class="ns-min-vh-50 ns-center pb-5">
-        <div class="ns-scan-preview">
-            <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
-            <div class="ns-scan-preview-elements">
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="ns-min-vh-50 ns-center pb-5">
-        <div class="ns-scan-preview">
-            <h3 class="ns-scan-preview-tile">Les exclu NyanScan</h3>
-            <div class="ns-scan-preview-elements">
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
+    <ns-api-data-block id="ns-index-data" href="project/index">
+        <div class="ns-min-vh-50 ns-center pb-5">
+            <div class="ns-scan-preview">
+                <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
+                <div class="overflow-scroll w-100">
+                    <div id="ns-index-fame" class="ns-scan-preview-elements">
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="ns-min-vh-50 ns-center pb-5">
-        <div class="ns-scan-preview">
-            <h3 class="ns-scan-preview-tile">Les coups de cœur de la rédaction</h3>
-            <div class="ns-scan-preview-elements">
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
-                </div>
-                <div class="ns-scan-preview-component">
-                    <a href="/">
-                        <img src="/res/book/love-is-war.jpg">
-                    </a>
-                    <span>Love Is War</span>
+        <div class="ns-min-vh-50 ns-center pb-5">
+            <div class="ns-scan-preview">
+                <h3 class="ns-scan-preview-tile">Derniére publication</h3>
+                <div class="overflow-scroll w-100">
+                    <div id="ns-index-last" class="ns-scan-preview-elements">
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="ns-min-vh-50 ns-center pb-5">
+            <div class="ns-scan-preview">
+                <h3 class="ns-scan-preview-tile">Les coups de cœur de la rédaction</h3>
+                <div class="overflow-scroll w-100">
+                    <div class="ns-scan-preview-elements" id="ns-index-love">
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                        <div class="ns-scan-preview-component placeholder-glow">
+                            <ns-a href="/">
+                                <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
+                            </ns-a>
+                            <span><span class="placeholder w-75"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ns-api-data-block>
 </section>
 <section class="min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
     <h1 class="ns-text-red fw-bold">NyanScan</h1>
@@ -277,7 +344,7 @@ class Index extends Pages {
 </section>
 <section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
     <h3>Tu souhaites nous rejoindre ?</h3>
-    <form action="auth/register.php" method="get" class="form-inline ns-news-form w-100 container-lg">
+    <form id="ns-index-join" class="form-inline ns-news-form w-100 container-lg">
         <div class="row">
             <div class="d-none d-lg-block col-lg-3"></div>
             <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton amil"></div>
@@ -292,38 +359,45 @@ class Index extends Pages {
     build(parent, vars) {
         super.build(parent, vars);
         setupCarousel(_('.ns-carousel', true));
+
+        this.data = _('#ns-index-data');
+        const join = _('#ns-index-join');
+        if (join) join.addEventListener('submit', ((e) => {
+            console.log(e);
+            e.preventDefault();
+            window.APP.session['register_email'] = join.querySelector('.ns-news-input').value;
+            window.APP.changePage('/auth/register');
+        }))
+
+        if (this.data.dataLoad) this.updateSelection();
+        this.data.addEventListener('dataLoad', this.updateSelection.bind(this));
+    }
+
+    updateSelection() {
+        if (this.data.isError) return;
+
+        for (const rawDataKey in this.data.rawData) {
+            const e = _('#ns-index-' + rawDataKey);
+            if (e) {
+                e.innerHTML = '';
+                for (let item of this.data.rawData[rawDataKey]) {
+                    const box = create('div', null, e, 'ns-scan-preview-component');
+                    const ns_a = create('ns-a', null, box);
+                    ns_a.href = '/p/' + item['id'];
+                    const img = create('img', null, ns_a);
+                    img.src = image_id_to_patch(item['picture']);
+                    const span = create('span', null, box)
+                    span.innerText = item['title'];
+
+                }
+            }
+        }
+
     }
 
     constructor(app) {
         super(app);
     }
-}
-
-class Error404 extends Pages {
-
-    get raw() {
-        return `
-        <section id="error-404">
-    <div class="ns-f-bg ns-f-bg-err"></div>
-    <div class="container vh-100">
-        <div class="row vh-100">
-            <div id="error" class="ns-theme-bg ns-theme-text rounded-3 my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
-                <div class="ns-center w-100 h-100 flex-row flex-wrap">
-                    <div class="w-100 ns-center py-2"><ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-404"></a></div>
-                    <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
-                    <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
-                    <div class="w-100 ns-center py-2"><p>Retourner à la <ns-aa href="/">page d'accueil</ns-aa></p></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>`
-    }
-
-    constructor(app) {
-        super(app, false, false, false);
-    }
-
 }
 
 const STRUCTURE = [
@@ -354,9 +428,21 @@ const STRUCTURE = [
         }
     },
     {
-        re: /^(user|u|profil|profile)\/([a-zA-Z0-9]+)$/,
-        rel: "user",
-        var: [{id: 2, name: 'user'}]
+        re: /^(user|u|profil|profile)\/([a-zA-Z0-9]+)(\/.*)?$/,
+        var: [{id: 2, name: 'user'}],
+        child: {
+            path_var: [3],
+            elements: [
+                {
+                    re: /^$/,
+                    rel: "user"
+                },
+                {
+                    re: /^(projet|project)$/,
+                    rel: "reading/userProject"
+                }
+            ]
+        }
     },
     {
         re: /^auth(\/.*)?$/,
@@ -388,184 +474,37 @@ const STRUCTURE = [
                 }
             ]
         }
+    },
+    {
+        re: /^publish$/,
+        rel: "reading/publish",
+        // loginLevel: LOGIN_LEVEL_CONNECT,
+    },
+    {
+        re: /^p\/([0-9]+)(?:\/(.*))?$/,
+        var: [{id: 1, name: 'project'}],
+        child: {
+            path_var: [2],
+            elements: [
+                {
+                    re: /^(|view)$/,
+                    rel: 'reading/project'
+                },
+                {
+                    re: /^(edit)$/,
+                    rel: 'reading/addChapter'
+                },
+                {
+                    re: /^([0-9]+)(?:\/([0-9]+)?)?$/,
+                    rel: 'reading/reader',
+                    var: [{id: 1, name: 'volume'}, {id: 2, name: 'page'}]
+                }
+            ]
+        }
     }
 ]
 
-class User {
-    app;
-    isLog;
-    data;
-
-    get profile_picture() {
-        return '/res/profile.webp';
-    }
-
-    constructor(app) {
-        this.app = app;
-        this.isLog = false;
-    }
-
-    log() {
-        sendApiGetRequest('user/me', (function (ev) {
-            if (checkApiResStatus(ev) === API_REP_OK) {
-                this.isLog = true;
-                this.data = getDataAPI(ev);
-                this.app.dispatchEvent(new CustomEvent('log', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                }))
-
-            }
-        }).bind(this))
-    }
-
-    get loginLevel() {
-        return this.isLog ? LOGIN_LEVEL_CONNECT : LOGIN_LEVEL_DISCONNECT;
-    }
-
-    logout(redirectLogin) {
-        sendApiGetRequest('auth/logout', (function (ev) {
-            if (checkApiResStatus(ev) === API_REP_OK) {
-                this.isLog = false;
-                this.data = [];
-                this.app.dispatchEvent(new CustomEvent('logout', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                }))
-                if (redirectLogin) this.app.changePage('/auth/')
-
-            }
-        }).bind(this))
-    }
-}
-
-class App extends EventTarget {
-
-    header;
-    footer;
-    index;
-    actualURL;
-    titleE;
-    caches = [];
-    user;
-    currentPages;
-    session = [];
-
-    constructor() {
-        super()
-        this.header = new Header(this);
-        this.footer = new Footer(this);
-        this.caches["index"] = Index;
-        this.caches["404"] = Error404;
-        this.session = ["start", new Date()]
-
-        this.titleE = _('title', true);
-
-        this.user = new User(this);
-        this.user.log();
-
-        this.actualURL = location.pathname.substring(1);
-        this.loadURL(this.actualURL);
-
-    }
-
-    async load_module(name) {
-        if (this.caches[name] === undefined) {
-            const module = await import(`/pages/${name}.js`);
-            this.caches[name] = module.default;
-        }
-        return this.caches[name];
-    }
-
-    changePage(url) {
-        this.actualURL = url;
-        if (url.startsWith('/')) url = url.substring(1);
-        window.history.pushState("", "", '/' + url);
-        this.loadURL(this.actualURL);
-        // if (url.startsWith('/')) {
-        //     this.actualURL = url;
-        //     this.loadURL(this.actualURL);
-        // } else {
-        //
-        // }
-        //
-    }
-
-    loadURL(url) {
-        if (url.startsWith('/')) url = url.substring(1);
-        // remove .html .js and .php
-        url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
-        let current_url = url;
-        let current = STRUCTURE;
-
-        let finalP = undefined;
-        let finalV = {};
-        let finalLoginLevel = 0;
-
-        big_loop: while (current !== null) {
-            for (let obj of current) {
-                let matches = current_url.match(obj.re);
-                if (matches) {
-                    if (obj.rel) {
-                        finalP = obj.rel;
-                        if (obj.loginLevel !== undefined) finalLoginLevel = obj.loginLevel;
-                        if (obj.var) {
-                            obj.var.forEach(value => {
-                                finalV[value.name] = matches[value.id];
-                            })
-                        }
-                        break big_loop;
-                    } else if (obj.child) {
-                        if (obj.child.path_var) {
-                            current_url = matches[obj.child.path_var];
-                            if (current_url === undefined) current_url = "";
-                            if (current_url.startsWith('/')) current_url = current_url.substring(1);
-                        }
-                        current = obj.child.elements;
-                        continue big_loop;
-                    }
-                }
-            }
-            current = null;
-        }
-        if (finalP === undefined) {
-            this.do404();
-            return;
-        }
-        if (finalLoginLevel) {
-            const currentLevel = this.user.loginLevel;
-            if (finalLoginLevel !== currentLevel) {
-                finalP = 'index';
-                window.history.pushState("", "", '/');
-            }
-        }
-        this.load_module(finalP).then(page => this.loadPage(new page(this), finalV));
-    }
-
-    do404() {
-        this.load_module('404').then(page => this.loadPage(new page(this), []));
-    }
-
-
-    loadPage(page, vars) {
-        const content = document.querySelector("#ns-main");
-        page.build(content, vars);
-        this.setTitle(page.title);
-        this.currentPages = page;
-    }
-
-    setTitle(title) {
-        this.titleE.innerText = title;
-    }
-
-    fatalError() {
-
-    }
-}
-
-export const APP = new App();
+export const APP = new Application(Header, Footer, Index, Error404, STRUCTURE, '');
 window.APP = APP;
 
 

@@ -24,3 +24,23 @@ EOT;
         $headers
     );
 }
+
+function send_project_status_change_mail($status, $title, $email, $username) {
+    $headers = "From : NyanScan " . '<no-reply@nyanscan.fr>';
+    $subject = 'Status de votre project actualisé';
+    $content = <<<EOT
+Salut $username,
+Un de vos projet a subit un changement de status,
+
+Projet : $title
+Status : $status
+
+Rendez-vous sur NyanScan pour avoir plus d'information !
+EOT;
+    mail(
+        $email,
+        $subject,
+        $content,
+        $headers
+    );
+}

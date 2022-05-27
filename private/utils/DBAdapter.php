@@ -29,7 +29,7 @@ class DBAdapter
         return $this->select_set_settings($statement, $where, $limit, $order, $offset);
     }
 
-    public function count($table, $col, $where) {
+    public function count($table, $col, $where=[]) {
         return $this->select_set_settings("SELECT COUNT(" . $col . ") AS amount FROM " . DB_PREFIX.$table, $where, 1)["amount"];
     }
 
