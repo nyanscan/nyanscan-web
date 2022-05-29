@@ -834,3 +834,21 @@ body {
     flex-direction: column;
     padding: 20px 5%;
 }
+.ns-scan-CGU {
+    background-color: #BF61BD;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    padding: 80px 5%;
+    margin-left: 200px;
+    margin-right: 200px;
+
+}
+
+.ns-background-image{
+    background-image: url("../res/ImageCGU.jpg");
+
+}
+
+
+
