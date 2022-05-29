@@ -66,48 +66,46 @@ class Header extends Component {
 
     get raw() {
         return `
-<header class="sticky-top">
- <nav id="mainNav" class="navbar navbar-expand-md"> <!--ns-nav -->
-        <div class="container-fluid px-4 px-md-5">
-            <ns-a href="/" class="navbar-brand ps-2"><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a> <!--class="ns-nav-logo"-->
-            <!--<div class="ns-nav-part">
-                </div>-->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle Navigation">
-                <svg class="svg-inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-                    <path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/>
-                </svg>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive"> <!--ns-nav-part -->
-                <ul class="navbar-nav mb-2 mb-md-0">
-                    <li class="nav-item me-5">
-                        <ns-a  class="ns-a-1" href="/forum">Forum</ns-a>
-                    </li>
-                    <li class="nav-item">
-                        <ns-a  class="ns-a-1" href="/publish">Publier</ns-a>
-                    </li>
-                </ul>
-                <form id="ns-search" class="justify-content-center mx-auto form-inline w-75 ns-form-search">
-                    <input class="ns-search" id="ns-nav-search" type="search" placeholder="Rechercher...">
-                    <div class="ns-search-result">
-                        <ul>
+
+<nav id="mainNav" class="navbar navbar-expand-md"> <!--ns-nav -->
+    <div class="container-fluid px-4 px-md-5">
+        <ns-a href="/" class="navbar-brand ps-2"><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a> <!--class="ns-nav-logo"-->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle Navigation">
+            <svg class="svg-inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+                <path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/>
+            </svg>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive"> <!--ns-nav-part -->
+            <ul class="navbar-nav mb-2 mb-md-0">
+                <li class="nav-item me-5">
+                    <ns-a  class="ns-a-1" href="/forum">Forum</ns-a>
+                </li>
+                <li class="nav-item">
+                    <ns-a  class="ns-a-1" href="/publish">Publier</ns-a>
+                </li>
+            </ul>
+            <form id="ns-search" class="justify-content-center mx-auto form-inline w-75 ns-form-search">
+                <input class="ns-search" id="ns-nav-search" type="search" placeholder="Rechercher...">
+                <div class="ns-search-result">
+                     ul>
                             
-                        </ul>
-                    </div>
-                </form>
-                <div class="form-check form-switch">
-                    <input id="ns-theme-toggle" class="form-check-input ns-them-check" type="checkbox" role="switch">
+                    </ul>
                 </div>
-            </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle Navigation">
-                <span class="ns-menu-profil img-circle img-responsive"></span>
-            </button>
-            <div>
-                <ul id="ns-h-log" class="navbar-nav me-auto mb-2 mb-md-0">
-                </ul>
+            </form>
+            <div class="form-check form-switch">
+                <input id="ns-theme-toggle" class="form-check-input ns-them-check" type="checkbox" role="switch">
             </div>
         </div>
-    </nav>
-</header>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle Navigation">
+            <span class="ns-menu-profil img-circle img-responsive"></span>
+        </button>
+        <div>
+            <ul id="ns-h-log" class="navbar-nav me-auto mb-2 mb-md-0">
+            </ul>
+        </div>
+    </div>
+</nav>
+
         `
     }
 
@@ -213,7 +211,7 @@ class Index extends Pages {
         <div class="ns-min-vh-50 ns-center pb-5">
             <div class="ns-scan-preview">
                 <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
-                <div class="overflow-scroll w-100">
+                <div class="overflow-auto w-100 pb-2">
                     <div id="ns-index-fame" class="ns-scan-preview-elements">
                         <div class="ns-scan-preview-component placeholder-glow">
                             <ns-a href="/">
@@ -246,7 +244,7 @@ class Index extends Pages {
         <div class="ns-min-vh-50 ns-center pb-5">
             <div class="ns-scan-preview">
                 <h3 class="ns-scan-preview-tile">Derniére publication</h3>
-                <div class="overflow-scroll w-100">
+                <div class="overflow-auto w-100 pb-2">
                     <div id="ns-index-last" class="ns-scan-preview-elements">
                         <div class="ns-scan-preview-component placeholder-glow">
                             <ns-a href="/">
@@ -279,7 +277,7 @@ class Index extends Pages {
         <div class="ns-min-vh-50 ns-center pb-5">
             <div class="ns-scan-preview">
                 <h3 class="ns-scan-preview-tile">Les coups de cœur de la rédaction</h3>
-                <div class="overflow-scroll w-100">
+                <div class="overflow-auto w-100 pb-2">
                     <div class="ns-scan-preview-elements" id="ns-index-love">
                         <div class="ns-scan-preview-component placeholder-glow">
                             <ns-a href="/">

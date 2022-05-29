@@ -113,7 +113,7 @@ body {
 }
 
 .ns-section-block {
-    /*background-color: var(--ns-color-purpureus);*/
+    overflow: auto;
     border-radius: 0.5rem;
     width: 80%;
     display: flex;
@@ -141,7 +141,7 @@ body {
 }
 
 .ns-scan-preview-component {
-    display: inline flex;
+    display: inline-flex;
     width: 296px;
     justify-content: center;
     align-content: center;
@@ -626,6 +626,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.ns-picture-preview {
+    background-color: var(--ns-color-deep-mauve);
+    border-radius: 0.5rem;
 }
 
 .ns-profile-picture {
