@@ -1,5 +1,7 @@
 export default class extends Pages {
 
+    haveStickyHeader = false;
+
     data;
     project;
     volume;
@@ -8,7 +10,6 @@ export default class extends Pages {
     pages = [];
     caches = [];
     view;
-    haveStickyHeader = false;
     zoomValue = 1;
     zoomMoreBtn;
     zoomLessBtn;
@@ -204,6 +205,10 @@ export default class extends Pages {
 
     constructor(app) {
         super(app);
+    }
+
+    get_client_url() {
+        return `/p/${this.project}/${this.volume}`;
     }
 
 }

@@ -61,6 +61,11 @@ function success($data = []) {
     exit();
 }
 
+function success204() {
+    http_response_code(204);
+    exit();
+}
+
 function internal_error() {
     json_exit(500, "Internal Server Error", "Internal Server Error");
 }
@@ -95,6 +100,17 @@ $controller = $uri[3] ?? null;
 $function = array_slice($uri, 4);
 parse_str($_SERVER['QUERY_STRING'], $query);
 $method = strtoupper($_SERVER["REQUEST_METHOD"]);
+
+if ($controller === 'analytic') {
+    $path = join('/', $function);
+} else $path = join('/', $uri);
+
+if ($path) {
+    $req = getDB()->get_pdo()->prepare('INSERT INTO PAE_LOG_ROUTE (root) VALUES (:path) ON DUPLICATE KEY UPDATE visited=visited+1');
+    $req->execute(["path" => $path]);
+    if ($controller === 'analytic') success204();
+}
+
 
 switch ($controller) {
     case 'forum':
