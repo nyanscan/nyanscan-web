@@ -26,6 +26,9 @@ export default class extends Pages {
                     </div>
                     <div class="d-flex flex-column justify-content-end">
                         <div class="p-2">
+                            <ns-a  href="user/${this.user}/projet">Voir les projets</ns-a>
+                        </div>
+                        <div class="p-2">
                             <span> Rejoint le <ns-api-data field="join"></ns-api-data></span>
                         </div>
                         <div class="p-2">
@@ -165,7 +168,9 @@ export default class extends Pages {
                         <section>
                             <h3>Zone dangereuse</h3>
                             <p>Suppression du compte : Une fois ton compte supprimé, tu ne peux pas revenir en arrière !</p>
-                            <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
+                            <div class ="ns-center">
+                                <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
+                            </div>
                         </section>
                     </div>
                 </div>`

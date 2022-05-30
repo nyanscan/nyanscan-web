@@ -17,6 +17,7 @@ class User
     private $join;
     private $last_sean;
     private ?string $verification_token = null;
+    private int $permission = -1;
 
     /**
      * @param string|null $user id or username of the user if null get current log user
@@ -34,7 +35,7 @@ class User
             ]);
         } else {
             $this->fetch_data( is_numeric($user)? ["id"=>$user] : ["username" => $user]);
-            if($this->is_log && !(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) &&
+            if($this->is_log && $this->token !== null && !(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) &&
                 $this->id == $_SESSION["account-id"] && $this->token === $_SESSION["token"]) {
                 $this->is_current_user = true;
                 if (User::$current_user === null) User::$current_user = $this;
@@ -43,37 +44,60 @@ class User
     }
 
     private function fetch_data($where) {
-        $raw = $this->db_adapter->select('USER', ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated'], $where, 1);
+        $raw = $this->db_adapter->select('USER', ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'permission'], $where, 1);
 
         if ($raw) {
             $this->is_log = true;
             $this->id = $raw["id"];
-            $this->token =$raw["token"];
+            $this->token =$raw["token"]??null;
             $this->username = $raw["username"];
             $this->email = $raw["email"];
             $this->birthday = $raw["birthday"];
             $this->status = $raw["status"];
             $this->join = $raw["date_inserted"];
-            $this->last_sean = $raw["date_updated"];
+            $this->last_sean = $raw["date_updated"]??$this->join;
+            $this->permission = $raw["permission"];
         }
     }
 
     public function login($email, $password) : bool {
 
-        $raw = $this->db_adapter->select(TABLE_USER, ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'password'], [
+        $raw = $this->db_adapter->select(TABLE_USER, ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'permission', 'password'], [
             "email" => $email
         ], 1);
 
-        if (!$raw || !password_verify($password, $raw["password"])) return false;
+        if (!$raw) return false;
+
+        $success = password_verify($password, $raw["password"]);
+
+        $log = [
+            "user" => $raw['id'],
+            'success' => $success
+        ];
+        $addr = $_SERVER['REMOTE_ADDR'];
+        $packedIp = @inet_pton($addr);
+        if ($packedIp === false) {
+            die('invalid ip');
+        } else if (isset($packedIp[4])) {
+            $log['ip_v6'] = $packedIp;
+        } else {
+            $log['ip_v4'] = $packedIp;
+        }
+        $this->db_adapter->insert(TABLE_CONNECTION, $log);
+
+
+
+        if (!$success) return false;
 
         $this->id = $raw['id'];
 
-        $this->token =$raw["token"];
+        $this->token =$raw["token"]??null;
         $this->username = $raw["username"];
         $this->birthday = $raw["birthday"];
         $this->status = $raw["status"];
         $this->join = $raw["date_inserted"];
-        $this->last_sean = $raw["date_updated"];
+        $this->last_sean = $raw["date_updated"]??$this->join;
+        $this->permission = $raw["permission"];
         $this->email = $email;
 
         if ($this->is_verified()) {
@@ -139,6 +163,7 @@ class User
         if ($self) {
             $data["email"] = $this->email;
             $data["birthday"] = $this->birthday;
+            $data["permission"] = $this->permission;
         }
 
         return $data;
@@ -155,6 +180,16 @@ class User
 
     public function get_verification_token() : ?string {
         return $this->verification_token;
+    }
+
+    public function get_permission_level() : int {
+        return $this->permission;
+    }
+
+    public function set_permission($permission): bool {
+        if (!is_numeric($permission) || $permission < 0 || $permission > 255) return false;
+        $this->permission = $permission;
+        return getDB()->update(TABLE_USER, ["permission" => $permission], ["id" => $this->id]);
     }
 
 }

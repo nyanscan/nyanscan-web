@@ -21,7 +21,7 @@ export default class extends Pages {
                     <form id="ns-re-form" class="ns-f-wrap">
                         <div class="ns-f-w-group">
                             <label for="email">Adresse Email :</label>
-                            <input id="email" class="form-control ns-form-pink" type="email" name="email" required="required">
+                            <input id="email" class="form-control ns-form-pink" type="email" name="email" required="required" ${this.app.session['register_email'] ? 'value=' + arrayPop(this.app.session, 'register_email') : ''}>
                         </div>
                         <div class="ns-f-w-group">
                         <label for="username">Pseudo :</label>
