@@ -36,23 +36,27 @@ function createPromise(type, id = null, parent = null, ...cla) {
     });
 }
 
-function sendApiPostRequest(url, formData, callBack = null) {
-    sendApiRequest("POST", url, callBack, formData);
+function sendApiPostRequest(url, formData, callBack = null, progressCallBack=null) {
+    sendApiRequest("POST", url, callBack, progressCallBack, formData);
 }
 
-function sendApiGetRequest(url,  callBack = null) {
-    sendApiRequest("GET", url, callBack);
+function sendApiGetRequest(url,  callBack = null, progressCallBack=null) {
+    sendApiRequest("GET", url, callBack, progressCallBack);
 }
 
-function sendApiDeleteRequest(url,  callBack = null) {
-    sendApiRequest("DELETE", url, callBack);
+function sendApiDeleteRequest(url,  callBack = null, progressCallBack=null) {
+    sendApiRequest("DELETE", url, callBack, progressCallBack);
 }
 
-function sendApiRequest(method, url, callBack, sendItem=undefined) {
+function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendItem=undefined) {
     const ajax = new XMLHttpRequest()
     ajax.open(method, '/api/v1/' + url, true);
 
-    if (callBack !== null) {
+    if (progressCallBack !== undefined && progressCallBack !== null) {
+        ajax.addEventListener('progress', progressCallBack);
+    }
+
+    if (callBack !== null && callBack !== undefined) {
         ajax.addEventListener("error", callBack);
         ajax.addEventListener("abort", callBack);
         ajax.addEventListener("timeout", callBack);
@@ -79,15 +83,9 @@ function getAPIErrorReason(event) {
 }
 
 function loadingScreen(show = true) {
-    let screen = _('#ns-loading-screen');
-    if (!screen) {
-        screen = create('div', 'ns-loading-screen', document.body, 'ns-loading-screen-style');
-        screen.innerHTML = '<div class="spinner-border ns-text-red ns-fs-2" role="status">' +
-            '<span class="visually-hidden">Loading...</span></div>';
-    }
-
-    screen.style.display = show ? '' : 'none';
+   window.APP.loading.switchState(show);
 }
+
 
 function uuidv4() {
     return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -283,7 +281,59 @@ class Error404 extends Pages {
     }
 
 }
+
+class LoadingScreen extends Component {
+
+    screen;
+    progressDiv;
+    progressBar;
+    screenText;
+
+    get raw() {
+        return `
+            <div class="ns-loading-screen-spinner spinner-border ns-text-red ns-fs-2" role="status"><span class="visually-hidden">Loading...</span></div>
+            <div id="ns-loading-screen-progress" class="ns-progress" style="display: none;">
+                <div></div>
+            </div>
+            <p id="ns-loading-screen-text"></p>
+        `;
+    }
+
+    build(parent) {
+
+        this.screen = create('div', 'ns-loading-screen', parent,  'ns-loading-screen-style');
+        this.screen.style.display = 'none';
+        this.screen.innerHTML = this.raw;
+        this.progressDiv = _('#ns-loading-screen-progress');
+        this.screenText = _('#ns-loading-screen-text');
+        this.progressBar = this.progressDiv.firstElementChild;
+    }
+
+    switchState(enable) {
+        this.screen.style.display = enable ? '' : 'none';
+    }
+
+    set progress(value) {
+        if (this.progressDiv.style.display === 'none')
+            this.progressDiv.style.display = '';
+        this.progressBar.style.width = value + '%';
+    }
+
+    set text(value) {
+        this.screenText.innerText = value;
+    }
+
+    set textHtml(value) {
+        this.screenText.innerHTML = value;
+    }
+
+    constructor(app) {
+        super(app, COMPONENT_TYPE_FLOAT);
+    }
+}
+
 class Application extends EventTarget {
+
     haveSticky = true;
     header;
     footer;
@@ -297,6 +347,7 @@ class Application extends EventTarget {
     prefix;
     structure;
     modal;
+    loading;
 
     constructor(header, footer, index, err404, structure, prefix='') {
         super()
@@ -319,6 +370,8 @@ class Application extends EventTarget {
 
         this.actualURL = location.pathname.substring(1 + this.prefix.length);
         this.loadURL(this.actualURL);
+        this.loading = new LoadingScreen(this);
+        this.loading.build(document.body);
     }
 
     setupModal() {

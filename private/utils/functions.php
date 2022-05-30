@@ -1,5 +1,8 @@
 <?php
 
+include $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+use Jcupitt\Vips;
+
 require 'config.php';
 require 'DBAdapter.php';
 require 'User.php';
@@ -118,43 +121,36 @@ function download_volume_from_post($from_name, $max_size=5e8) {
     if (is_numeric($d_path) && intval($d_path) < 0) {
         return $d_path;
     }
-    print_r($d_path);
+
     $data = [
         "pages" => []
     ];
     $pager_count = 0;
     try {
-        $document = new Imagick();
-
-        $document->setResolution(40, 40);
-
-        for($i = 0; $i < 200; $i++) {
-
-            $document->readImage($d_path . '[' . $i . ']' );
-            if (!$document->valid()) {
-                if ($i === 0) return -4;
-                break;
-            }
+        $image = Vips\Image::newFromFile($d_path);
+        $n_pages = $image->get("n-pages");
+        for ($n = 0; $n < $n_pages; $n++) {
 
             $uuid = uniqidReal(24);
-            print_r($uuid);
             $data["pages"][] = $uuid;
+
+            $page = Vips\Image::newFromFile($d_path, [
+                "dpi" => 30,
+                "page" => $n,
+                # this enables image streaming
+                "access" => "sequential"
+            ]);
             $dir = substr($uuid,  0,3);
             if (!file_exists(VOLUME_PATH . $dir)) {
                 mkdir(VOLUME_PATH . $dir, 0775);
             }
-            $document->setImageCompressionQuality(80);
-            $document->writeImage(VOLUME_PATH . $dir .  '/' . substr($uuid, 3) . '.jpg');
+            $page->writeToFile(VOLUME_PATH . $dir .  '/' . substr($uuid, 3) . '.webp');
             $pager_count++;
         }
-        $document->destroy();
-        return $data;
-    } catch (ImagickException $e) {
+    } catch (Vips\Exception $e) {
         if ($e->getCode() !== 1) {
             $data["error"] = true;
         }
-        print_r($pager_count);
-        print_r($e->getMessage());
     } finally {
         unlink($d_path);
     }

@@ -174,7 +174,7 @@ export default class extends Pages {
 
         const currentIMG = this.pages[this.page];
 
-        this.view.src = `volume/${currentIMG.substr(0, 3)}/${currentIMG.substr(3)}.jpg`
+        this.view.src = `volume/${currentIMG.substr(0, 3)}/${currentIMG.substr(3)}.webp`
         this.cacheNext();
 
         window.history.pushState("", "",  `${(this.app.prefix ? `/${this.app.prefix}/` : '/')}p/${this.project}/${this.volume}/${this.page}`);
@@ -183,7 +183,7 @@ export default class extends Pages {
     cacheNext() {
         for (let i = this.page + 1; i < this.page + 4 && this.page < this.maxPage; i++) {
             const currentIMG = this.pages[i];
-            this.preloadImage(`volume/${currentIMG.substr(0, 3)}/${currentIMG.substr(3)}.jpg`);
+            this.preloadImage(`volume/${currentIMG.substr(0, 3)}/${currentIMG.substr(3)}.webp`);
         }
     }
 
