@@ -25,9 +25,8 @@ if (!($user->is_connected() && $user->get_permission_level() >= PERMISSION_MODER
     <link rel="stylesheet" type="text/css" href="/css/admincss.css">
 
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100" ns-log-status=false>
 <header class="sticky-top">
-
 </header>
 <div class="flex-grow-1 main-section" id="ns-main">
 

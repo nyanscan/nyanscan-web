@@ -327,6 +327,7 @@ body {
     position: fixed;
     z-index: 900;
     overflow: auto;
+    top: 48px;
 }
 
 #horizontal-mobile-nav-container {

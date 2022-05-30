@@ -238,12 +238,12 @@ class Pages extends Component {
         const head = document.querySelector("header");
         const foot = document.querySelector("footer");
         if (this.haveHeader) {
-            if (head.childElementCount > 0) head.style.display = '';
-            else this.app.header.build(head);
+            head.style.display = '';
+            if (head.childElementCount === 0) this.app.header.build(head);
         } else head.style.display = 'none';
         if (this.haveFooter) {
-            if (foot.childElementCount > 0) foot.style.display = '';
-            else this.app.footer.build(foot);
+            foot.style.display = '';
+            if (foot.childElementCount === 0) this.app.footer.build(foot);
         } else foot.style.display = 'none';
         parent.innerHTML = this.getHTML(vars);
     }
@@ -489,7 +489,6 @@ class Captcha extends Component {
 
     setupSettings() {
         const captcha = _('#captcha');
-        console.log(this.block.rawData);
         captcha.style.setProperty("--ns-captcha-width", this.block.getField('width')+'px');
         captcha.style.setProperty("--ns-captcha-height", this.block.getField('height')+'px');
         captcha.style.setProperty("--ns-captcha-piece-size", this.block.getField('piece_size')+'px');
@@ -550,8 +549,6 @@ class Captcha extends Component {
         const ceilSize = this.block.getField('cell_size') * 1;
         const captchaHeight = this.block.getField('height') * 1;
         const captchaWidth = this.block.getField('width') * 1;
-
-        console.log(numberPiece, pieceSize, ceilSize, captchaHeight, captchaWidth);
 
         let currentPiece;
 
