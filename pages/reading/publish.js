@@ -25,7 +25,7 @@ export default class extends Pages {
     <div class="ns-center d-flex">
         <hr class="ns-line">
     </div>
-    <div class="ns-center">
+    <div class="ns-center ns-text-black">
         <form id="ns-publish-form" class="ns-categ-topic my-5">
         <div>
             <div>

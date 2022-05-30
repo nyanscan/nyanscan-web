@@ -334,9 +334,8 @@ class Index extends Pages {
     <form class="form-inline w-lg-40 w-75 ns-fs-4">
         <input class="ns-search w-100 p-4" id="ns-nav-search" type="search" placeholder="Rechercher...">
     </form>
-    <span class="text-white ns-fs-3 fw-bold">OU</span>
-<!-- Todo: change this -->
-    <a class="btn text-black ns-fs-4 ns-tickle-pink-btn" href="auth">Se connecter</a>
+    <span class="text-white ns-fs-3 fw-bold ns-hide-connected">OU</span>
+    <a class="btn text-black ns-fs-4 ns-tickle-pink-btn ns-hide-connected" href="auth">Se connecter</a>
 </section>
 <section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
     <h3>Tu souhaites nous rejoindre ?</h3>
