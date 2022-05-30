@@ -1,4 +1,4 @@
-console.log("Attend ! Tu ne devrais pas toucher quoique ce soit ici !\nSi tu sais vraiment ce que tu fais, l'ESGI devrait être pas trop mal pour toi~");
+console.log("/!\\ Attend ! Tu ne devrais pas toucher quoique ce soit ici !\nSi tu sais vraiment ce que tu fais, l'ESGI devrait être pas trop mal pour toi~ /!\\");
 
 class Footer extends Component {
 
@@ -57,7 +57,7 @@ class Footer extends Component {
 }
 
 class Header extends Component {
-
+    nav;
     lastSearchTime = 0;
     lastSearchValue = '';
     searchForm;
@@ -66,48 +66,49 @@ class Header extends Component {
 
     get raw() {
         return `
-<header class="sticky-top">
- <nav id="mainNav" class="navbar navbar-expand-md"> <!--ns-nav -->
-        <div class="container-fluid px-4 px-md-5">
-            <ns-a href="/" class="navbar-brand ps-2"><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a> <!--class="ns-nav-logo"-->
-            <!--<div class="ns-nav-part">
-                </div>-->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle Navigation">
-                <svg class="svg-inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-                    <path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/>
-                </svg>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive"> <!--ns-nav-part -->
-                <ul class="navbar-nav mb-2 mb-md-0">
-                    <li class="nav-item me-5">
-                        <ns-a  class="ns-a-1" href="/forum">Forum</ns-a>
-                    </li>
-                    <li class="nav-item">
-                        <ns-a  class="ns-a-1" href="/publish">Publier</ns-a>
-                    </li>
-                </ul>
-                <form id="ns-search" class="justify-content-center mx-auto form-inline w-75 ns-form-search">
-                    <input class="ns-search" id="ns-nav-search" type="search" placeholder="Rechercher...">
-                    <div class="ns-search-result">
-                        <ul>
-                            
-                        </ul>
-                    </div>
-                </form>
-                <div class="form-check form-switch">
-                    <input id="ns-theme-toggle" class="form-check-input ns-them-check" type="checkbox" role="switch">
-                </div>
+        <nav id="mainNav">
+            <div id="ns-main-burger" class="d-lg-none">
+               <div class="ns-burger mx-auto"></div>
             </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle Navigation">
-                <span class="ns-menu-profil img-circle img-responsive"></span>
-            </button>
+            <div class="d-flex gap-3 justify-content-center align-items-center">
+                <ns-a href="/" class=""><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a>
+                <ns-a  class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
+                <ns-a  class="ns-a-1 ns-hide-disconnected ns-d-none-mlg" href="/publish">Publier</ns-a>
+            </div>
             <div>
-                <ul id="ns-h-log" class="navbar-nav me-auto mb-2 mb-md-0">
-                </ul>
+                <form id="ns-search" class="justify-content-center form-inline ns-form-search">
+                    <input class="ns-search" id="ns-nav-search" type="search" placeholder="Rechercher...">
+                    <div class="ns-search-result"><ul></ul></div>
+                </form>
             </div>
-        </div>
-    </nav>
-</header>
+            <div class="form-check form-switch ns-d-none-mlg">
+                <input id="ns-theme-toggle" class="form-check-input ns-them-check mx-auto" type="checkbox" role="switch">
+            </div>
+            <div class="ns-d-none-mlg">
+               <ns-a class='ns-a-1 nav-link ns-hide-connected' href='/auth'>Se Connecter</ns-a>
+               <span class='ns-a-1 nav-link ns-hide-disconnected d-inline' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
+               <ns-a class="ns-hide-disconnected d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive ns-avatar-sm"></ns-a>
+            </div>
+        </nav>  
+        <nav id="horizontal-mobile-nav" style="display: none">
+            <div id="horizontal-mobile-nav-container">
+                      <button type="button" id="ns-mobile-nav-close" class="btn-close ns-modal-cancel-btn"
+              data-ns-modal="ns-modal"
+              aria-label="Close"></button>
+            <ul id="horizontal-mobile-nav-ul">
+                <span>NyanScan</span>
+                <li><ns-a class="ns-a-1" href="/forum">Forum</ns-a></li>
+                <li class="ns-hide-disconnected"><ns-a  class="ns-a-1" href="/publish">Publier</ns-a></li>
+                <li class="ns-hide-connected"><ns-a class='ns-a-1' href='/auth'>Se Connecter</ns-a></li>
+                <li class="ns-hide-disconnected"><span class='ns-a-1' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span></li>
+                <li class="ns-hide-disconnected"><ns-a class="d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive ns-avatar-sm"></ns-a></li>
+                <li><div class="form-check form-switch">
+                <input id="ns-theme-toggle-mobile" class="form-check-input ns-them-check" type="checkbox" role="switch">
+                </div></li>
+            </ul>  
+            </div>
+
+        </nav>
         `
     }
 
@@ -116,6 +117,7 @@ class Header extends Component {
     }
 
     updateLogStatus() {
+
         const login = _('#ns-h-log')
         if (!login) return;
         login.innerHTML = null;
@@ -127,20 +129,32 @@ class Header extends Component {
             btn.innerText = 'Se Déconnecter';
 
         } else {
-            login.innerHTML = "<li class='nav-item'><ns-a class='ns-a-1 nav-link' href='/auth'>Se Connecter</ns-a></li>"
+            login.innerHTML = "<ns-a class='ns-a-1 nav-link' href='/auth'>Se Connecter</ns-a>"
         }
     }
 
     build(parent) {
+        console.log('build');
         super.build(parent);
         registerToggle(_('#ns-theme-toggle'));
+        registerToggle(_('#ns-theme-toggle-mobile'));
         this.updateLogStatus();
 
         this.searchForm = _('#ns-search');
         this.searchInput = _('#ns-nav-search');
         this.searchRes = _('#ns-nav-search + .ns-search-result > ul', true);
 
+        this.nav = _('#mainNav');
+
         this.searchInput.addEventListener('input', this.search.bind(this));
+
+        _('#ns-main-burger').addEventListener('click', (e) => {
+            const current = _('#horizontal-mobile-nav').style.display === 'none';
+            _('#horizontal-mobile-nav').style.display = current ? 'block' : 'none';
+        }, true);
+
+        _('#ns-mobile-nav-close').addEventListener('click', () => {_('#horizontal-mobile-nav').style.display = 'none'});
+        _('#horizontal-mobile-nav').addEventListener('click', (e) => { if(e.target && e.target.id === 'horizontal-mobile-nav') _('#horizontal-mobile-nav').style.display = 'none'});
 
     }
 
@@ -151,15 +165,18 @@ class Header extends Component {
     }
 
     search() {
-        const v = this.searchInput.value.trim();
-        console.log(v);
+        const v = this.searchInput.value;
         if (v.length === 0) {
             this.lastSearchValue = '';
             this.searchRes.innerHTML = '';
         } else if (v !== this.lastSearchValue) {
             this.lastSearchValue = v;
-            sendApiGetRequest(`search?v=${v}&short=1`, this.searchResult.bind(this));
+            sendApiGetRequest(`search?v=${encodeURIComponent(v)}&short=1`, this.searchResult.bind(this));
         }
+    }
+
+    openBurger() {
+        _('#horizontal-mobile-nav').style.display = '';
     }
 
     searchResult(e) {

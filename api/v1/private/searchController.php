@@ -20,12 +20,12 @@ function global_search($query) {
     if (!$search) success($data);
 
     if ($search[0] === '#') {
-        $data["project"] = project_search(substr($search,1), $search);
+        $data["project"] = project_search(substr($search,1), $short);
     } elseif ($search[0] === '@') {
-        $data["user"] = user_search(substr($search,1), $search);
+        $data["user"] = user_search(substr($search,1), $short);
     } else {
-        $data["user"] = user_search($search, $search);
-        $data["project"] = project_search($search, $search);
+        $data["user"] = user_search($search, $short);
+        $data["project"] = project_search($search, $short);
     }
     success($data);
 }

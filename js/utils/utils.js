@@ -134,12 +134,14 @@ class User {
             if (checkApiResStatus(ev) === API_REP_OK) {
                 this.isLog = true;
                 this.data = getDataAPI(ev);
+                this.switchBodyLogValue(true);
                 this.app.dispatchEvent(new CustomEvent('log', {
                     cancelable: false,
                     bubbles: true,
                     composed: false,
                 }))
             } else {
+                this.switchBodyLogValue(false);
                 this.app.dispatchEvent(new CustomEvent('logout', {
                     cancelable: false,
                     bubbles: true,
@@ -154,6 +156,7 @@ class User {
     }
 
     logout(redirectLogin) {
+        this.switchBodyLogValue(false);
         sendApiGetRequest('auth/logout', (function (ev) {
             if (checkApiResStatus(ev) === API_REP_OK) {
                 this.isLog = false;
@@ -168,6 +171,11 @@ class User {
             }
         }).bind(this))
     }
+
+    switchBodyLogValue(value) {
+        document.body.setAttribute('ns-log-status', value);
+    }
+
 }
 class Component {
     app;
@@ -227,12 +235,16 @@ class Pages extends Component {
         } else {
             if (currentTheme) main.classList.remove('ns-theme-bg');
         }
+        const head = document.querySelector("header");
+        const foot = document.querySelector("footer");
         if (this.haveHeader) {
-            this.app.header.build(document.querySelector("header"));
-        } else document.querySelector("header").innerHTML = '';
+            if (head.childElementCount > 0) head.style.display = '';
+            else this.app.header.build(head);
+        } else head.style.display = 'none';
         if (this.haveFooter) {
-            this.app.footer.build(document.querySelector("footer"));
-        } else document.querySelector("footer").innerHTML = '';
+            if (foot.childElementCount > 0) foot.style.display = '';
+            else this.app.footer.build(foot);
+        } else foot.style.display = 'none';
         parent.innerHTML = this.getHTML(vars);
     }
 }
