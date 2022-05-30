@@ -247,6 +247,15 @@ class Pages extends Component {
         } else foot.style.display = 'none';
         parent.innerHTML = this.getHTML(vars);
     }
+
+    get_client_url() {
+        return window.location.pathname;
+    }
+
+    send_analytic() {
+        sendApiGetRequest(`analytic${this.get_client_url()}`);
+    }
+
 }
 class Error404 extends Pages {
 
@@ -419,6 +428,7 @@ class Application extends EventTarget {
         this.setTitle(page.title);
         this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader );
         this.currentPages = page;
+        page.send_analytic();
     }
 
     setHeaderSticky(value) {

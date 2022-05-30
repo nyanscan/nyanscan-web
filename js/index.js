@@ -391,6 +391,10 @@ class Index extends Pages {
 
     }
 
+    get_client_url() {
+        return '/index';
+    }
+
     constructor(app) {
         super(app);
     }
