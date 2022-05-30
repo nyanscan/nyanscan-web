@@ -72,7 +72,7 @@ class User
 
         $log = [
             "user" => $raw['id'],
-            'success' => $success
+            'success' => $success ? '1' : '0'
         ];
         $addr = $_SERVER['REMOTE_ADDR'];
         $packedIp = @inet_pton($addr);
