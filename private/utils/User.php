@@ -66,7 +66,28 @@ class User
             "email" => $email
         ], 1);
 
-        if (!$raw || !password_verify($password, $raw["password"])) return false;
+        if (!$raw) return false;
+
+        $success = password_verify($password, $raw["password"]);
+
+        $log = [
+            "user" => $raw['id'],
+            'success' => $success
+        ];
+        $addr = $_SERVER['REMOTE_ADDR'];
+        $packedIp = @inet_pton($addr);
+        if ($packedIp === false) {
+            die('invalid ip');
+        } else if (isset($packedIp[4])) {
+            $log['ip_v6'] = $packedIp;
+        } else {
+            $log['ip_v4'] = $packedIp;
+        }
+        $this->db_adapter->insert(TABLE_CONNECTION, $log);
+
+
+
+        if (!$success) return false;
 
         $this->id = $raw['id'];
 
