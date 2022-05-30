@@ -402,6 +402,10 @@ class Index extends Pages {
 
 const STRUCTURE = [
     {
+        re: /^test-text$/,
+        rel: 'text'
+    },
+    {
         re: /^(|index|home)$/,
         rel: "index",
     },

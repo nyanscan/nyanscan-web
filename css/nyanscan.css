@@ -869,6 +869,45 @@ body {
     height: 150px;
 }
 
+.ns-success-css {
+    margin-top: 90px;
+}
+.ns-font-size-success {
+    font-size: x-large;
+    padding-top: 1rem !important;
+}
+.ns-scan-success {
+    background-color: RGBA(112,224,0,0.6);
+    border-radius: 0.5rem;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 5%;
+}
+.ns-scan-failed {
+    background-color: RGBA(238,45,56,0.76);
+    border-radius: 0.5rem;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 5%;
+}
+.ns-scan-CGU {
+    background-color: #BF61BD;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    padding: 80px 5%;
+    margin-left: 200px;
+    margin-right: 200px;
+
+}
+
+.ns-background-image{
+    background-image: url("../res/ImageCGU.jpg");
+
+}
+
 .ns-reading-head {
     width: 100%;
     background-color: #ec6a87;
@@ -1215,3 +1254,4 @@ body {
     }
 
 }
+>>>>>>> dev
