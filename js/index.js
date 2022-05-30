@@ -230,7 +230,7 @@ class Index extends Pages {
         <div class="ns-min-vh-50 ns-center pb-5">
             <div class="ns-scan-preview">
                 <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
-                <div class="overflow-scroll w-100">
+                <div class="overflow-auto w-100 pb-2">
                     <div id="ns-index-fame" class="ns-scan-preview-elements">
                         <div class="ns-scan-preview-component placeholder-glow">
                             <ns-a href="/">
@@ -263,7 +263,7 @@ class Index extends Pages {
         <div class="ns-min-vh-50 ns-center pb-5">
             <div class="ns-scan-preview">
                 <h3 class="ns-scan-preview-tile">Derniére publication</h3>
-                <div class="overflow-scroll w-100">
+                <div class="overflow-auto w-100 pb-2">
                     <div id="ns-index-last" class="ns-scan-preview-elements">
                         <div class="ns-scan-preview-component placeholder-glow">
                             <ns-a href="/">
@@ -296,7 +296,7 @@ class Index extends Pages {
         <div class="ns-min-vh-50 ns-center pb-5">
             <div class="ns-scan-preview">
                 <h3 class="ns-scan-preview-tile">Les coups de cœur de la rédaction</h3>
-                <div class="overflow-scroll w-100">
+                <div class="overflow-auto w-100 pb-2">
                     <div class="ns-scan-preview-elements" id="ns-index-love">
                         <div class="ns-scan-preview-component placeholder-glow">
                             <ns-a href="/">
