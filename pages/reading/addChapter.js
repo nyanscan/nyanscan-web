@@ -127,7 +127,8 @@ export default class extends Pages {
     }
 
     sendProgressCallback(event) {
-        const percent = Math.round( event.loaded / event.total * 100);
+        console.log(event);
+        const percent = Math.round( (event.loaded / event.total) * 100);
         this.app.loading.progress = percent;
         if (percent >= 100)
             this.app.loading.textHtml = `Upload fini vous pouvez aller à la page <ns-a class="ns-tickle-pink-btn ns-btn-sm">d'acceuile</ns-a> le temps que le procces se termine ou attendre que le traitement se termine vous serez automatiquement redirigé à le fin!`

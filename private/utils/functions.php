@@ -116,7 +116,7 @@ function download_image_from_post($from_name, $type=[], $max_size=1e6)  {
 }
 
 function download_volume_from_post($from_name, $max_size=5e8) {
-    set_time_limit(1200);
+    set_time_limit(0);
     $d_path = download_file_from_post($from_name, DOWNLOAD_PATH, $max_size);
     if (is_numeric($d_path) && intval($d_path) < 0) {
         return $d_path;
