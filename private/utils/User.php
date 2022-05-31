@@ -8,7 +8,7 @@ class User
     private bool $is_log = false;
     private bool $is_current_user = false;
     private int $id;
-    private string $token;
+    private ?string $token;
     private DBAdapter $db_adapter;
     private string $username;
     private string $email;

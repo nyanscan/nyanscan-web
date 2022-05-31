@@ -161,7 +161,7 @@ function _fetch_volume($project, $tome) {
     $req->execute(["project" => $project, "volume" => $tome]);
     $data = $req->fetch(PDO::FETCH_ASSOC);
 
-    if ($data["project_status"] != PROJECT_STATUS_PUBLISHED || $data["volume_picture"] != PROJECT_STATUS_PUBLISHED){
+    if ($data["project_status"] != PROJECT_STATUS_PUBLISHED || $data["volume_status"] != PROJECT_STATUS_PUBLISHED){
         $user = get_log_user();
         if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $data["author"])) forbidden();
     }

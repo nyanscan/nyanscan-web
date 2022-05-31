@@ -100,7 +100,7 @@ export default class extends Pages {
         if(this.pictureInput.files) {
             const file = this.pictureInput.files[0];
             if (file.type === 'image/png' || file.type === 'image/jpeg') {
-                if (file.size <= 500_000) {
+                if (file.size <= 1_000_000) {
                     window.URL = window.URL || window.webkitURL;
                     this.pictureURL = window.URL.createObjectURL(file);
                     this.previewImage.src = this.pictureURL;
