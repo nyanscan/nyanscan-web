@@ -116,6 +116,11 @@ function download_image_from_post($from_name, $type=[], $max_size=1e6)  {
 }
 
 function download_volume_from_post($from_name, $max_size=5e8) {
+    Vips\Config::CacheSetMax(0);
+    Vips\Config::cacheSetMaxMem(1.2e9);
+
+
+
     set_time_limit(0);
     $d_path = download_file_from_post($from_name, DOWNLOAD_PATH, $max_size);
     if (is_numeric($d_path) && intval($d_path) < 0) {
@@ -129,6 +134,7 @@ function download_volume_from_post($from_name, $max_size=5e8) {
     try {
         $image = Vips\Image::newFromFile($d_path);
         $n_pages = $image->get("n-pages");
+        unset($image);
         for ($n = 0; $n < $n_pages; $n++) {
 
             $uuid = uniqidReal(24);
@@ -146,6 +152,7 @@ function download_volume_from_post($from_name, $max_size=5e8) {
             }
             $page->writeToFile(VOLUME_PATH . $dir .  '/' . substr($uuid, 3) . '.webp');
             $pager_count++;
+            unset($page);
         }
     } catch (Vips\Exception $e) {
         if ($e->getCode() !== 1) {
