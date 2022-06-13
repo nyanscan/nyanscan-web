@@ -4,40 +4,39 @@ export default class extends Pages {
 
     getBookTemplate(project) {
         let html = `  
-<div>
-    <ns-a href="/p/${project["id"]}"><img src="${image_id_to_patch(project["picture"])}" alt="${project["title"]}"></ns-a> 
-    <div>  
-        <span>${ escapeHtml(project["title"])}</span>
-    </div>         
-        `;
-        if (this.isSelf) {
-            html += `
-    <div>
-        <span>Status: ${project_status_to_html(project.status)}</span>
-        <ns-a href="/p/${project["id"]}/edit">Edit</ns-a>
-    </div>
-            `;
-        }
-
-        html +=
-"</div>";
+        <div>
+            <ns-a href="/p/${project["id"]}"><img src="${image_id_to_patch(project["picture"])}" alt="${project["title"]}"></ns-a>
+            <div>
+                <span>${ escapeHtml(project["title"])}</span>
+            </div>
+                `;
+            if (this.isSelf) {
+                html += `
+                    <div>
+                        <span>Status: ${project_status_to_html(project.status)}</span>
+                        <ns-a href="/p/${project["id"]}/edit">Edit</ns-a>
+                    </div>
+                `;
+            }
+        
+         html +=
+        "</div>";
         return html;
     }
-
+    
     get raw() {
         return `
-<section>
-    <div>
-        ${this.isSelf ? 'Vos projet' : "Projet de todo nom"}
-    </div>
-    <div>
-        <ns-api-data-block id="ns-user-project-data">
-        
-        </ns-api-data-block>
-    </div>
-</section>
+        <section>
+            <div>
+                ${this.isSelf ? 'Vos projet' : "Projet de <!--TODO : Name-->"}
+            </div>
+            <div>
+                <ns-api-data-block id="ns-user-project-data">
+                
+                </ns-api-data-block>
+            </div>
+        </section>
         `;
-
     }
 
     constructor(app) {
@@ -64,6 +63,8 @@ export default class extends Pages {
                     e.innerHTML = this.getBookTemplate(project);
                 })
             }
-        } else this.app.changePage('/');
+        } else {
+            this.app.changePage('/');
+        }
     }
 }

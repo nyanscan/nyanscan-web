@@ -25,7 +25,5 @@ if ($raw) {
     }
     exit();
 }
+
 header('Location: /auth/verification-failed');
-
-
-

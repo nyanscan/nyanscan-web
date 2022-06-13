@@ -1,43 +1,48 @@
 <?php
 
-function invokeAuth($method, $function, $query)
-{
+function invokeAuth($method, $function, $query) {
     if (count($function) === 1) {
-        if ($method === "GET" && $function[0] === "logout") _logout();
-        if ($method === "GET" && $function[0] === "verification") _verification($query);
-        elseif ($method === "POST") {
-            if ($function[0] === "login") _log();
-            elseif ($function[0] === "register") _register();
+        if ($method === "GET" && $function[0] === "logout") {
+            _logout();
+        }
+        if ($method === "GET" && $function[0] === "verification") {
+            _verification($query);
+        } elseif ($method === "POST") {
+            if ($function[0] === "login") {
+                _log();
+            } elseif ($function[0] === "register") {
+                _register();
+            }
         }
     }
 }
-
 
 function _verification($query) {
     $token = $query["t"]??null;
     $user = $query["user"]??null;
 
-    if ($token === null || $user === null) bad_request('invalid query');
+    if ($token === null || $user === null) {
+        bad_request('invalid query');
+    }
     $req = getDB()->get_pdo()->prepare('SELECT V.token as token, U.email as email, U.username as username FROM '.DB_PREFIX.TABLE_VERIFICATION.' as V JOIN '.DB_PREFIX.TABLE_USER.' U ON U.id = V.user_id WHERE V.user_id=:user_id AND V.id=:id LIMIT 1');
     $req->execute(['id' => $token, 'user_id' => $user]);
     $r = $req->fetch(PDO::FETCH_ASSOC);
     if ($r) {
         send_verification_mail($r["token"], $user, $r["email"], $r["username"]);
         success();
-    } else bad_request();
-
+    } else {
+        bad_request();
+    }
 }
 
-function _logout()
-{
+function _logout() {
     unset($_SESSION["token"]);
     unset($_SESSION["account-id"]);
     unset($_SESSION["account-username"]);
     success();
 }
 
-function _log()
-{
+function _log() {
     $user = get_log_user();
     if ($user->is_connected()) {
         bad_request('Already connect');
@@ -46,8 +51,9 @@ function _log()
     $username = trim(strtolower($_POST["user"]??""));
     $pwd = $_POST["password"]??"";
 
-    if (!$username || !$pwd || !filter_var($username, FILTER_VALIDATE_EMAIL) || !$user->login($username, $pwd))
+    if (!$username || !$pwd || !filter_var($username, FILTER_VALIDATE_EMAIL) || !$user->login($username, $pwd)) {
         bad_request('E-mail ou mot de passe invalide !');
+    }
 
     if (!$user->is_verified()) {
         success([
@@ -59,8 +65,7 @@ function _log()
     success();
 }
 
-function _register()
-{
+function _register() {
     $errors = [];
     if (
         (count($_POST) != 8 and count($_POST) != 9) ||
@@ -71,13 +76,12 @@ function _register()
         empty($_POST["birth"]) ||
         empty($_POST["cgu"])
     ) {
-        $errors[] = "Donnée du formulaire invalide merci de recommencer !";
+        $errors[] = "Donnée du formulaire invalide ! Merci de recommencer.";
     } else {
         $username = trim($_POST["username"]);
         $email = strtolower(trim($_POST["email"]));
         $password = trim($_POST["password"]);
         $password_v = trim($_POST["password-v"]);
-        $newsLetter = !empty($_POST["newsletter"]);
         $newsLetter = !empty($_POST["newsletter"]);
         $birthday = $_POST["birth"];
 
@@ -86,27 +90,39 @@ function _register()
             case CAPTCHA_CODE_FALSE: $errors[] = "Merci de remplir correctement le captcha."; break;
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Format de mail invalide";
-        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $username)) $errors[] = "Le pseudo ne peux contenir que des miniscule, majuscles, chiffres ou un _ avec une longeur maximum de 20 caractéres";
-        if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) $errors[] = "Le mots de passe dois contenire au minimum 8 caractéres dont 1 majuscule 1 majuscule 1 chiffres et 1 caractéres spéciale";
-        if ($password !== $password_v) $errors[] = "Les mots de passes ne correspondent pas !";
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Format d'e-mail invalide.";
+        }
+        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $username)) {
+            $errors[] = "Le pseudo ne peut contenir que des minuscules, majuscules, chiffres ou un \"_\" avec une longueur maximale de 20 caractères.";
+        }
+        if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
+            $errors[] = "Le mots de passe doit contenir au minimum 8 caractères dont 1 majuscule, 1 majuscule, 1 chiffres et 1 caractère spéciale.";
+        }
+        if ($password !== $password_v) {
+            $errors[] = "Les mots de passes ne correspondent pas !";
+        }
 
         $birthdayExploded = explode("-", $birthday);
 
         if( count($birthdayExploded)!=3 || !checkdate($birthdayExploded[1], $birthdayExploded[2], $birthdayExploded[0]) ){
-            $errors[] = "Date de naissance incorrecte";
+            $errors[] = "Date de naissance incorrecte.";
         }else{
             $age = (time() - strtotime($birthday))/60/60/24/365.25;
             if($age<13 || $age>100){
-                $errors[] = "Vous êtes trop jeune ou trop vieux";
+                $errors[] = "Date de naissance hors borne.";
             }
         }
 
         $rq_select = getDB()->get_pdo()->prepare("SELECT email, username FROM " . DB_PREFIX.TABLE_USER. " WHERE email=:email OR username=:username LIMIT 2");
         $rq_select->execute(["email" => $email, "username" => $username]);
         foreach ($rq_select->fetchAll(PDO::FETCH_ASSOC) as $user) {
-            if ($user["email"] === $email) $errors[] = "Ce mail est dèja reliée à un compte";
-            if ($user["username"] === $username) $errors[] = "Ce nom d'utilisateur est dèja reliée à un compte";
+            if ($user["email"] === $email) {
+                $errors[] = "Ce mail est deja reliée à un compte.";
+            }
+            if ($user["username"] === $username) {
+                $errors[] = "Ce nom d'utilisateur est deja reliée à un compte.";
+            }
         }
         if (count($errors) === 0) {
             getDB()->insert(TABLE_USER, [

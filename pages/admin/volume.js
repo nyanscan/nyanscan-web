@@ -4,29 +4,29 @@ class ModalEditStatus extends Component {
 
     get raw() {
         return `
-<form id="nsa-modal-pform">
-    <h3>Changer le staus du projet n° ${this.id} ? </h3>
-    <div class="ns-form-group">
-    <input type="hidden" hidden="hidden" name="project" value="${this.id}">
-    <label for="nsa-mdoal-ps" class="form-label">Status</label>
-        <select id="nsa-mdoal-ps" name="status" class="form-select">
-            <option value="0">Attente de vérification</option>   
-            <option value="1" >Rejeté</option>   
-            <option value="2" selected>Accepté en attente de contenu</option>   
-            <option value="3">Publié</option>   
-        </select>     
-    </div>
-    <div class="ns-form-group">
-        <label for="nsa-mdoal-pr" class="form-label">Raison</label>
-        <textarea id="nsa-mdoal-pr" name="reason" rows="4" maxlength="255" class="form-control"></textarea>
-        <div class="form-text">Raison de la modification</div>
-    </div>
-    <div class="fpp-modal-btn-container">
-        <button type="button" class="ns-modal-cancel-btn bg-secondary"> Annuler </button>
-        <button type="submit" class="bg-danger">Modifier</button>
-    </div>
-           
-</form>`;
+        <form id="nsa-modal-pform">
+            <h3>Changer le statut du projet n° ${this.id} ? </h3>
+            <div class="ns-form-group">
+                <input type="hidden" hidden="hidden" name="project" value="${this.id}">
+                <label for="nsa-mdoal-ps" class="form-label">Status</label>
+                <select id="nsa-mdoal-ps" name="status" class="form-select">
+                    <option value="0">En attente de vérification.</option>
+                    <option value="1" >Rejeté.</option>
+                    <option value="2" selected>Accepté, en attente de contenu.</option>
+                    <option value="3">Publié.</option>
+                </select>
+            </div>
+            <div class="ns-form-group">
+                <label for="nsa-mdoal-pr" class="form-label">Raison</label>
+                <textarea id="nsa-mdoal-pr" name="reason" rows="4" maxlength="255" class="form-control"></textarea>
+                <div class="form-text">Raison de la modification</div>
+            </div>
+            <div class="fpp-modal-btn-container">
+                <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
+                <button type="submit" class="bg-danger">Modifier</button>
+            </div>
+        </form>
+        `;
     }
 
     build(parent) {
@@ -57,16 +57,17 @@ class ModalDeleteVolume extends Component {
 
     get raw() {
         return `
-<form id="nsa-modal-pform">
-    <h3>Suprimer le tome n° ${this.volume} du project ${this.project} ? </h3>
-    <div class="alert alert-danger">
-       ATTENTION suprimer un volume entraine la supression de tous les fichiers des pages du volume !!!
-    </div>
-    <div class="fpp-modal-btn-container">
-        <button type="button" class="ns-modal-cancel-btn bg-secondary"> Annuler </button>
-        <button id="nsa-modal-vdelete" type="button" class="bg-danger"> Supprimer </button>
-    </div>
-</form>`;
+        <form id="nsa-modal-pform">
+            <h3>Suprimer le tome n° ${this.volume} du projet ${this.project} ? </h3>
+            <div class="alert alert-danger">
+               !!! ATTENTION !!! Supprimer un volume entraîne la supression de tous les fichiers liés au volume !!!
+            </div>
+            <div class="fpp-modal-btn-container">
+                <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
+                <button id="nsa-modal-vdelete" type="button" class="bg-danger">Supprimer</button>
+            </div>
+        </form>
+        `;
     }
 
     build(parent) {
@@ -92,7 +93,6 @@ class ModalDeleteVolume extends Component {
             //todo toast
         })
     }
-
 }
 
 export default class extends SimpleTablePages {
@@ -133,7 +133,7 @@ export default class extends SimpleTablePages {
                 createPromise('button', null, group, 'btn', 'btn-danger', 'btn-sm').then((btn) => {
                     btn.ariaLabel = 'Delete';
                     btn.setAttribute('data-bs-toggle', 'tooltip');
-                    btn.title = 'Suprimer le volume';
+                    btn.title = 'Supprimer le volume';
                     btn.type = "button";
                     btn.addEventListener('click', this.openDeleteModal.bind(this, rowData['project'], rowData["volume"]));
                     create('i', null, btn, 'bi', 'bi-trash');
@@ -141,12 +141,12 @@ export default class extends SimpleTablePages {
                 break;
         }
     }
-
-
+    
     build(parent, vars) {
         super.build(parent, vars);
-        if (vars["project"])
+        if (vars["project"]) {
             this.admTable.vars = 'project=' + vars["project"];
+        }
     }
 
     openChangeStatusModal(id) {
@@ -156,5 +156,4 @@ export default class extends SimpleTablePages {
     openDeleteModal(project, id) {
         this.app.openModal(new ModalDeleteVolume(this.app, project, id));
     }
-
 }
