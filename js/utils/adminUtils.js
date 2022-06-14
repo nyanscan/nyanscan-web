@@ -26,40 +26,44 @@ class AdminTable extends Component {
 
     get raw() {
         return `
-<div class="ns-adm-table">
-    <div class="ns-adm-table-settings">
-        <select id="${this.id}-table-select-amount" class="ns-adm-table-settings-amount">
-            <option value="25">Elléments par page: 25</option>
-            <option value="50">Elléments par page: 50</option>
-            <option value="75">Elléments par page: 75</option>
-            <option value="100">Elléments par page: 100</option>
-            <option value="150">Elléments par page: 150</option>
-            <option value="200">Elléments par page: 200</option>
-        </select>
-         <nav aria-label="Page navigatione" class="${this.id}-table-pagination ns-adm-table-settings-pagination">
-            <button type="button" class="ns-table-previous">Previous</button>
-            <div><span class="device-pages text-white"></span></div>
-            <button type="button" class="ns-table-next"">Next</button>
-        </nav>
-<!--        <a href="/device_view_edit" class="device-view-settings-add"><i class="bi bi-plus-circle"></i> Create</a>-->
-        <div class="ns-adm-table-total-amount"><span id="${this.id}-table-total-amount"></span></div>
-        <button type="button" aria-label="refresh" title="Actualiser" id="${this.id}-table-refresh" class="ns-table-refresh"><i class="bi bi-arrow-clockwise"></i></button>
-    </div>
-    <div id="${this.id}-table-colum" class="ns-adm-table-settings-col">
-
-    </div>
-        <ns-api-data-block id="${this.id}-data-block">
-        <table class="table table-dark table-striped table-hover">
-            <thead>
-                <tr id="${this.id}-admin-thead">
-                </tr>
-            </thead>
-            <tbody id="${this.id}-admin-tbody" class="ns-monospaced">
-
-            </tbody>
-        </table>
-    </ns-api-data-block>
-</div>
+        <div class="ns-adm-table">
+            <div class="ns-adm-table-settings">
+                <select id="${this.id}-table-select-amount" class="ns-adm-table-settings-amount">
+                    <option value="25">Eléments par page : 25</option>
+                    <option value="50">Eléments par page : 50</option>
+                    <option value="75">Eléments par page : 75</option>
+                    <option value="100">Eléments par page : 100</option>
+                    <option value="150">Eléments par page : 150</option>
+                    <option value="200">Eléments par page : 200</option>
+                </select>
+                 <nav aria-label="Page navigatione" class="${this.id}-table-pagination ns-adm-table-settings-pagination">
+                    <button type="button" class="ns-table-previous">Précédent</button>
+                    <div>
+                        <span class="device-pages text-white"></span>
+                    </div>
+                    <button type="button" class="ns-table-next"">Suivant</button>
+                </nav>
+                <!--<a href="/device_view_edit" class="device-view-settings-add"><i class="bi bi-plus-circle"></i> Create</a>-->
+                <div class="ns-adm-table-total-amount">
+                    <span id="${this.id}-table-total-amount"></span>
+                </div>
+                <button type="button" aria-label="refresh" title="Actualiser" id="${this.id}-table-refresh" class="ns-table-refresh"><i class="bi bi-arrow-clockwise"></i></button>
+            </div>
+            <div id="${this.id}-table-colum" class="ns-adm-table-settings-col">
+            </div>
+                <ns-api-data-block id="${this.id}-data-block">
+                <table class="table table-dark table-striped table-hover">
+                    <thead>
+                        <tr id="${this.id}-admin-thead">
+                        
+                        </tr>
+                    </thead>
+                    <tbody id="${this.id}-admin-tbody" class="ns-monospaced">
+        
+                    </tbody>
+                </table>
+            </ns-api-data-block>
+        </div>
         `;
     }
 
@@ -87,14 +91,13 @@ class AdminTable extends Component {
         this.selectAmount = _('#' + this.id + '-table-select-amount');
         _('#' + this.id + '-table-refresh').addEventListener('click', ((e) => {
             e.preventDefault();
-            this.refersh();
+            this.refresh();
         }).bind(this))
         this.block.addEventListener('dataLoad', this.setup.bind(this));
         this.setupColumnBtn();
         this.setupPagination();
         this.updateAmount(null, true);
         this.update();
-
     }
 
     setupColumnBtn() {
@@ -157,7 +160,6 @@ class AdminTable extends Component {
                 });
             }
         }
-
         createPromise('td', null, row).then(e => this.colCallback('action', e, null, data));
     }
 
@@ -224,7 +226,7 @@ class AdminTable extends Component {
         this.update();
     }
 
-    refersh() {
+    refresh() {
         this.block.refresh();
     }
 
@@ -265,8 +267,7 @@ class SimpleTablePages extends Pages {
     }
 
 
-    refersh() {
-        this.admTable.refersh();
+    refresh() {
+        this.admTable.refresh();
     }
-
 }

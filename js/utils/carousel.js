@@ -1,3 +1,4 @@
+//Create the Carousel
 function setupCarousel(carousel) {
     const imagesDiv =  carousel.getElementsByClassName("ns-carousel-images")[0];
     const images = imagesDiv.getElementsByTagName("img");
@@ -26,6 +27,7 @@ function setupCarousel(carousel) {
     setCarouselActiveElements(carousel, 0);
 }
 
+//Make it functional and in loop
 function setCarouselActiveElements(carousel, index) {
     if (carousel.nsCarouselCount <= index) return;
 

@@ -1,10 +1,7 @@
 <?php
 
-class User
-{
-
+class User {
     public static $current_user = null;
-
     private bool $is_log = false;
     private bool $is_current_user = false;
     private int $id;
@@ -20,25 +17,27 @@ class User
     private int $permission = -1;
 
     /**
-     * @param string|null $user id or username of the user if null get current log user
+     * @param string|null $user id or username of the user: If null, get the current logged user
      */
-    public function __construct(string $user = null)
-    {
+    public function __construct(string $user = null) {
         $this->db_adapter = getDB();
         if ($user === null) {
             $this->is_current_user = true;
             User::$current_user = $this;
-            if(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) return;
+            if(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) {
+                return;
+            }
             $this->fetch_data([
                 "token"=>$_SESSION["token"],
                 "id"=>$_SESSION["account-id"]
             ]);
         } else {
             $this->fetch_data( is_numeric($user)? ["id"=>$user] : ["username" => $user]);
-            if($this->is_log && $this->token !== null && !(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) &&
-                $this->id == $_SESSION["account-id"] && $this->token === $_SESSION["token"]) {
+            if($this->is_log && $this->token !== null && !(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) && $this->id == $_SESSION["account-id"] && $this->token === $_SESSION["token"]) {
                 $this->is_current_user = true;
-                if (User::$current_user === null) User::$current_user = $this;
+                if (User::$current_user === null) {
+                    User::$current_user = $this;
+                }
             }
         }
     }
@@ -66,7 +65,9 @@ class User
             "email" => $email
         ], 1);
 
-        if (!$raw) return false;
+        if (!$raw) {
+            return false;
+        }
 
         $success = password_verify($password, $raw["password"]);
 
@@ -85,12 +86,11 @@ class User
         }
         $this->db_adapter->insert(TABLE_CONNECTION, $log);
 
-
-
-        if (!$success) return false;
+        if (!$success) {
+            return false;
+        }
 
         $this->id = $raw['id'];
-
         $this->token =$raw["token"]??null;
         $this->username = $raw["username"];
         $this->birthday = $raw["birthday"];
@@ -108,10 +108,10 @@ class User
             $_SESSION["token"] = $this->token;
         } else {
             $r = $this->db_adapter->select(TABLE_VERIFICATION, ["id"], ["user_id" => $this->id], 1);
-            if ($r)
+            if ($r) {
                 $this->verification_token = $r["id"];
-            else {
-                // created token and send mail
+            } else {
+                // create token and send email
                 $this->verification_token = createMD5Token();
                 $token_2 = createMD5Token();
                 $this->db_adapter->insert(TABLE_VERIFICATION, ["id" => $this->verification_token, "user_id" => $this->id, "token" => $token_2]);
@@ -121,29 +121,25 @@ class User
         return true;
     }
 
-    public function is_connected(): bool
-    {
+    public function is_connected(): bool {
         return $this->is_log;
     }
 
-    public function is_current_connected(): bool
-    {
+    public function is_current_connected(): bool {
         return $this->is_current_user;
     }
 
     /**
      * @return string
      */
-    public function getUsername(): string
-    {
+    public function getUsername(): string {
         return $this->username;
     }
 
     /**
      * @return string
      */
-    public function getId(): string
-    {
+    public function getId(): string {
         return $this->id;
     }
 
@@ -169,8 +165,7 @@ class User
         return $data;
     }
 
-    public function getForumViewLevel(): int
-    {
+    public function getForumViewLevel(): int {
         return $this->is_connected() ? FORUM_PERMISSION_VIEW_ADMIN : FORUM_PERMISSION_VIEW_EVERYONE;
     }
 
@@ -187,9 +182,10 @@ class User
     }
 
     public function set_permission($permission): bool {
-        if (!is_numeric($permission) || $permission < 0 || $permission > 255) return false;
+        if (!is_numeric($permission) || $permission < 0 || $permission > 255) {
+            return false;
+        }
         $this->permission = $permission;
         return getDB()->update(TABLE_USER, ["permission" => $permission], ["id" => $this->id]);
     }
-
 }

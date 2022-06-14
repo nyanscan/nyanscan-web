@@ -1,14 +1,14 @@
 <?php
 
 function invokeSearch($method, $function, $query) {
-
     if ($method === "GET") {
-        if (count($function) === 0) global_search($query);
-    } else bad_method();
-
+        if (count($function) === 0) {
+            global_search($query);
+        }
+    } else {
+        bad_method();
+    }
 }
-
-
 
 function global_search($query) {
 
@@ -17,7 +17,9 @@ function global_search($query) {
     $search = $query["v"]??null;
     $short = isset($query["short"]) && $query["short"] === '1';
 
-    if (!$search) success($data);
+    if (!$search) {
+        success($data);
+    }
 
     if ($search[0] === '#') {
         $data["project"] = project_search(substr($search,1), $short);

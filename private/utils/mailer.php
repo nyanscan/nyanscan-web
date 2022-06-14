@@ -29,13 +29,16 @@ function send_project_status_change_mail($status, $title, $email, $username) {
     $headers = "From : NyanScan " . '<no-reply@nyanscan.fr>';
     $subject = 'Status de votre project actualisé';
     $content = <<<EOT
-Salut $username,
-Un de vos projet a subit un changement de status,
+Salut $username !
+
+Un de tes projet a subit un changement de statut :
 
 Projet : $title
 Status : $status
 
-Rendez-vous sur NyanScan pour avoir plus d'information !
+Rends-toi sur NyanScan pour avoir plus d'information.
+
+À très vite !
 EOT;
     mail(
         $email,

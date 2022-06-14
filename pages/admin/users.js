@@ -7,24 +7,25 @@ class ModalEditStatus extends Component {
 
     get raw() {
         let html = `
-<form id="nsa-modal-uperm-form">
-    <h3>Changer les permission de utilisateur n°${this.id} (${this.name}) ? </h3>
-    <div class="ns-form-group">
-    <input type="hidden" hidden="hidden" name="user" value="${this.id}">
-    <select id="nsa-mdoal-uperm" name="permisison" class="form-select">`
-
-    for (const permKey in this.perms) {
-        html += `<option value="${this.perms[permKey]}" ${(this.perm === 255 || this.perm > this.perms[permKey]) ? '' : 'disabled'}>${permKey}</option>`;
-    }
-
-    html += `
-    </select>     
-    </div>
-    <div class="mt-3 fpp-modal-btn-container">
-        <button type="button" class="ns-modal-cancel-btn bg-secondary"> Annuler </button>
-        <button type="submit" class="bg-warning">Modifier</button>
-    </div>           
-</form>`;
+        <form id="nsa-modal-uperm-form">
+            <h3>Changer les permissions de l'utilisateur n°${this.id} (${this.name}) ? </h3>
+            <div class="ns-form-group">
+                <input type="hidden" hidden="hidden" name="user" value="${this.id}">
+                <select id="nsa-mdoal-uperm" name="permisison" class="form-select">`
+            
+                for (const permKey in this.perms) {
+                    html += `<option value="${this.perms[permKey]}" ${(this.perm === 255 || this.perm > this.perms[permKey]) ? '' : 'disabled'}>${permKey}</option>`;
+                }
+            
+                html += `
+                </select>
+            </div>
+            <div class="mt-3 fpp-modal-btn-container">
+                <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
+                <button type="submit" class="bg-warning">Modifier</button>
+            </div>
+        </form>
+        `;
         return html;
     }
 
@@ -50,26 +51,25 @@ class ModalEditStatus extends Component {
             loadingScreen(false);
         })
     }
-
 }
 
 export default class extends SimpleTablePages {
 
     PERMISSION = {
         "Administrateur": 255,
-        "Modérateur": 200,
+        "Moderateur": 200,
         "Default": 0
     }
 
     COLUMN = [
         {name: 'id', display: 'ID', force: true, default: 'null', isDefault: true, isPrimary: true},
         {name: 'username', display: 'Pseudo', force: false, default: 'null', isDefault: true, href: ''},
-        {name: 'email', display: 'Email', force: false, default: 'null', isDefault: true},
-        {name: 'birthday', display: 'Birthday', force: false, default: 'null'},
-        {name: 'status', display: 'Status', force: false, default: '0'},
+        {name: 'email', display: 'E-mail', force: false, default: 'null', isDefault: true},
+        {name: 'birthday', display: 'Anniversaire', force: false, default: 'null'},
+        {name: 'status', display: 'Statut', force: false, default: '0'},
         {name: 'permission', display: 'Permission', force: false, default: '0', isDefault: true, needCallback: true},
         {name: 'date_inserted', display: 'Créé le', force: false, default: 'never'},
-        {name: 'date_updated', display: 'Derniére connexion', force: false, default: 'never'}
+        {name: 'date_updated', display: 'Dernière connection', force: false, default: 'never'}
     ];
 
     constructor(app) {
@@ -94,10 +94,11 @@ export default class extends SimpleTablePages {
                     btn.title = 'Modifier les permission';
                     btn.type = "button";
                     const perm = parseInt(this.app.user.data["permission"]);
-                    if (perm === 255 || perm > rowData["permission"])
+                    if (perm === 255 || perm > rowData["permission"]) {
                         btn.addEventListener('click', this.openChangePermissionModal.bind(this, rowData['id'], rowData["username"]));
-                    else
+                    } else {
                         btn.disabled = true;
+                    }
                     create('i', null, btn, 'bi', 'bi-pencil');
                 });
                 break;
@@ -110,8 +111,9 @@ export default class extends SimpleTablePages {
         let lastValue = 0;
         for (const permName in this.PERMISSION) {
             let value = this.PERMISSION[permName]
-            if ($permission === value) return permName;
-            else if ($permission > value &&  value > lastValue) {
+            if ($permission === value) {
+                return permName;
+            } else if ($permission > value &&  value > lastValue) {
                 last = permName;
                 lastValue = value;
             }
@@ -122,6 +124,4 @@ export default class extends SimpleTablePages {
     openChangePermissionModal(id, name) {
         this.app.openModal(new ModalEditStatus(this.app, id, name, this.PERMISSION, this.app.user.data["permission"]));
     }
-
-
 }

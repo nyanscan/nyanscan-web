@@ -8,8 +8,8 @@ export default class extends Pages {
     get raw() {
         return `
             <div>
-                Votre compte a bien été créé. Un email de vérification à était envoyé ! <br>
-                Si vous ne recever pas le mail clicker <button id="ns-resend-mail" type="button" class="btn btn-primary"> ici </button> pour en recevoir un nouveau !
+                Votre compte a bien été créé. Un email de vérification a été envoyé ! <br>
+                Pas de mail reçu ? Cliquez <button id="ns-resend-mail" type="button" class="btn btn-primary">ici</button> pour en recevoir un nouveau !
             </div>
         `
     }
@@ -40,5 +40,4 @@ export default class extends Pages {
     constructor(app) {
         super(app);
     }
-
 }

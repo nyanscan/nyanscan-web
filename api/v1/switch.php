@@ -17,8 +17,7 @@ include __DIR__ . '/private/projectController.php';
 include __DIR__ . '/private/adminController.php';
 include __DIR__ . '/private/searchController.php';
 
-function my_error_handler()
-{
+function my_error_handler() {
     $last_error = error_get_last();
     if ($last_error && $last_error['type'] == E_ERROR) {
         header("HTTP/1.1 500 Internal Server Error");
@@ -27,7 +26,7 @@ function my_error_handler()
 
 header("Content-Type: application/json");
 
-function is_moderator() : bool{
+function is_moderator() : bool {
     $user = get_log_user();
     return $user->is_connected() && $user->get_permission_level() >= PERMISSION_MODERATOR;
 }
@@ -37,18 +36,16 @@ function is_admin() : bool {
     return $user->is_connected() && $user->get_permission_level() >= PERMISSION_ADMIN;
 }
 
-function bad_method()
-{
+function bad_method() {
     json_exit(405, "Method Not Allowed", "Only accept POST");
 }
 
-function bad_request($reason = "")
-{
+function bad_request($reason = "") {
     json_exit(400, "Bad Request", $reason);
 }
 
 function unauthorized() {
-    json_exit(401, "Unauthorized", "Une authentification est nécessaire pour accéder à la ressource.");
+    json_exit(401, "Unauthorized", "Authentication is required to access ressources");
 }
 
 function forbidden() {
@@ -70,10 +67,13 @@ function internal_error() {
     json_exit(500, "Internal Server Error", "Internal Server Error");
 }
 
-
 function admin_fetch($table, $col, $query, $primary) {
-    if (!isConnected()) unauthorized();
-    if (!is_moderator()) forbidden();
+    if (!isConnected()) {
+        unauthorized();
+    }
+    if (!is_moderator()) {
+        forbidden();
+    }
 
     $limit = min(200, max(0, intval($query["limit"]??0)));
     $offset = max(0, intval($query["offset"]??0));
@@ -84,7 +84,9 @@ function admin_fetch($table, $col, $query, $primary) {
     $order_v = null;
 
     if ($order) {
-        if (in_array($order,$col)) $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
+        if (in_array($order,$col)) {
+            $order_v = $order . ' ' . ($order_reverse ? 'DESC' : 'ASC');
+        }
     }
     $data = [];
 
@@ -103,14 +105,17 @@ $method = strtoupper($_SERVER["REQUEST_METHOD"]);
 
 if ($controller === 'analytic') {
     $path = join('/', $function);
-} else $path = join('/', $uri);
+} else {
+    $path = join('/', $uri);
+}
 
 if ($path) {
     $req = getDB()->get_pdo()->prepare('INSERT INTO PAE_LOG_ROUTE (root) VALUES (:path) ON DUPLICATE KEY UPDATE visited=visited+1');
     $req->execute(["path" => $path]);
-    if ($controller === 'analytic') success204();
+    if ($controller === 'analytic') {
+        success204();
+    }
 }
-
 
 switch ($controller) {
     case 'forum':
@@ -132,7 +137,6 @@ switch ($controller) {
         break;
 }
 
-
 function _get_captcha_settings() {
     success([
         "width" => CAPTCHA_WIDTH,
@@ -144,4 +148,5 @@ function _get_captcha_settings() {
 }
 
 header("HTTP/1.1 404 Not Found");
+
 exit();

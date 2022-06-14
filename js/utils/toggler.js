@@ -1,5 +1,6 @@
-window.addEventListener('DOMContentLoaded', event => {
+//Not used (?)
 
+window.addEventListener('DOMContentLoaded', event => {
     // Collapse responsive navbar when toggler is visible
     const navbarToggler = document.body.querySelector('.navbar-toggler');
     const responsiveNavItems = [].slice.call(
@@ -12,7 +13,6 @@ window.addEventListener('DOMContentLoaded', event => {
             }
         });
     });
-
 });
 
 /* When the user clicks on the button,
@@ -21,7 +21,7 @@ function dropSearch() {
     document.getElementById("myDropdown").classList.toggle("show");
 }
 
-// Close the dropdown menu if the user clicks outside of it
+// Close the dropdown menu if the user clicks outside it
 window.onclick = function(event) {
     if (!event.target.matches('.dropBtnSearch')) {
         let dropdowns = document.getElementsByClassName("dropdown-content");

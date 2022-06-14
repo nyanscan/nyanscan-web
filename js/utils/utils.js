@@ -3,35 +3,49 @@ const COMPONENT_TYPE_FOOTER = 1;
 const COMPONENT_TYPE_PAGE = 2;
 const COMPONENT_TYPE_FLOAT = 3;
 const COMPONENT_TYPE_MODAL = 4;
-
 const API_REP_OK = 1;
 const API_REP_BAD = 0;
 const API_REP_CONNECTION_ERROR = -1;
-
 const LOGIN_LEVEL_DISCONNECT = -1;
 const LOGIN_LEVEL_CONNECT = 1;
 
 
 function _(query, mono=false) {
-    if (query.startsWith('#') && !query.includes(' ')) mono = true;
-    if (mono) return document.querySelector(query);
+    if (query.startsWith('#') && !query.includes(' ')) {
+        mono = true;
+    }
+    if (mono) {
+        return document.querySelector(query);
+    }
     return document.querySelectorAll(query);
 }
 
 function create(type, id = null, parent = null, ...cla) {
     const e = document.createElement(type);
-    if (cla.length > 0) e.classList.add(...cla);
-    if (id) e.id = id;
-    if (parent) parent.appendChild(e);
+    if (cla.length > 0) {
+        e.classList.add(...cla);
+    }
+    if (id) {
+        e.id = id;
+    }
+    if (parent) {
+        parent.appendChild(e);
+    }
     return e;
 }
 
 function createPromise(type, id = null, parent = null, ...cla) {
     return new Promise(resolve => {
         const e = document.createElement(type);
-        if (cla) e.classList.add(...cla);
-        if (id) e.id = id;
-        if (parent) parent.appendChild(e);
+        if (cla) {
+            e.classList.add(...cla);
+        }
+        if (id) {
+            e.id = id;
+        }
+        if (parent) {
+            parent.appendChild(e);
+        }
         resolve(e);
     });
 }
@@ -63,14 +77,20 @@ function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendI
         ajax.addEventListener("load", callBack);
     }
 
-    if (sendItem !== undefined)
+    if (sendItem !== undefined) {
         ajax.send(sendItem);
-    else ajax.send();
+    } else {
+        ajax.send();
+    }
 }
 
 function checkApiResStatus(event) {
-    if (event.type !== 'load') return API_REP_CONNECTION_ERROR;
-    if (event.target.status >= 200 && event.target.status < 300) return API_REP_OK;
+    if (event.type !== 'load') {
+        return API_REP_CONNECTION_ERROR;
+    }
+    if (event.target.status >= 200 && event.target.status < 300) {
+        return API_REP_OK;
+    }
     return API_REP_BAD
 }
 
@@ -164,8 +184,9 @@ class User {
                     bubbles: true,
                     composed: false,
                 }))
-                if (redirectLogin) this.app.changePage('/auth/')
-
+                if (redirectLogin) {
+                    this.app.changePage('/auth/')
+                }
             }
         }).bind(this))
     }
@@ -173,8 +194,8 @@ class User {
     switchBodyLogValue(value) {
         document.body.setAttribute('ns-log-status', value);
     }
-
 }
+
 class Component {
     app;
     type;
@@ -207,8 +228,7 @@ class Pages extends Component {
     haveHeader;
     haveFooter;
     haveDefaultBackground;
-
-
+    
     constructor(app, haveHeader = true, haveFooter = true, haveDefaultBackground =true) {
         super(app, COMPONENT_TYPE_PAGE);
         this.app = app;
@@ -229,20 +249,32 @@ class Pages extends Component {
         const main = _('#ns-main');
         const currentTheme = main.classList.contains('ns-theme-bg');
         if (this.haveDefaultBackground) {
-            if (!currentTheme) main.classList.add('ns-theme-bg');
+            if (!currentTheme) {
+                main.classList.add('ns-theme-bg');
+            }
         } else {
-            if (currentTheme) main.classList.remove('ns-theme-bg');
+            if (currentTheme) {
+                main.classList.remove('ns-theme-bg');
+            }
         }
         const head = document.querySelector("header");
         const foot = document.querySelector("footer");
         if (this.haveHeader) {
             head.style.display = '';
-            if (head.childElementCount === 0) this.app.header.build(head);
-        } else head.style.display = 'none';
+            if (head.childElementCount === 0) {
+                this.app.header.build(head);
+            }
+        } else {
+            head.style.display = 'none';
+        }
         if (this.haveFooter) {
             foot.style.display = '';
-            if (foot.childElementCount === 0) this.app.footer.build(foot);
-        } else foot.style.display = 'none';
+            if (foot.childElementCount === 0) {
+                this.app.footer.build(foot);
+            }
+        } else {
+            foot.style.display = 'none';
+        }
         parent.innerHTML = this.getHTML(vars);
     }
 
@@ -255,25 +287,33 @@ class Pages extends Component {
     }
 
 }
+
 class Error404 extends Pages {
 
     get raw() {
         return `
         <section id="error-404">
-    <div class="ns-f-bg ns-f-bg-err"></div>
-    <div class="container vh-100">
-        <div class="row vh-100">
-            <div id="error" class="ns-theme-bg ns-theme-text rounded-3 my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
-                <div class="ns-center w-100 h-100 flex-row flex-wrap">
-                    <div class="w-100 ns-center py-2"><ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-404"></a></div>
-                    <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
-                    <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
-                    <div class="w-100 ns-center py-2"><p>Retourner à la <ns-aa href="/">page d'accueil</ns-aa></p></div>
+            <div class="ns-f-bg ns-f-bg-err">
+            
+            </div>
+            <div class="container vh-100">
+                <div class="row vh-100">
+                    <div id="error" class="ns-theme-bg ns-theme-text rounded-3 my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
+                        <div class="ns-center w-100 h-100 flex-row flex-wrap">
+                            <div class="w-100 ns-center py-2">
+                                <ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-404"></a>
+                            </div>
+                            <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
+                            <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
+                            <div class="w-100 ns-center py-2">
+                                <p>Retourner à la <ns-aa href="/">page d'accueil</ns-aa></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</section>`
+        </section>
+        `
     }
 
     constructor(app) {
@@ -333,7 +373,6 @@ class LoadingScreen extends Component {
 }
 
 class Application extends EventTarget {
-
     haveSticky = true;
     header;
     footer;
@@ -377,7 +416,9 @@ class Application extends EventTarget {
     setupModal() {
         this.modal.display = "none";
         this.modal.addEventListener("click", ev => {
-            if (ev.target.classList.contains("ns-modal-container")) ev.target.style.display = "none";
+            if (ev.target.classList.contains("ns-modal-container")) {
+                ev.target.style.display = "none";
+            }
         }, {capture: true});
         _('#ns-modal-main-close').addEventListener("click", (function (ev) {
             ev.preventDefault();
@@ -386,7 +427,9 @@ class Application extends EventTarget {
     }
 
     openModal(modal) {
-        if (modal.type !== COMPONENT_TYPE_MODAL) return;
+        if (modal.type !== COMPONENT_TYPE_MODAL) {
+            return;
+        }
         const container = _('#ns-modal-container');
         container.innerHTML = '';
         modal.build(container);
@@ -412,15 +455,21 @@ class Application extends EventTarget {
     }
 
     changePage(url) {
-        if (url === undefined || url === null) url = '';
+        if (url === undefined || url === null) {
+            url = '';
+        }
         this.actualURL = url;
-        if (url.startsWith('/')) url = url.substring(1);
+        if (url.startsWith('/')) {
+            url = url.substring(1);
+        }
         window.history.pushState("", "", (this.prefix ? `/${this.prefix}/` : '/') + url);
         this.loadURL(this.actualURL);
     }
 
     loadURL(url) {
-        if (url.startsWith('/')) url = url.substring(1);
+        if (url.startsWith('/')) {
+            url = url.substring(1);
+        }
         // remove .html .js and .php
         url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
         let current_url = url;
@@ -441,13 +490,19 @@ class Application extends EventTarget {
                     }
                     if (obj.rel) {
                         finalP = obj.rel;
-                        if (obj.loginLevel !== undefined) finalLoginLevel = obj.loginLevel;
+                        if (obj.loginLevel !== undefined) {
+                            finalLoginLevel = obj.loginLevel;
+                        }
                         break big_loop;
                     } else if (obj.child) {
                         if (obj.child.path_var) {
                             current_url = matches[obj.child.path_var];
-                            if (current_url === undefined) current_url = "";
-                            if (current_url.startsWith('/')) current_url = current_url.substring(1);
+                            if (current_url === undefined) {
+                                current_url = "";
+                            }
+                            if (current_url.startsWith('/')) {
+                                current_url = current_url.substring(1);
+                            }
                         }
                         current = obj.child.elements;
                         continue big_loop;
@@ -475,7 +530,9 @@ class Application extends EventTarget {
     }
 
     loadPage(page, vars) {
-        if (this.currentPages) this.currentPages.destroy();
+        if (this.currentPages) {
+            this.currentPages.destroy();
+        }
         const content = document.querySelector("#ns-main");
         page.build(content, vars);
         this.setTitle(page.title);
@@ -488,10 +545,12 @@ class Application extends EventTarget {
         const header = _('header', true);
         const haveStick = header.classList.contains('sticky-top');
         if (value ^ haveStick) {
-            if (value) header.classList.add('sticky-top');
-            else header.classList.remove('sticky-top');
+            if (value) {
+                header.classList.add('sticky-top');
+            } else {
+                header.classList.remove('sticky-top');
+            }
         }
-
     }
 
     setTitle(title) {
@@ -510,33 +569,36 @@ class Captcha extends Component {
 
     get raw() {
         return `
-<ns-api-data-block id="ns-captcha-data-block" href="captchaSettings">
-<div id="captcha">
-    <input id="captcha-id" type="hidden" name="captcha-id"">
-    <input class="captcha-input" type="hidden" name="captcha">
-    <div class="captcha-view">
-        <img id="captcha-img" alt="captcha">
-    </div>
-    <div class="captcha-piece-storage">
-    </div>
-    <div id="captcha-load" style="display: none">
-        <div class="spinner-border ns-text-red" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-    <div id="captcha-error" style="display: none">
-          <strong class="ns-text-red">Une erreur est survenue.</strong>
-          <p>Merci <button class="btn btn-secondary btn-sm" onClick="window.location.reload();">d'actualiser</button> la page pour ressayer. Si le problème persiste, merci de contacter un administrateur.</p>
-    </div>
-</div>
-</ns-api-data-block>
+        <ns-api-data-block id="ns-captcha-data-block" href="captchaSettings">
+            <div id="captcha">
+                <input id="captcha-id" type="hidden" name="captcha-id"">
+                <input class="captcha-input" type="hidden" name="captcha">
+                <div class="captcha-view">
+                    <img id="captcha-img" alt="captcha">
+                </div>
+                <div class="captcha-piece-storage">
+                
+                </div>
+                <div id="captcha-load" style="display: none">
+                    <div class="spinner-border ns-text-red" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+                <div id="captcha-error" style="display: none">
+                      <strong class="ns-text-red">Une erreur est survenue.</strong>
+                      <p>Merci <button class="btn btn-secondary btn-sm" onClick="window.location.reload();">d'actualiser</button> la page pour ressayer. Si le problème persiste, merci de contacter un administrateur.</p>
+                </div>
+            </div>
+        </ns-api-data-block>
         `
     }
 
     build(parent) {
         super.build(parent);
         this.block = _('#ns-captcha-data-block');
-        if (this.block.dataLoad) this.setupSettings();
+        if (this.block.dataLoad) {
+            this.setupSettings();
+        }
         this.block.addEventListener('dataLoad', this.setupSettings.bind(this));
     }
 
@@ -558,9 +620,10 @@ class Captcha extends Component {
             if (main_image.naturalWidth === 0) {
                 document.getElementById("captcha-error").style.display = 'flex';
             }
-            else this.setup_captcha(cap, main_image);
-        }
-        else {
+            else {
+                this.setup_captcha(cap, main_image);
+            }
+        } else {
             load.style.display = 'flex';
             main_image.addEventListener('load', ev => {
                 load.style.display = 'none';
@@ -571,7 +634,6 @@ class Captcha extends Component {
                 document.getElementById("captcha-error").style.display = 'flex';
             })
         }
-
     }
 
     setUUID() {
@@ -591,11 +653,8 @@ class Captcha extends Component {
     constructor(app) {
         super(app, COMPONENT_TYPE_FLOAT);
     }
-
-
-
+    
     setup_captcha(captcha) {
-
         // GET var
         const numberPiece = this.block.getField('number_piece') * 1;
         const pieceSize = this.block.getField('piece_size') * 1;
@@ -628,17 +687,16 @@ class Captcha extends Component {
             const target = e.target.parentElement;
             target.moving = true;
             if (e.clientX) {
-                target.oldX = e.clientX; // If they exist then use Mouse input
+                target.oldX = e.clientX; // If they exist, use Mouse input
                 target.oldY = e.clientY;
             } else {
-                target.oldX = e.touches[0].clientX; // Otherwise use touch input
+                target.oldX = e.touches[0].clientX; // Otherwise, use touch input
                 target.oldY = e.touches[0].clientY;
             }
 
             target.oldLeft = window.getComputedStyle(target).getPropertyValue('left').split('px')[0] * 1;
             target.oldTop = window.getComputedStyle(target).getPropertyValue('top').split('px')[0] * 1;
-
-
+            
             function endDrag() {
                 target.moving = false;
             }
@@ -661,7 +719,6 @@ class Captcha extends Component {
                 target.style.top = y + "px";
 
                 input.value = Captcha.newStringCord(input.value, target.pieceCont, x, y);
-
             }
             document.onmouseup = endDrag;
             document.ontouchend = endDrag;
@@ -675,8 +732,11 @@ class Captcha extends Component {
     static validateCord(pos, captchaWidth, captchaHeight, ceilSize, pieceSize, isx = true) {
         return Math.min(isx ? (captchaWidth - ceilSize) : (captchaHeight + ceilSize + pieceSize), Math.max(0, Math.floor(pos / ceilSize) * ceilSize));
     }
+    
     static newStringCord(old="", index=0, x=0, y=0) {
-        if (!old) old = '0';
+        if (!old) {
+            old = '0';
+        }
         let split = old.split(':');
         while (split.length < index * 2 + 1) {
             split.push('0');
@@ -782,14 +842,13 @@ function project_status_to_html($status) {
 }
 
 function escapeHtml(text) {
-    var map = {
+    let map = {
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
         "'": '&#039;'
     };
-
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
@@ -807,6 +866,8 @@ function hexColorToCSSColor(color) {
 
 function arrayPop(array, key) {
     const e = array[key];
-    if (e !== undefined) delete (array[key]);
+    if (e !== undefined) {
+        delete (array[key]);
+    }
     return e;
 }
