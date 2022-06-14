@@ -71,7 +71,9 @@ class ApiDataBlock extends HTMLElement {
             this.isError = true;
             if (code === API_REP_BAD) {
                 this.error = {code: event.target.status, message: getAPIErrorReason(event)};
-            } else this.error = {code: -1, message: 'ConnexionError'};
+            } else {
+                this.error = {code: -1, message: 'ConnexionError'};
+            }
         }
 
         this.dispatchEvent(new CustomEvent('dataLoad', {
@@ -83,7 +85,6 @@ class ApiDataBlock extends HTMLElement {
                 raw: this.rawData
             }
         }));
-
         this.replaceAttrVar();
     }
 
@@ -94,7 +95,7 @@ class ApiDataBlock extends HTMLElement {
         for (let element of elements) {
             for (let attr of element.getAttributeNames()) {
                 let value = element.getAttribute(attr);
-                let new_value = value;
+                //nex_value was redundant (?)
                 while (matches = regex.exec(value)) {
                     let filedV = '';
                     if (matches[1].startsWith('%picture%.')) {
@@ -102,13 +103,12 @@ class ApiDataBlock extends HTMLElement {
                     }
                     else filedV = this.getField(matches[1]);
                     if (filedV) {
-                        element.setAttribute(attr, new_value.replace(matches[0], filedV));
+                        element.setAttribute(attr, value.replace(matches[0], filedV));
                     }
                 }
             }
         }
     }
-
 }
 
 window.customElements.define('ns-api-data-block', ApiDataBlock);
@@ -170,5 +170,3 @@ class NSAnchor extends HTMLElement {
 }
 
 window.customElements.define('ns-a', NSAnchor);
-
-

@@ -1,7 +1,6 @@
 <?php
 
-class Picture
-{
+class Picture {
     public bool $isNew = false;
     private bool $isLoad = false;
     private ?string $id = null;
@@ -10,18 +9,18 @@ class Picture
     private string $format = PICTURE_FORMAT_NONE;
     private $resource;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
-    public function __destruct()
-    {
-        if ($this->resource)
+    public function __destruct() {
+        if ($this->resource) {
             imagedestroy($this->resource);
+        }
     }
 
     public function load($id, bool $load_resource = true) : bool {
-        if ($this->isLoad) return false;
+        if ($this->isLoad) {
+            return false;
+        }
         $raw = getDB()->select(TABLE_PICTURE, ['id', 'author', 'title', 'format'], ["id" => $id], 1);
         if ($raw) {
             $this->isLoad = true;
@@ -46,7 +45,9 @@ class Picture
                 } catch (Exception $e) {return false;}
             }
             return true;
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
     public function get_format(): ?string {
@@ -56,11 +57,18 @@ class Picture
     public function get_target_dir(): ?string {
         if ($this->id !== null && $this->format !== PICTURE_FORMAT_NONE) {
             return substr($this->id,  0,5);
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
+    /**
+     * @throws Exception
+     */
     public function create(string $base_patch, string $format, bool $delete_origin = false, ?int $author=null, ?string $title = null) : bool {
-        if ($this->isLoad) return false;
+        if ($this->isLoad) {
+            return false;
+        }
         $this->id = $format . uniqidReal(23);
         $this->author = $author;
         $this->title =  $title;
@@ -83,7 +91,9 @@ class Picture
                 unlink($base_patch);
             } catch (Exception $e) {}
         }
-        if (!$this->resource) return false;
+        if (!$this->resource) {
+            return false;
+        }
         $this->isLoad = true;
         return true;
     }
@@ -92,12 +102,16 @@ class Picture
         $ext = FORMAT_EXTENSION[$this->format]??null;
         if ($this->id && $ext !== null) {
             return PICTURE_PATH . substr($this->id,  0,5) . '/' . substr($this->id,  5) . '.' . $ext;
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
     public function save(bool $bdd_only = false): bool {
-        if (!$this->isLoad || $this->format === PICTURE_FORMAT_NONE || !$this->resource) return false;
-//        var_dump($this);
+        if (!$this->isLoad || $this->format === PICTURE_FORMAT_NONE || !$this->resource) {
+            return false;
+        }
+        //var_dump($this);
         if (!$bdd_only) {
             $dir = substr($this->id,  0,5);
 
@@ -132,20 +146,21 @@ class Picture
         return true;
     }
 
-    public function resize(int $n_width, int $n_height)
-    {
-        if (!$this->id || !$this->resource) return false;
+    public function resize(int $n_width, int $n_height): bool {
+        if (!$this->id || !$this->resource) {
+            return false;
+        }
         $width = imagesx($this->resource);
         $height = imagesy($this->resource);
-        //redimention de l'image source
-        if ($width >= $height) //visuel horizontal
-        {
-            $ratio = max($width / $n_width, $height / $n_height);
+        //resize source picture
+        //Extracted common part
+        $ratio = max($width / $n_width, $height / $n_height);
+        if ($width >= $height) {
+            //horizontal visual
             $new_width = $n_width;
             $new_height = $height / $ratio;
-        } else //visuel vertical
-        {
-            $ratio = max($width / $n_width, $height / $n_height);
+        } else {
+            //vertical visual
             $new_width = $width / $ratio;
             $new_height = $n_height;
         }
@@ -159,13 +174,14 @@ class Picture
 
     /**
      *
-     * @param int $size for the logo 0 for default size
+     * @param int $size Default size of the logo is 0
      */
     public function add_logo(int $size = 0): bool {
-        if (!$this->id || !$this->resource) return false;
+        if (!$this->id || !$this->resource) {
+            return false;
+        }
 
         $logo = imagecreatefrompng(LOGO_ALPHA_PATH);
-
         $width = imagesx($this->resource);
         $height = imagesy($this->resource);
         $logo_size = $size ?: floor(min($width / 8, $height / 8));
@@ -182,9 +198,11 @@ class Picture
         return true;
     }
 
-//    public function delete() {
-//        if ($this->isLoad) return false;
-//    }
+    /*public function delete() {
+        if ($this->isLoad) {
+            return false;
+        }
+    }*/
 
     public function set_author(?int $id) {
         $this->author = $id;
@@ -194,9 +212,7 @@ class Picture
         $this->title = $title;
     }
 
-    public function get_id(): ?string
-    {
+    public function get_id(): ?string {
         return $this->id;
     }
-
 }

@@ -1,10 +1,11 @@
 <?php
 
-function invokeUser($method, $function, $query)
-{
+function invokeUser($method, $function, $query) {
     if ($method === "GET") {
         if (count($function) === 1) {
-            if ($function[0] === 'all') _admin_fetch_user($query);
+            if ($function[0] === 'all') {
+                _admin_fetch_user($query);
+            }
             _get_user($function[0]);
         }
     } elseif ($method === "POST") {
@@ -14,7 +15,9 @@ function invokeUser($method, $function, $query)
                 default: break;
             }
         }
-    } else bad_method();
+    } else {
+        bad_method();
+    }
 }
 
 /**
@@ -38,14 +41,20 @@ function _admin_fetch_user($query) {
  * @author Alice.B
  */
 function _get_user($userid) {
-    if (strlen($userid) === 0 || strlen($userid) > 32) bad_request('Invalid user');
+    if (strlen($userid) === 0 || strlen($userid) > 32) {
+        bad_request('Invalid user');
+    }
     if ($userid === 'me') {
         $user = get_log_user();
-        if (!$user->is_connected()) unauthorized();
+        if (!$user->is_connected()) {
+            unauthorized();
+        }
     } else {
         $user = new User($userid);
     }
-    if (!$user->is_connected()) bad_request('Invalid user');
+    if (!$user->is_connected()) {
+        bad_request('Invalid user');
+    }
     success($user->getAPIData($userid === 'me'));
 }
 
@@ -59,21 +68,35 @@ function _get_user($userid) {
  * @author Alice.B
  */
 function _admin_change_permission() {
-    if (!isConnected()) unauthorized();
-    if (!is_moderator()) forbidden();
+    if (!isConnected()) {
+        unauthorized();
+    }
+    if (!is_moderator()) {
+        forbidden();
+    }
 
     $user = $_POST["user"]??null;
-    $permission = $_POST["permisison"]??null;
+    $permission = $_POST["permission"]??null;
 
     // check
-    if ($user === null || !is_numeric($permission) || $permission < 0 || $permission > 255) bad_request();
+    if ($user === null || !is_numeric($permission) || $permission < 0 || $permission > 255) {
+        bad_request();
+    }
     $sendPerm = get_log_user()->get_permission_level();
-    if ($permission >= $sendPerm && $sendPerm !== PERMISSION_ADMIN) forbidden();
+    if ($permission >= $sendPerm && $sendPerm !== PERMISSION_ADMIN) {
+        forbidden();
+    }
 
     $userO = new User($user);
-    if (!$userO->is_connected()) bad_request('Invalid user');
-    if ($sendPerm <= $userO->get_permission_level() && $sendPerm !== PERMISSION_ADMIN) forbidden();
-
-    if ($userO->set_permission($permission)) success();
-    else internal_error();
+    if (!$userO->is_connected()) {
+        bad_request('Invalid user');
+    }
+    if ($sendPerm <= $userO->get_permission_level() && $sendPerm !== PERMISSION_ADMIN) {
+        forbidden();
+    }
+    if ($userO->set_permission($permission)) {
+        success();
+    } else {
+        internal_error();
+    }
 }
