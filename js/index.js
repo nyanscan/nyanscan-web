@@ -356,38 +356,28 @@ class Index extends Pages {
                         </div>
                     </div>
                 </div>
-            </ns-api-data-block>
-        </section>
-        <section class="min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
-            <h1 class="ns-text-red fw-bold">NyanScan</h1>
-            <p class="text-white ns-fs-5 w-lg-25 w-75 text-center">NyanScan est un site de lecture de scan en ligne. Avec son moteur de recherche complet, trouve le manga qui te plait en quelque clic !</p>
-            <form class="form-inline w-lg-40 w-75 ns-fs-4">
-                <input class="ns-search w-100 p-4" id="ns-nav-search" type="search" placeholder="Rechercher...">
-            </form>
-            <span class="text-white ns-fs-3 fw-bold">OU</span>
-            <!-- Todo: to remove ? -->
-            <a class="btn text-black ns-fs-4 ns-tickle-pink-btn" href="#">Se connecter</a>
-        </section>
-        <section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
-            <h3>Tu souhaites nous rejoindre ?</h3>
-            <form id="ns-index-join" class="form-inline ns-news-form w-100 container-lg">
-                <div class="row">
-                    <div class="d-none d-lg-block col-lg-3">
-                    
-                    </div>
-                    <div class="col-lg-6 mb-5 mb-lg-0">
-                        <input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton amil">
-                    </div>
-                    <div class="col-lg-auto ns-center">
-                        <button class="ns-news-btn" type="submit">Rejoindre</button>
-                    </div>
-                    <div class="d-none d-lg-block col-lg">
-                    
-                    </div>
-                </div>
-            </form>
-        </section>
-        `
+    </ns-api-data-block>
+</section>
+<section class="min-vh-100 ns-violet-blue-bg p-5 d-flex flex-column align-items-center justify-content-evenly">
+    <h1 class="ns-text-red fw-bold">NyanScan</h1>
+    <p class="text-white ns-fs-5 w-lg-25 w-75 text-center">NyanScan est un site de lecture de scan en ligne. Avec son moteur de recherche complet, trouve le manga qui te plait en quelque clic !</p>
+    <form class="form-inline w-lg-40 w-75 ns-fs-4">
+        <input class="ns-search w-100 p-4" id="ns-nav-search" type="search" placeholder="Rechercher...">
+    </form>
+    <span class="text-white ns-fs-3 fw-bold ns-hide-connected">OU</span>
+    <a class="btn text-black ns-fs-4 ns-tickle-pink-btn ns-hide-connected" href="auth">Se connecter</a>
+</section>
+<section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
+    <h3>Tu souhaites nous rejoindre ?</h3>
+    <form id="ns-index-join" class="form-inline ns-news-form w-100 container-lg">
+        <div class="row">
+            <div class="d-none d-lg-block col-lg-3"></div>
+            <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton amil"></div>
+            <div class="col-lg-auto ns-center"><button class="ns-news-btn" type="submit"> Rejoindre </button></div>
+            <div class="d-none d-lg-block col-lg"></div>
+        </div>
+    </form>
+</section>
     }
 
     build(parent, vars) {

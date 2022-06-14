@@ -102,7 +102,6 @@ function _register() {
         if ($password !== $password_v) {
             $errors[] = "Les mots de passes ne correspondent pas !";
         }
-
         $birthdayExploded = explode("-", $birthday);
 
         if( count($birthdayExploded)!=3 || !checkdate($birthdayExploded[1], $birthdayExploded[2], $birthdayExploded[0]) ){

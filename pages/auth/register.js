@@ -108,6 +108,7 @@ export default class extends Pages {
             const error =  _('#ns-log-error');
             error.style.display = 'inherit';
             if (repType === API_REP_BAD) {
+                error.innerHTML = '';
                 for (let err of getAPIErrorReason(event)) {
                     createPromise('p', null, error, 'my-1', 'justify-content-center').then(e => e.innerText = err);
                 }

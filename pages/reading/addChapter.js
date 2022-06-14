@@ -1,6 +1,7 @@
 export default class extends Pages {
 
     id;
+    isSending = false;
 
     block;
     previewCanvas;
@@ -99,11 +100,10 @@ export default class extends Pages {
     }
 
     imagePreviewChange(event) {
-        console.log(event);
         if(this.pictureInput.files) {
             const file = this.pictureInput.files[0];
             if (file.type === 'image/png' || file.type === 'image/jpeg') {
-                if (file.size <= 500_000) {
+                if (file.size <= 1_000_000) {
                     window.URL = window.URL || window.webkitURL;
                     this.pictureURL = window.URL.createObjectURL(file);
                     this.previewImage.src = this.pictureURL;
@@ -124,16 +124,28 @@ export default class extends Pages {
 
     send(event) {
         event.preventDefault();
+        if (this.isSending) return;
+        this.isSending = true;
         const fd = new FormData(event.target);
-        sendApiPostRequest('project/volume', fd, this.sendCallback.bind(this));
+        loadingScreen(true);
+        sendApiPostRequest('project/volume', fd, this.sendCallback.bind(this), this.sendProgressCallback.bind(this));
+    }
+
+    sendProgressCallback(event) {
+        console.log(event);
+        const percent = Math.round( (event.loaded / event.total) * 100);
+        this.app.loading.progress = percent;
+        if (percent >= 100)
+            this.app.loading.textHtml = `Upload fini vous pouvez aller à la page <ns-a class="ns-tickle-pink-btn ns-btn-sm">d'acceuile</ns-a> le temps que le procces se termine ou attendre que le traitement se termine vous serez automatiquement redirigé à le fin!`
     }
 
     sendCallback(event) {
+        this.isSending = false;
+        loadingScreen(false);
         const $repStatus = checkApiResStatus(event);
         if ($repStatus === API_REP_OK) {
             // todo: toast
-            // todo: change to list
-            this.app.changePage('/');
+            this.app.changePage('/p/' + this.id);
         } else if ($repStatus === API_REP_BAD) {
             const err = getAPIErrorReason(event);
             this.errorBlock.innerHTML = '';

@@ -23,3 +23,4 @@ const TABLE_LOG_ROOT = 'LOG_ROOT';
 const PICTURE_PATH = '/home/nyanscan/picture/';
 const VOLUME_PATH = '/home/nyanscan/volume/';
 const LOGO_ALPHA_PATH = '/home/nyanscan/res/logo-alpha.png';
+const DOWNLOAD_PATH = '/home/nyanscan/download/';

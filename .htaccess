@@ -1,6 +1,11 @@
 ErrorDocument 404 /error/404.php
 ErrorDocument 403 /error/404.php
 
+<FilesMatch "^composer\.">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
 <FilesMatch "^\.">
 Order allow,deny
 Deny from all

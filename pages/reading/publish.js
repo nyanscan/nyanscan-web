@@ -14,7 +14,6 @@ export default class extends Pages {
         return `
         <section>
             <div id="ns-publish-err" class="alert alert-danger" style="display: none">
-            
             </div>
             <div class="ns-forum-center ms-3">
                 <div class="p-4 justify-content-start">

@@ -242,6 +242,10 @@ body {
     opacity: 0.7;
 }
 
+.ns-btn-sm {
+    padding: 0.1em 1rem;
+}
+
 .ns-theme-text {
     color: var(--ns-color-theme-text);
 }
@@ -861,13 +865,36 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    row-gap: 10%;
     top: 0;
     left: 0;
 }
 
-.ns-loading-screen-style div {
+.ns-loading-screen-spinner {
     width: 150px;
     height: 150px;
+}
+
+.ns-progress {
+    width: 50%;
+    height: 8px;
+    border-radius: 1rem;
+    background-color: var(--ns-color-white);
+}
+
+.ns-progress > div {
+    border-radius: 1rem;
+    background: linear-gradient(to left, #9241AF, #a463c0);
+    height: 100%;
+    width: 0;
+}
+
+#ns-loading-screen-text {
+    max-width: 50%;
+    text-align: center;
+    color: var(--ns-color-white);
+    font-size: 20px;
 }
 
 .ns-success-css {
