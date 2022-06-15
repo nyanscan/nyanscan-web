@@ -89,7 +89,7 @@ class Header extends Component {
             </div>
             <div class="ns-d-none-mlg">
                <ns-a class='ns-a-1 nav-link ns-hide-connected' href='/auth'>Se Connecter</ns-a>
-               <span class='ns-a-1 nav-link ns-hide-disconnected d-inline' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
+               <span class='ns-a-1 nav-link ns-hide-disconnected d-inline' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
                <ns-a class="ns-hide-disconnected d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive ns-avatar-sm"></ns-a>
             </div>
         </nav>  
@@ -108,7 +108,7 @@ class Header extends Component {
                         <ns-a class='ns-a-1' href='/auth'>Se Connecter</ns-a>
                     </li>
                     <li class="ns-hide-disconnected">
-                        <span class='ns-a-1' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
+                        <span class='ns-a-1' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
                     </li>
                     <li class="ns-hide-disconnected">
                         <ns-a class="d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive ns-avatar-sm"></ns-a>
@@ -223,10 +223,10 @@ class Index extends Pages {
         <section class="ns-theme-bg py-5">
             <div class="ns-carousel">
                 <div class="ns-carousel-images">
-                    <img src="/res/banner/b1.jpg">
-                    <img src="/res/banner/b2.jpg">
-                    <img src="/res/banner/b3.jpeg">
-                    <img src="/res/banner/b1.jpg">
+                    <img src="/res/banner/b1.jpg" alt="">
+                    <img src="/res/banner/b2.jpg" alt="">
+                    <img src="/res/banner/b3.jpeg" alt="">
+                    <img src="/res/banner/b1.jpg" alt="">
                 </div>
                 <div class="ns-carousel-points">
                 
@@ -378,6 +378,7 @@ class Index extends Pages {
         </div>
     </form>
 </section>
+        `
     }
 
     build(parent, vars) {

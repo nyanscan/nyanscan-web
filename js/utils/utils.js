@@ -9,7 +9,11 @@ const API_REP_CONNECTION_ERROR = -1;
 const LOGIN_LEVEL_DISCONNECT = -1;
 const LOGIN_LEVEL_CONNECT = 1;
 
-
+//Kind of a selector function :
+//to select html tag
+//Query is the tag
+//Mono tell it has to be an isolated element or not
+//return either the first html element or a list of matching elements
 function _(query, mono=false) {
     if (query.startsWith('#') && !query.includes(' ')) {
         mono = true;
@@ -20,6 +24,10 @@ function _(query, mono=false) {
     return document.querySelectorAll(query);
 }
 
+//Function that create html element
+//type is tag type, id like the id, parent like the parent tag
+//and class where you can give class as much as you want
+//return the created element
 function create(type, id = null, parent = null, ...cla) {
     const e = document.createElement(type);
     if (cla.length > 0) {
@@ -34,6 +42,7 @@ function create(type, id = null, parent = null, ...cla) {
     return e;
 }
 
+//Same as above but with a Promise
 function createPromise(type, id = null, parent = null, ...cla) {
     return new Promise(resolve => {
         const e = document.createElement(type);
@@ -50,18 +59,24 @@ function createPromise(type, id = null, parent = null, ...cla) {
     });
 }
 
+//Function to send POST request
+//with the formData for this one for more context
 function sendApiPostRequest(url, formData, callBack = null, progressCallBack=null) {
     sendApiRequest("POST", url, callBack, progressCallBack, formData);
 }
 
+//Function to send GET request
 function sendApiGetRequest(url,  callBack = null, progressCallBack=null) {
     sendApiRequest("GET", url, callBack, progressCallBack);
 }
 
+//Function to send DELETE request
 function sendApiDeleteRequest(url,  callBack = null, progressCallBack=null) {
     sendApiRequest("DELETE", url, callBack, progressCallBack);
 }
 
+//Function that send the request
+//with the method to use, the url, the callback and the item to send
 function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendItem=undefined) {
     const ajax = new XMLHttpRequest()
     ajax.open(method, '/api/v1/' + url, true);
@@ -84,6 +99,8 @@ function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendI
     }
 }
 
+//Function that check the response status of the Api
+//return the state
 function checkApiResStatus(event) {
     if (event.type !== 'load') {
         return API_REP_CONNECTION_ERROR;
@@ -94,25 +111,35 @@ function checkApiResStatus(event) {
     return API_REP_BAD
 }
 
+//Function that get some Api data via event
+//return an object as response
 function getDataAPI(event) {
     return JSON.parse(event.target.responseText)["data"];
 }
 
+//Function that get the reason of an Api error via an event as well
+//return an object as response
 function getAPIErrorReason(event) {
     return JSON.parse(event.target.responseText)["reason"];
 }
 
+//Function that create the loading screen
+//It can be shown or not
 function loadingScreen(show = true) {
    window.APP.loading.switchState(show);
 }
 
-
+//Function that create a very random ID
+//return the ID
 function uuidv4() {
     return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 }
 
+//Function that import fragment of a document into a document
+//with template that is a html element
+//return document fragment
 function importTemplate(template, vars) {
     let clone = document.importNode(template.content, true);
     const regex = /\$([^$]*)\$/g;
@@ -133,6 +160,7 @@ function importTemplate(template, vars) {
     return clone;
 }
 
+//Here, we're creating our User class...
 class User {
     app;
     isLog;
@@ -147,6 +175,7 @@ class User {
         this.isLog = false;
     }
 
+    //to get log of the user
     log() {
         sendApiGetRequest('user/me', (function (ev) {
             if (checkApiResStatus(ev) === API_REP_OK) {
@@ -169,10 +198,12 @@ class User {
         }).bind(this))
     }
 
+    //Get the status of the user
     get loginLevel() {
         return this.isLog ? LOGIN_LEVEL_CONNECT : LOGIN_LEVEL_DISCONNECT;
     }
 
+    //Redirect on logout
     logout(redirectLogin) {
         this.switchBodyLogValue(false);
         sendApiGetRequest('auth/logout', (function (ev) {
@@ -196,10 +227,12 @@ class User {
     }
 }
 
+//Over here, we are creating our base component class...
 class Component {
     app;
     type;
 
+    //get html
     get raw() {
         return '';
     }
@@ -209,10 +242,12 @@ class Component {
         this.app = app;
     }
 
+    //return html
     getHTML() {
         return this.raw;
     }
 
+    //create parent node
     build(parent) {
         parent.innerHTML = this.getHTML();
     }
@@ -222,6 +257,8 @@ class Component {
     }
 
 }
+
+//Creating base class pages from component
 class Pages extends Component {
 
     app;
@@ -245,6 +282,7 @@ class Pages extends Component {
         return super.getHTML();
     }
 
+    //construct the pages
     build(parent, vars) {
         const main = _('#ns-main');
         const currentTheme = main.classList.contains('ns-theme-bg');
@@ -372,8 +410,10 @@ class LoadingScreen extends Component {
     }
 }
 
+//Creating class application from EventTarget
+//for our Api (a Homemade one !)
 class Application extends EventTarget {
-    haveSticky = true;
+    haveStickyHeader = true;
     header;
     footer;
     index;
@@ -562,6 +602,8 @@ class Application extends EventTarget {
     }
 
 }
+
+//Creating the captcha
 class Captcha extends Component {
 
     block;
