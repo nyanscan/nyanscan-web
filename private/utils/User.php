@@ -165,8 +165,14 @@ class User {
         return $data;
     }
 
-    public function getForumViewLevel(): int {
-        return $this->is_connected() ? FORUM_PERMISSION_VIEW_ADMIN : FORUM_PERMISSION_VIEW_EVERYONE;
+    public function getForumViewLevel(): int
+    {
+        if ($this->is_connected()) {
+            $perm = $this->get_permission_level();
+            if ($perm >= PERMISSION_ADMIN) return FORUM_PERMISSION_VIEW_ADMIN;
+            elseif ($perm >= PERMISSION_MODERATOR) return FORUM_PERMISSION_VIEW_MODERATOR;
+            else return FORUM_PERMISSION_VIEW_CONNECTED;
+        } else return FORUM_PERMISSION_VIEW_EVERYONE;
     }
 
     public function is_verified(): bool {
