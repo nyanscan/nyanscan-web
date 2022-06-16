@@ -378,6 +378,7 @@ class Index extends Pages {
         </div>
     </form>
 </section>
+`;
     }
 
     build(parent, vars) {
