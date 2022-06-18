@@ -72,6 +72,7 @@ class Header extends Component {
             <div class="d-flex gap-3 justify-content-center align-items-center">
                 <ns-a href="/" class=""><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
+                <ns-a  class="ns-a-1 ns-d-none-mlg" href="/catalogue">Catalogue</ns-a>
                 <ns-a  class="ns-a-1 ns-hide-disconnected ns-d-none-mlg" href="/publish">Publier</ns-a>
             </div>
             <div>
@@ -100,6 +101,9 @@ class Header extends Component {
                     <span>NyanScan</span>
                     <li>
                         <ns-a class="ns-a-1" href="/forum">Forum</ns-a>
+                    </li>
+                    <li>
+                        <ns-a class="ns-a-1" href="/catalogue">Catalogue</ns-a>
                     </li>
                     <li class="ns-hide-disconnected">
                         <ns-a  class="ns-a-1" href="/publish">Publier</ns-a>
@@ -433,12 +437,12 @@ class Index extends Pages {
 
 const STRUCTURE = [
     {
-        re: /^test-text$/,
-        rel: 'text'
-    },
-    {
         re: /^(|index|home)$/,
         rel: "index",
+    },
+    {
+        re: /^(catalogue|catalog)$/,
+        rel: 'reading/catalog'
     },
     {
         re: /^(f|forum)(\/.*)?$/,
