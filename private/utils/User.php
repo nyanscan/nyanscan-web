@@ -14,7 +14,7 @@ class User {
     private $join;
     private $last_sean;
     private ?string $verification_token = null;
-    private int $permission = -1;
+    private int $permission = PERMISSION_DISCONNECT;
 
     /**
      * @param string|null $user id or username of the user: If null, get the current logged user
@@ -165,8 +165,12 @@ class User {
         return $data;
     }
 
-    public function getForumViewLevel(): int {
-        return $this->is_connected() ? FORUM_PERMISSION_VIEW_ADMIN : FORUM_PERMISSION_VIEW_EVERYONE;
+    /**
+     * @deprecated
+     */
+    public function getForumViewLevel(): int
+    {
+        return 0;
     }
 
     public function is_verified(): bool {
@@ -178,11 +182,11 @@ class User {
     }
 
     public function get_permission_level() : int {
-        return $this->permission;
+        return $this->permission & PERMISSION_MASK;
     }
 
     public function set_permission($permission): bool {
-        if (!is_numeric($permission) || $permission < 0 || $permission > 255) {
+        if (!is_numeric($permission) || $permission < 1 || $permission > 255) {
             return false;
         }
         $this->permission = $permission;
