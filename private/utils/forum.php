@@ -1,11 +1,22 @@
 <?php
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/functions.php');
 
-function create_category($title, $description, $view_level, $create_level) {
+/**
+ * create new category
+ * warn no check is mak at this level
+ *
+ * @param $title string
+ * @param $description string
+ * @param $view_level int
+ * @param $create_level int
+ * @return void
+ */
+function create_category(string $title, string $description, int $view_level, int $create_level) {
     getDB()->insert(TABLE_FORUM_CATEGORY, [
         "name" => $title,
         "description" => $description,
-        "permission" => ($view_level & 0b1111) | (($create_level & 0b1111) << 4)
+        "permission_view" => $view_level & PERMISSION_MASK,
+        "permission_create" => $create_level & PERMISSION_MASK
     ]);
 }
 
@@ -13,16 +24,22 @@ function delete_category($id) : bool {
     return getDB()->delete(TABLE_FORUM_CATEGORY, ["id" => $id]);
 }
 
-function get_category($id, $column = ["id, name, description"]) {
+/**
+ * fetch one category
+ * @param $id int
+ * @param string[] $column
+ * @return array|null
+ */
+function get_category(int $id, array $column = ["id", "name", "description", "permission_create", "permission_view"]): ?array
+{
     if (!is_numeric($id)) return null;
-    return getDB()->select('FORUM_CATEGORY', $column, ["id" => $id], 1);
+    return getDB()->select(TABLE_FORUM_CATEGORY, $column, ["id" => $id], 1)?:null;
 }
 
-function get_all_visible_category($view_level, $column = ["id, name, description"]) {
-    $req =getDB()->get_pdo()->prepare("SELECT " . join(', ', $column) . " FROM PAE_FORUM_CATEGORY WHERE (permission & :mask) <= :level");
+function get_all_visible_category($view_level, $column = ["id", "name", "description", "permission", "permission_create", "permission_view"]) {
+    $req =getDB()->get_pdo()->prepare("SELECT " . join(', ', $column) . " FROM ".DB_PREFIX.TABLE_FORUM_CATEGORY." WHERE permission_view <= :level");
     $req->execute([
-        "mask" => FORUM_PERMISSION_VIEW_MASK,
-        "level" => $view_level & FORUM_PERMISSION_VIEW_MASK
+        "level" => $view_level
     ]);
     return $req->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -53,7 +70,7 @@ function get_all_full_category($view_level) {
                             LEFT JOIN PAE_FORUM_TOPIC AS T ON C.id = T.category
                             LEFT JOIN PAE_FORUM_MESSAGE AS M ON T.last_message = M.id
                             LEFT JOIN PAE_USER A ON A.id = M.author
-                            WHERE (C.permission & ".FORUM_PERMISSION_VIEW_MASK.") <= ".($view_level & FORUM_PERMISSION_VIEW_MASK).") G) FG
+                            WHERE (C.permission_view) <= $view_level) G) FG
                     WHERE FG.num <= 5
                     ORDER BY FG.CAT_ID, FG.NUM;
     ");

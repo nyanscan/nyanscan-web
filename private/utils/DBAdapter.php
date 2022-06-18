@@ -34,9 +34,17 @@ class DBAdapter {
         if (count($where) > 0) {
             $condition = [];
             foreach ($where as $k => $v) {
-                $n_k = str_replace('.', '_', $k);
-                $to_bind[$n_k] = $v;
-                $condition[] = $k . '=:' . $n_k;
+                if (is_array($v)) {
+                    $fv = $v['v'];
+                    $fp = $v['o'];
+                    $n_k = str_replace('.', '_', $k);
+                    $to_bind[$n_k] = $fv;
+                    $condition[] = $k . $fp .':' . $n_k;
+                } else {
+                    $n_k = str_replace('.', '_', $k);
+                    $to_bind[$n_k] = $v;
+                    $condition[] = $k . '=:' . $n_k;
+                }
             }
 
             $statement .= $no_where ? ' AND ' : ' WHERE ';
