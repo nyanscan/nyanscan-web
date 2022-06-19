@@ -134,6 +134,7 @@ function importTemplate(template, vars) {
 }
 
 class User {
+    permissionLevel;
     app;
     isLog;
     data;
@@ -145,6 +146,7 @@ class User {
     constructor(app) {
         this.app = app;
         this.isLog = false;
+        this.permissionLevel = 0;
     }
 
     log() {
@@ -152,6 +154,7 @@ class User {
             if (checkApiResStatus(ev) === API_REP_OK) {
                 this.isLog = true;
                 this.data = getDataAPI(ev);
+                this.permissionLevel = parseInt(this.data["permission"]);
                 this.switchBodyLogValue(true);
                 this.app.dispatchEvent(new CustomEvent('log', {
                     cancelable: false,
@@ -193,6 +196,7 @@ class User {
 
     switchBodyLogValue(value) {
         document.body.setAttribute('ns-log-status', value);
+        if (this.app.currentPages) this.app.currentPages.update_permission_item();
     }
 }
 
@@ -276,6 +280,12 @@ class Pages extends Component {
             foot.style.display = 'none';
         }
         parent.innerHTML = this.getHTML(vars);
+        this.update_permission_item();
+    }
+
+    update_permission_item() {
+        const perm = this.app.user.permissionLevel;
+        _('[ns-perm-level]').forEach(e =>  e.style.display = ( e.getAttribute('ns-perm-level') > perm ? 'none' : ''));
     }
 
     get_client_url() {
@@ -382,6 +392,7 @@ class Application extends EventTarget {
     caches = [];
     user;
     currentPages;
+    currentVars = [];
     session = [];
     prefix;
     structure;
@@ -534,11 +545,21 @@ class Application extends EventTarget {
             this.currentPages.destroy();
         }
         const content = document.querySelector("#ns-main");
+        this.currentVars = vars;
         page.build(content, vars);
         this.setTitle(page.title);
         this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader );
         this.currentPages = page;
         page.send_analytic();
+    }
+
+    reload() {
+        if (!this.currentPages) return;
+        const C = this.currentPages.constructor;
+        console.log(this.currentPages);
+        console.log(C);
+        if (C) this.loadPage(new C(this), this.currentVars);
+
     }
 
     setHeaderSticky(value) {

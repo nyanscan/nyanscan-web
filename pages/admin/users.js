@@ -11,7 +11,7 @@ class ModalEditStatus extends Component {
             <h3>Changer les permissions de l'utilisateur n°${this.id} (${this.name}) ? </h3>
             <div class="ns-form-group">
                 <input type="hidden" hidden="hidden" name="user" value="${this.id}">
-                <select id="nsa-mdoal-uperm" name="permisison" class="form-select">`
+                <select id="nsa-mdoal-uperm" name="permission" class="form-select">`
             
                 for (const permKey in this.perms) {
                     html += `<option value="${this.perms[permKey]}" ${(this.perm === 255 || this.perm > this.perms[permKey]) ? '' : 'disabled'}>${permKey}</option>`;
@@ -20,7 +20,7 @@ class ModalEditStatus extends Component {
                 html += `
                 </select>
             </div>
-            <div class="mt-3 fpp-modal-btn-container">
+            <div class="mt-3 ns-modal-btn-container">
                 <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
                 <button type="submit" class="bg-warning">Modifier</button>
             </div>
@@ -32,7 +32,6 @@ class ModalEditStatus extends Component {
     build(parent) {
         super.build(parent);
         _('#nsa-modal-uperm-form').addEventListener('submit', this.sendRequest.bind(this));
-
     }
 
     constructor(app, id, name, perms, perm) {
@@ -58,7 +57,8 @@ export default class extends SimpleTablePages {
     PERMISSION = {
         "Administrateur": 255,
         "Moderateur": 200,
-        "Default": 0
+        "vip": 100,
+        "Default": 1
     }
 
     COLUMN = [

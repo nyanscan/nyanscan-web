@@ -80,7 +80,7 @@ function _admin_change_permission() {
 
     // check
     if ($user === null || !is_numeric($permission) || $permission < 0 || $permission > 255) {
-        bad_request();
+        bad_request($_POST);
     }
     $sendPerm = get_log_user()->get_permission_level();
     if ($permission >= $sendPerm && $sendPerm !== PERMISSION_ADMIN) {

@@ -1,6 +1,9 @@
 <?php
 /**
  *
+ * @param $method string
+ * @param $function array
+ * @param $query array
  * @api POST forum/category
  * @api POST forum/topic
  * @api POST forum/message
@@ -16,9 +19,6 @@
  *
  *
  * invoker
- * @param $method string
- * @param $function array
- * @param $query array
  */
 function invokeForm(string $method, array $function, array $query)
 {
@@ -49,13 +49,14 @@ function invokeForm(string $method, array $function, array $query)
 
 /**
  * return data for root forum view
- * @api GET forum/category/root
+ * @return void => success => array
  * @version 1.0.0
  * @author Alice.B
  * @get void
- * @return void => success => array
+ * @api GET forum/category/root
  */
-function _get_root_category() {
+function _get_root_category()
+{
     $user = get_log_user();
     $perm = $user->get_permission_level();
     $raw = get_all_full_category($perm);
@@ -63,7 +64,7 @@ function _get_root_category() {
     foreach ($raw as $row) {
         $cat = $row["cat_id"];
         if (!isset($final[$cat]))
-            $final[$cat] = ["id" => $cat, "name" => $row["cat_name"], "description" => $row["cat_description"], "topics" => []];
+            $final[$cat] = ["id" => $cat, "name" => $row["cat_name"], "description" => $row["cat_description"], "permission_view" => $row["permission_view"], "permission_create" => $row["permission_create"], "topics" => []];
         $topic = [
             "id" => $row["topic_id"],
             "name" => $row["topic_name"],
@@ -149,7 +150,7 @@ function _get_topic_from_category($id, $query)
 
     $data["topics"] = array_map(function ($array) {
         return concatenate_array_by_prefix($array, ["message", "author"]);
-    } ,getDB()->select_set_settings('SELECT
+    }, getDB()->select_set_settings('SELECT
                    T.id            AS id,
                    T.name          AS name,
                    T.date_inserted AS date_inserted,
@@ -228,14 +229,14 @@ function _get_messages($query)
 
 /**
  * Create new message
- * permission depends on category permission  @see _create_category, must be connected
- *
- * @post topic string not null =>  id of topic
- * @post message string not null => content message
+ * permission depends on category permission  @return void
  * @api POST forum/topic
  * @version 1.0.0
  * @author Alice.B
- * @return void
+ * @see _create_category, must be connected
+ *
+ * @post topic string not null =>  id of topic
+ * @post message string not null => content message
  */
 function _create_message()
 {
@@ -245,7 +246,7 @@ function _create_message()
     $errors = [];
 
     $message = $_POST["message"] ?? "";
-    $topic = $_POST["topic"]??null;
+    $topic = $_POST["topic"] ?? null;
 
     if ($topic === null) bad_request('invalid topic');
     $req = getDB()->get_pdo()->prepare("SELECT T.id AS id, C.permission_create AS permission_create FROM PAE_FORUM_TOPIC AS T LEFT JOIN PAE_FORUM_CATEGORY C on T.category = C.id WHERE T.id=:topic LIMIT 1;");
@@ -267,22 +268,23 @@ function _create_message()
 
 /**
  * Create message reply
- * permission depends on category permission  @see _create_category, must be connected
- *
- * @post message string not null =>  content
- * @post reply string not null => id of message to reply
+ * permission depends on category permission  @return void
  * @api POST forum/topic
  * @version 1.0.0
  * @author Alice.B
- * @return void
+ * @see _create_category, must be connected
+ *
+ * @post message string not null =>  content
+ * @post reply string not null => id of message to reply
  */
-function _create_reply() {
+function _create_reply()
+{
     $user = get_log_user();
     if (!$user->is_connected()) unauthorized();
     $errors = [];
 
     $message = $_POST["message"] ?? "";
-    $reply = $_POST["reply"]??null;
+    $reply = $_POST["reply"] ?? null;
 
     if ($reply === null) bad_request('invalid reply');
     $req = getDB()->get_pdo()->prepare("SELECT M.id AS id, C.permission_create AS permission_create FROM PAE_FORUM_MESSAGE AS M LEFT JOIN PAE_FORUM_TOPIC T ON M.id = T.last_message LEFT JOIN PAE_FORUM_CATEGORY C ON T.category = C.id WHERE M.id=:message LIMIT 1;");
@@ -301,15 +303,15 @@ function _create_reply() {
 
 /**
  * Create new topic
- * permission depends on category permission  @see _create_category, must be connected
+ * permission depends on category permission  @return void
+ * @api POST forum/topic
+ * @version 1.0.0
+ * @author Alice.B
+ * @see _create_category, must be connected
  *
  * @post category string not null =>  id of category
  * @post title string not null
  * @post message string not null => first message @see _create_message
- * @api POST forum/topic
- * @version 1.0.0
- * @author Alice.B
- * @return void
  */
 function _create_topic()
 {
@@ -340,23 +342,25 @@ function _create_topic()
 
 /**
  * Create new category
- * permission need  @see PERMISSION_CREATE_CATEGORY
+ * permission need  @return void
+ * @api POST forum/category
+ * @version 1.0.0
+ * @author Alice.B
+ * @see PERMISSION_CREATE_CATEGORY
  *
  * @post title string not null
  * @post description string not null
  * @post view int @see PERMISSION_MASK
  * @post creat int @see PERMISSION_MASK
- * @api POST forum/category
- * @version 1.0.0
- * @author Alice.B
- * @return void
  */
 function _create_category()
 {
     $user = get_log_user();
-    if (!$user->get_permission_level() < PERMISSION_CREATE_CATEGORY) unauthorized();
+    if ($user->get_permission_level() < PERMISSION_CREATE_CATEGORY) unauthorized();
     $errors = [];
 
+
+    $id = $_POST["id"] ?? '';
     $title = trim($_POST["title"] ?? "");
     $description = trim($_POST["description"] ?? "");
     $view = $_POST["view"] ?? PERMISSION_DISCONNECT;
@@ -365,11 +369,23 @@ function _create_category()
     if (strlen($title) < 5 || strlen($title) > 100) $errors["title"] = 'Le titre doit contenir au minimum 5 caractéres et au maximum 100 !';
     if (strlen($description) > 255) $errors["description"] = 'La description doit contenir au maximum 255 caractéres !';
 
-    if (!is_int($view) || ($view & PERMISSION_MASK) > $user->get_permission_level()) $errors["view"] = 'La préférence de vue est invalide !';
-    if (!is_int($create) || ($create & PERMISSION_MASK) > $user->get_permission_level() || ($create | PERMISSION_MASK) < ($view | PERMISSION_MASK)) $errors["create"] = 'La préférence de création est invalide !';
+    if (!is_numeric($view) || ($view & PERMISSION_MASK) > $user->get_permission_level()) $errors["view"] = 'La préférence de vue est invalide !';
+    if (!is_numeric($create) || ($create & PERMISSION_MASK) > $user->get_permission_level() || ($create | PERMISSION_MASK) < ($view | PERMISSION_MASK)) $errors["create"] = 'La préférence de création est invalide !';
 
     if (count($errors) === 0) {
-        create_category($title, $description, $view, $create);
+        $data = [
+            "name" => $title,
+            "description" => $description,
+            "permission_view" => $view & PERMISSION_MASK,
+            "permission_create" => $create & PERMISSION_MASK
+        ];
+        if (empty($id)) {
+            getDB()->insert(TABLE_FORUM_CATEGORY, $data);
+        } else {
+            if (!getDB()->select(TABLE_FORUM_CATEGORY, ['id'], ['id' => $id], 1)) bad_request("invalid category");
+            getDB()->update(TABLE_FORUM_CATEGORY, $data, ['id' => $id]);
+        }
+
         success();
     } else bad_request($errors);
 }

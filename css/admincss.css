@@ -180,25 +180,6 @@ body {
     font-weight: bold;
 }
 
-.fpp-modal-btn-container {
-    width: 100%;
-    display: flex;
-    gap: .5rem;
-}
-
-.fpp-modal-btn-container button {
-    padding: .5rem 20px;
-    flex: auto;
-    border: none;
-    cursor: pointer;
-    opacity: 0.9;
-    font-size: 20px;
-}
-
-.fpp-modal-btn-container button:hover {
-    opacity: 1;
-}
-
 .f-toast-container {
     position: fixed;
     bottom: 0.5rem;

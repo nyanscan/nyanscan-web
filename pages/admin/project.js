@@ -21,7 +21,7 @@ class ModalEditStatus extends Component {
                 <textarea id="nsa-mdoal-pr" name="reason" rows="4" maxlength="255" class="form-control"></textarea>
                 <div class="form-text">Raison de la modification</div>
             </div>
-            <div class="fpp-modal-btn-container">
+            <div class="ns-modal-btn-container">
                 <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
                 <button type="submit" class="bg-danger">Modifier</button>
             </div>

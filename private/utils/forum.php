@@ -1,25 +1,6 @@
 <?php
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/functions.php');
 
-/**
- * create new category
- * warn no check is mak at this level
- *
- * @param $title string
- * @param $description string
- * @param $view_level int
- * @param $create_level int
- * @return void
- */
-function create_category(string $title, string $description, int $view_level, int $create_level) {
-    getDB()->insert(TABLE_FORUM_CATEGORY, [
-        "name" => $title,
-        "description" => $description,
-        "permission_view" => $view_level & PERMISSION_MASK,
-        "permission_create" => $create_level & PERMISSION_MASK
-    ]);
-}
-
 function delete_category($id) : bool {
     return getDB()->delete(TABLE_FORUM_CATEGORY, ["id" => $id]);
 }
@@ -50,30 +31,5 @@ function update_topic_last_message($topic) {
 }
 
 function get_all_full_category($view_level) {
-    $req = getDB()->get_pdo()->prepare("
-                    SELECT *
-                    FROM (SELECT 
-                              *,
-                              ROW_NUMBER() OVER (PARTITION BY cat_id ORDER BY message_date_inserted DESC) AS num
-                        FROM (SELECT 
-                                  C.id            AS cat_id,
-                                  C.name          AS cat_name,
-                                  C.description   AS cat_description,
-                                  T.id            AS topic_id,
-                                  T.name          AS topic_name,
-                                  T.date_inserted AS topic_date_inserted,
-                                  M.id            AS message_id,
-                                  M.date_inserted AS message_date_inserted,
-                                  A.id            AS author_id,
-                                  A.username      AS author_username
-                            FROM PAE_FORUM_CATEGORY AS C
-                            LEFT JOIN PAE_FORUM_TOPIC AS T ON C.id = T.category
-                            LEFT JOIN PAE_FORUM_MESSAGE AS M ON T.last_message = M.id
-                            LEFT JOIN PAE_USER A ON A.id = M.author
-                            WHERE (C.permission_view) <= $view_level) G) FG
-                    WHERE FG.num <= 5
-                    ORDER BY FG.CAT_ID, FG.NUM;
-    ");
-    $req->execute();
-    return $req->fetchAll(PDO::FETCH_ASSOC);
+    return getDB()->select(VIEW_ROOT_FORUM_CATEGORIES, ['*'], ['num' => ['v' => 5, 'o' => '<=']], 0, 'cat_id, num');
 }
