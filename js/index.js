@@ -71,7 +71,7 @@ class Header extends Component {
             </div>
             <div class="d-flex gap-3 justify-content-center align-items-center">
                 <ns-a href="/" class=""><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a>
-                <ns-a  class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
+                <ns-a class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/catalogue">Catalogue</ns-a>
                 <ns-a  class="ns-a-1 ns-hide-disconnected ns-d-none-mlg" href="/publish">Publier</ns-a>
             </div>

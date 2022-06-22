@@ -35,6 +35,10 @@
     --ns-color-theme-invert-bg: #ffffff;
 }
 
+ns-api-data {
+    display: inline-block;
+}
+
 ns-a {cursor: pointer;}
 .ns-modal-container {
     height: 100vh;
@@ -126,4 +130,21 @@ body[ns-log-status=false] .ns-hide-disconnected {display: none !important;}
 
 @media (max-width: 992px) {
     .ns-d-none-mlg { display: none !important; }
+}
+
+.ns-empty-placeholder:empty, .ns-placeholder {
+    /*display: inline-block;*/
+    min-height: 1em;
+    vertical-align: middle;
+    cursor: wait;
+    background-color: currentColor;
+    background-clip: content-box;
+    opacity: 0.5;
+    min-width: 20em;
+    -webkit-animation: placeholder-glow 2s ease-in-out infinite;
+    animation: placeholder-glow 2s ease-in-out infinite;
+}
+
+ns-pagination .nsp-current {
+    background-color: red;
 }

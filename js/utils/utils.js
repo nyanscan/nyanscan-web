@@ -37,7 +37,7 @@ function create(type, id = null, parent = null, ...cla) {
 function createPromise(type, id = null, parent = null, ...cla) {
     return new Promise(resolve => {
         const e = document.createElement(type);
-        if (cla) {
+        if (cla.length > 0) {
             e.classList.add(...cla);
         }
         if (id) {
@@ -942,4 +942,9 @@ function arrayPop(array, key) {
         delete (array[key]);
     }
     return e;
+}
+
+function isInt(value) {
+    const x = parseFloat(value);
+    return !isNaN(value) && (x | 0) === x;
 }

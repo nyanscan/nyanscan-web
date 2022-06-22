@@ -1185,6 +1185,11 @@ body {
     margin-bottom: 2rem;
 }
 
+#topics-container:empty {
+    background-color: var(--ns-color-deep-mauve);;
+    height: 100vh;
+}
+
 @media (max-width: 576px) {
     .ns-pr-picture {
         width: 296px;
@@ -1283,4 +1288,4 @@ body {
     }
 
 }
->>>>>>> dev
+

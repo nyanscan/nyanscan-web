@@ -9,10 +9,23 @@ class ModalEditCategories extends Component {
         <h3>${this.id === null ? 'Créer' : 'Modifier'} une catégorie ?</h3>
         <div class="ns-form-group d-flex flex-column gap-2">
             <input type="hidden" hidden="hidden" name="id" value="${this.id}">
-            <input type="text" name="title" placeholder="Titre" value="${this.data['name'] || ''}">
-            <input type="text" name="description" placeholder="Description" value="${this.data['description'] || ''}">
-            <input type="number" min="0" max="255" name="create" placeholder="Permission création" value="${this.data['permission_create'] || ''}">
-            <input type="number" min="0" max="255" name="view" placeholder="Permission visibilité" value="${this.data['permission_view'] || ''}">
+            <div class="form-floating">
+                <input type="text" name="title" id="nsfm-edit-title" placeholder="Titre" class="form-control" value="${this.data['name'] || ''}">
+                <label for="nsfm-edit-title">Titre</label>
+            </div>
+            <div class="form-floating">
+                <input type="text" name="description" id="nsfm-edit-description" placeholder="Description" class="form-control" value="${this.data['description'] || ''}">
+                <label for="nsfm-edit-description">Description</label>
+            </div>
+            <div class="form-floating">
+                <input type="number" min="0" max="255" id="nsfm-edit-create" name="create" placeholder="Permission création"  class="form-control" value="${this.data['permission_create'] || ''}">
+                <label for="nsfm-edit-create">Permission de création</label>
+            </div>
+                <div class="form-floating">
+                <input type="number" min="0" max="255" id="nsfm-edit-view" name="view" placeholder="Permission visibilité" class="form-control" value="${this.data['permission_view'] || ''}">
+            <label for="nsfm-edit-view">Permission de visibilité</label>
+            </div>
+            
         </div>
         <div class="mt-3 ns-modal-btn-container">
             <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
@@ -39,10 +52,7 @@ class ModalEditCategories extends Component {
         event.preventDefault();
         loadingScreen(true);
         this.app.closeModal();
-        sendApiPostRequest('forum/category', new FormData(event.target), (e) => {
-            loadingScreen(false);
-            this.app.reload();
-        });
+        sendApiPostFetch('forum/category', new FormData(event.target)).then(d => this.app.reload()).catch(console.error).finally(() => loadingScreen(false));
     }
 
 }
@@ -152,12 +162,13 @@ export default class extends Pages {
         }
         _('#ns-forum-add-cat').addEventListener('click', (e => {
             e.preventDefault();
+            if (this.app.user?.permissionLevel < 255) return;
             this.app.openModal(new ModalEditCategories(this.app));
         }).bind(this));
     }
 
     openEditModal(id, e) {
-        e.preventDefault();
+        if (this.app.user?.permissionLevel < 255) return;
         this.app.openModal(new ModalEditCategories(this.app, id, this.dataBlock.rawData[id]));
     }
 
