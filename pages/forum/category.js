@@ -105,7 +105,7 @@ export default class extends Pages {
                 this.firstLoad = false;
                 this.amount = raw["total"];
                 this.maxPage = Math.ceil(this.amount / this.countPerPage);
-                _('#ns-categ-total').innerText = Math.ceil(this.amount / this.countPerPage);
+                _('#ns-categ-total').innerText = this.amount;
             }
 
             const container = _("#topics-container");

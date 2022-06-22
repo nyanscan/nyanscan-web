@@ -31,5 +31,5 @@ function update_topic_last_message($topic) {
 }
 
 function get_all_full_category($view_level) {
-    return getDB()->select(VIEW_ROOT_FORUM_CATEGORIES, ['*'], ['num' => ['v' => 5, 'o' => '<=']], 0, 'cat_id, num');
+    return getDB()->select(VIEW_ROOT_FORUM_CATEGORIES, ['*'], ['num' => ['v' => 5, 'o' => '<='], 'permission_view' => ["v" => $view_level, 'o' => '<=']], 0, 'cat_id, num');
 }

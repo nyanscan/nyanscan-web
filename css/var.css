@@ -145,6 +145,51 @@ body[ns-log-status=false] .ns-hide-disconnected {display: none !important;}
     animation: placeholder-glow 2s ease-in-out infinite;
 }
 
+ns-pagination ul {
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    padding: 0;
+}
+ns-pagination ul >*:first-child button {
+    border-radius: .5rem 0 0 .5rem;
+    border-right: 1px solid #333;
+}
+
+ns-pagination ul >*:last-child button {
+    border-radius: 0 .5rem .5rem 0;
+    border-left: 1px solid #333;
+}
+
+ns-pagination button {
+    border: none;
+    padding: .5rem;
+    background-color: var(--ns-color-tickle-me-pink);
+    color: var(--ns-color-white);
+    font-size: 24px;
+}
+
+ns-pagination button:hover, ns-pagination button:disabled {
+    opacity: .7;
+}
+
 ns-pagination .nsp-current {
-    background-color: red;
+    opacity: .7;
+}
+
+ns-pagination[placeholder] {
+    min-height: 1em;
+    vertical-align: middle;
+    cursor: wait;
+    background-color: var(--ns-color-tickle-me-pink);
+    background-clip: content-box;
+    opacity: 0.5;
+    min-width: 20em;
+    border-radius: .5rem;
+    -webkit-animation: placeholder-glow 2s ease-in-out infinite;
+    animation: placeholder-glow 2s ease-in-out infinite;
+}
+ns-pagination[placeholder] > * {
+    opacity: 0;
 }
