@@ -53,39 +53,29 @@ class ApiDataBlock extends HTMLElement {
 
     refresh() {
         if (this.href) {
-            sendApiGetRequest(this.href, this.dataCallBack.bind(this));
+            this.dataCallBack(sendApiGetFetch(this.href));
         }
     }
 
-    dataCallBack(event) {
-        this.dataLoad = true;
-        const code = checkApiResStatus(event);
-        if (code === API_REP_OK) {
-            try {
-                this.rawData = getDataAPI(event);
-            } catch (error) {
-                this.error = {code: -1, message: 'parseError'};
-                this.isError = true;
-            }
-        } else {
+    dataCallBack(promise) {
+        promise.then(data => {
+            this.rawData = data;
+        }).catch(err => {
+            this.error = {code: err?.status||-1, message: err?.statusText||'ConnexionError'};
             this.isError = true;
-            if (code === API_REP_BAD) {
-                this.error = {code: event.target.status, message: getAPIErrorReason(event)};
-            } else {
-                this.error = {code: -1, message: 'ConnexionError'};
-            }
-        }
-
-        this.dispatchEvent(new CustomEvent('dataLoad', {
-            cancelable: false,
-            bubbles: true,
-            composed: false,
-            detail: {
-                isError: this.isError,
-                raw: this.rawData
-            }
-        }));
-        this.replaceAttrVar();
+        }).finally(() => {
+            this.dataLoad = true;
+            this.dispatchEvent(new CustomEvent('dataLoad', {
+                cancelable: false,
+                bubbles: true,
+                composed: false,
+                detail: {
+                    isError: this.isError,
+                    raw: this.rawData
+                }
+            }));
+            this.replaceAttrVar();
+        })
     }
 
     replaceAttrVar() {

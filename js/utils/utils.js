@@ -50,18 +50,49 @@ function createPromise(type, id = null, parent = null, ...cla) {
     });
 }
 
+/**
+ *
+ * @param url
+ * @param formData
+ * @param callBack
+ * @param progressCallBack
+ * @deprecated
+ */
 function sendApiPostRequest(url, formData, callBack = null, progressCallBack=null) {
     sendApiRequest("POST", url, callBack, progressCallBack, formData);
 }
 
+/**
+ *
+ * @param url
+ * @param callBack
+ * @param progressCallBack
+ * @deprecated
+ */
 function sendApiGetRequest(url,  callBack = null, progressCallBack=null) {
     sendApiRequest("GET", url, callBack, progressCallBack);
 }
 
+/**
+ *
+ * @param url
+ * @param callBack
+ * @param progressCallBack
+ * @deprecated
+ */
 function sendApiDeleteRequest(url,  callBack = null, progressCallBack=null) {
     sendApiRequest("DELETE", url, callBack, progressCallBack);
 }
 
+/**
+ *
+ * @param method
+ * @param url
+ * @param callBack
+ * @param progressCallBack
+ * @param sendItem
+ * @deprecated
+ */
 function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendItem=undefined) {
     const ajax = new XMLHttpRequest()
     ajax.open(method, '/api/v1/' + url, true);
@@ -82,6 +113,27 @@ function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendI
     } else {
         ajax.send();
     }
+}
+
+function sendApiPostFetch(url, fd) {
+    return sendApiFetch(new Request('/api/v1/' + url, {
+        method: 'post',
+        body: fd
+    }));
+}
+
+function sendApiGetFetch(url) {
+    return sendApiFetch('/api/v1/' + url);
+}
+
+function sendApiFetch(req) {
+    return  fetch(req).then(response => {
+        if (response.status >= 200 && response.status < 300) {
+            return Promise.resolve(response)
+        } else {
+            return Promise.reject(response);
+        }
+    }).then(r => r.json()).then(e => Promise.resolve(e.data));
 }
 
 function checkApiResStatus(event) {
@@ -178,20 +230,19 @@ class User {
 
     logout(redirectLogin) {
         this.switchBodyLogValue(false);
-        sendApiGetRequest('auth/logout', (function (ev) {
-            if (checkApiResStatus(ev) === API_REP_OK) {
-                this.isLog = false;
-                this.data = [];
-                this.app.dispatchEvent(new CustomEvent('logout', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                }))
-                if (redirectLogin) {
-                    this.app.changePage('/auth/')
-                }
+        sendApiGetFetch('auth/logout').then(data => {
+            this.isLog = false;
+            this.data = [];
+            this.permissionLevel = 0;
+            this.app.dispatchEvent(new CustomEvent('logout', {
+                cancelable: false,
+                bubbles: true,
+                composed: false,
+            }))
+            if (redirectLogin) {
+                this.app.changePage('/auth/')
             }
-        }).bind(this))
+        }).catch(console.error);
     }
 
     switchBodyLogValue(value) {
@@ -293,7 +344,7 @@ class Pages extends Component {
     }
 
     send_analytic() {
-        sendApiGetRequest(`analytic${this.get_client_url()}`);
+        sendApiGetFetch(`analytic${this.get_client_url()}`).catch(console.error);
     }
 
 }
