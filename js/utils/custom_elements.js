@@ -124,7 +124,7 @@ class ApiData extends HTMLElement {
                 console.warn('A api-data must be in api-data-block !');
             } else  {
                 if (this.block.dataLoad) {
-                    this.innerText = this.block.getField(this.field || '');
+                    this.innerText =  escapeHtml(this.block.getField(this.field || ''));
                 } else {
                     this.block.addEventListener('dataLoad', this.setData.bind(this))
                 }

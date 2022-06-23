@@ -165,8 +165,12 @@ function uuidv4() {
     );
 }
 
-function importTemplate(template, vars) {
-    let clone = document.importNode(template.content, true);
+function importTemplate(template, vars, isString=false) {
+    let clone;
+    if (isString) {
+        clone = document.createElement('div');
+        clone.innerHTML = template;
+    } else clone = document.importNode(template.content, true);
     const regex = /\$([^$]*)\$/g;
     let matches;
     let couldChangeAttr = clone.querySelectorAll('.ns-template-var-attr');
@@ -184,6 +188,7 @@ function importTemplate(template, vars) {
     }
     return clone;
 }
+
 
 class User {
     permissionLevel;

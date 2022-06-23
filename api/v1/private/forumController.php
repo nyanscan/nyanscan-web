@@ -16,6 +16,7 @@
  * @api GET forum/category/{cat-id}/topics?limit=[0-20]&offset=[0+]
  * @api GET forum/message/{msg-id}
  * @api GET forum/messages
+ * @api GET forum/message/{msg-id}/reply?offset=[0-9]+?limit=[0-9]+
  *
  *
  * invoker
@@ -28,20 +29,21 @@ function invokeForm(string $method, array $function, array $query)
         elseif (count($function) === 1 && $function[0] === "message") _create_message();
         elseif (count($function) === 1 && $function[0] === "reply") _create_reply();
     } elseif ($method === "GET") {
-        if (count($function) === 2 && $function[0] == "category") {
-            if ($function[1] === "all") _get_all_category();
-            if ($function[1] === "root") _get_root_category();
-            else _get_category($function[1]);
-        } elseif (count($function) === 3 && $function[0] == "category" && $function[2] === "topics") {
-            _get_topic_from_category($function[1], $query);
-        } elseif (count($function) === 2 && $function[0] === "topic") {
-            _get_topic($function[1]);
-        } elseif (count($function) === 2 && $function[0] === "message") {
-            _get_message($function[1], $query);
-        } elseif (count($function) === 1 && $function[0] === "messages") {
-            _get_messages($query);
-        }
-    } else bad_method();
+	    if (count($function) === 2 && $function[0] == "category") {
+		    if ($function[1] === "all") _get_all_category();
+		    if ($function[1] === "root") _get_root_category(); else _get_category($function[1]);
+	    } elseif (count($function) === 3 && $function[0] == "category" && $function[2] === "topics") {
+		    _get_topic_from_category($function[1], $query);
+	    } elseif (count($function) === 2 && $function[0] === "topic") {
+		    _get_topic($function[1]);
+	    } elseif (count($function) === 2 && $function[0] === "message") {
+		    _get_message($function[1], $query);
+	    } elseif (count($function) === 1 && $function[0] === "messages") {
+		    _get_messages($query);
+	    } elseif (count($function) === 3 && $function[0] === "message" && $function[2] === "reply") {
+		    _get_reply($function[1], $query);
+	    } else bad_method();
+    }
 }
 
 
@@ -161,11 +163,12 @@ function _get_topic_from_category($id, $query)
 
             FROM PAE_FORUM_TOPIC AS T
                      LEFT JOIN PAE_FORUM_MESSAGE AS M ON T.last_message = M.id
-                     LEFT JOIN PAE_USER A ON A.id = M.author', ["T.category" => $id], $limit, 'T.last_message DESC', $offset));
+                     LEFT JOIN PAE_USER A ON A.id = M.author', ["T.category" => $id], $limit, 'T.last_message DESC', $offset, false, true));
     $data["category"] = [
         "id" => $id,
         "name" => $category["name"],
         "description" => $category["description"],
+        "permission_create" => $category["permission_create"],
     ];
     if ($count !== '0') {
         if ($data["topics"]) {
@@ -191,7 +194,7 @@ function _get_message($id, $query)
 }
 
 /**
- * @api GET forum/message/{msg-id}
+ * @api GET forum/messages
  * return one message
  * @version 1.0.0
  * @author Alice.B
@@ -212,18 +215,55 @@ function _get_messages($query)
     if ($topic !== null) $where['topic_id'] = $topic;
     $where['category_permission_view'] = ['v' => $perm, 'o' => '<='];
 
-    $data = getDB()->select(VIEW_FULL_FORUM_MESSAGE, ['*'], $where, $limit, 'date_inserted DESC', $offset);
-
+    $data = getDB()->select(VIEW_FULL_FORUM_MESSAGE, ['*'], $where, $limit, 'date_inserted ASC', $offset, true);
     $elements = [];
     foreach ($data as $d) {
         $elements[] = concatenate_array_by_prefix($d, ["replay", "author", "topic"]);
     }
 
-    success([
-        "count" => count($elements),
-        "elements" => $elements
-    ]);
+	$final_data = [
+		"count" => getDB()->count(VIEW_FULL_FORUM_MESSAGE, 'id', $where),
+		"elements" => $elements
+	];
+
+	if ($topic !== null) {
+		if (count($elements) > 0) {
+			$final_data["topic"] = $elements[0]["topic"];
+		} else {
+			$final_data["topic"] = getDB()->select(TABLE_FORUM_TOPIC, ['id', 'name', 'category', 'date_inserted', 'last_message'], ['id' => $topic], 1);
+		}
+	}
+
+    success($final_data);
 }
+
+function _get_reply(string $message, array $query) {
+	$user = get_log_user();
+	$perm = $user->get_permission_level();
+	$limit = max(1, min(50, intval($query['limit'] ?? 10)));
+	$offset = max(0, intval($query['offset'] ?? 0));
+	if ($message === '') bad_request("invalid message");
+	$messageData = getDB()->select(VIEW_FULL_FORUM_MESSAGE, ['*'], ['id' => $message, 'category_permission_view' => ['v' => $perm, 'o' => '<=']], 1);
+	if (!$messageData) bad_request("invalid message");
+
+	$reply = getDB()->select(TABLE_FORUM_REPLY, ['id', 'author', 'content', 'date_inserted', 'status'], ['message' => $message], $limit, 'date_inserted ASC', $offset, true);
+
+	$data = [
+		"total" => $messageData["reply_count"]??0,
+		"message" => concatenate_array_by_prefix($messageData, ["replay", "author", "topic"]),
+		"elements" => $reply
+	];
+	$url = 'forum/message/' . $message . '/reply';
+	if ($data["total"] > $offset + $limit) {
+		$data["next"] = $url . '?offset=' . ($offset + $limit) . '&limit=' . $limit;
+	}
+	if ($offset > 0) {
+		$data["previous"] = $url . '?offset=' . ($offset - $limit) . '&limit=' . $limit;
+	}
+
+	success($data);
+}
+
 
 // POST
 
@@ -255,7 +295,7 @@ function _create_message()
 
     if (!$sql_topic || $sql_topic['permission_create'] > $user->get_permission_level()) bad_request('invalid topic');
 
-    if (strlen($message) < 1 || strlen($message) > 2000) $errors["$message"] = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
+    if (strlen($message) < 1 || strlen($message) > 2000) $errors[] = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
 
     if (count($errors) !== 0) bad_request($errors);
 
@@ -295,7 +335,7 @@ function _create_reply()
     if (strlen($message) < 1 || strlen($message) > 2000) $errors["$message"] = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
     if (count($errors) !== 0) bad_request($errors);
 
-    $data = ["author" => $user->getId(), "reply" => $sql_reply["id"], "content" => $message];
+    $data = ["author" => $user->getId(), "message" => $sql_reply["id"], "content" => $message];
     getDB()->insert(TABLE_FORUM_REPLY, $data);
     success();
 
@@ -371,6 +411,7 @@ function _create_category()
 
     if (!is_numeric($view) || ($view & PERMISSION_MASK) > $user->get_permission_level()) $errors["view"] = 'La préférence de vue est invalide !';
     if (!is_numeric($create) || ($create & PERMISSION_MASK) > $user->get_permission_level() || ($create | PERMISSION_MASK) < ($view | PERMISSION_MASK)) $errors["create"] = 'La préférence de création est invalide !';
+	if ($create < PERMISSION_DEFAULT) $create = PERMISSION_DEFAULT;
 
     if (count($errors) === 0) {
         $data = [

@@ -18,12 +18,12 @@ class ModalEditCategories extends Component {
                 <label for="nsfm-edit-description">Description</label>
             </div>
             <div class="form-floating">
-                <input type="number" min="0" max="255" id="nsfm-edit-create" name="create" placeholder="Permission création"  class="form-control" value="${this.data['permission_create'] || ''}">
+                <input type="number" min="1" max="255" id="nsfm-edit-create" name="create" placeholder="Permission création"  class="form-control" value="${this.data['permission_create'] || ''}">
                 <label for="nsfm-edit-create">Permission de création</label>
             </div>
-                <div class="form-floating">
+            <div class="form-floating">
                 <input type="number" min="0" max="255" id="nsfm-edit-view" name="view" placeholder="Permission visibilité" class="form-control" value="${this.data['permission_view'] || ''}">
-            <label for="nsfm-edit-view">Permission de visibilité</label>
+                <label for="nsfm-edit-view">Permission de visibilité</label>
             </div>
             
         </div>
@@ -117,7 +117,7 @@ export default class extends Pages {
                 </div>
             </template>
             <template id="category-template-topic">
-                <ns-a href="/forum/$id$/$topic$" class="ns-template-var-attr ns-categ-subject mb-3 ns-a-categ ns-b-purple-gradient">
+                <ns-a href="/forum/t$topic-id$-$topic-name$" class="ns-template-var-attr ns-categ-subject mb-3 ns-a-categ ns-b-purple-gradient">
                     <h4>
                         <ns-api-data field="$id$.topics.$topic$.name" class="ns-template-var-attr"></ns-api-data>
                     </h4>
@@ -181,7 +181,8 @@ export default class extends Pages {
             const clone = importTemplate(templateC, {"id": cat});
             const topicContainer = clone.querySelector('.ns-category-topic-container');
             for (const topic in raw[cat]["topics"]) {
-                const cloneTopic = importTemplate(templateT, {"id": cat, "topic": topic.toString()});
+                const urlName = encodeURIComponent(raw[cat]['topics'][topic]['name'].trim().replace(/\s/g, '-'));
+                const cloneTopic = importTemplate(templateT, {"id": cat, "topic-name": urlName, "topic-id": raw[cat]['topics'][topic]['id'], "topic": topic.toString()});
                 topicContainer.appendChild(cloneTopic);
             }
 

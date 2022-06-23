@@ -91,7 +91,7 @@ class Header extends Component {
             <div class="ns-d-none-mlg">
                <ns-a class='ns-a-1 nav-link ns-hide-connected' href='/auth'>Se Connecter</ns-a>
                <span class='ns-a-1 nav-link ns-hide-disconnected d-inline' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
-               <ns-a class="ns-hide-disconnected d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive ns-avatar-sm"></ns-a>
+               <ns-a class="ns-hide-disconnected d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive ns-avatar-sm"></ns-a>
             </div>
         </nav>  
         <nav id="horizontal-mobile-nav" style="display: none">
@@ -115,7 +115,7 @@ class Header extends Component {
                         <span class='ns-a-1' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
                     </li>
                     <li class="ns-hide-disconnected">
-                        <ns-a class="d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive ns-avatar-sm"></ns-a>
+                        <ns-a class="d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive ns-avatar-sm"></ns-a>
                     </li>
                     <li>
                         <div class="form-check form-switch">
@@ -454,14 +454,14 @@ const STRUCTURE = [
                     rel: 'forum/categories'
                 },
                 {
-                    re: /^([0-9]+)$/,
+                    re: /^(\d+)$/,
                     rel: 'forum/category',
                     var: [{id: 1, name: 'category'}]
                 },
                 {
-                    re: /^([0-9]+)\/([0-9]+)\/?([0-9]*)/,
+                    re: /^t(\d+)-[^/]*\/?(\d*)/,
                     rel: 'forum/topic',
-                    var: [{id: 1, name: 'category'}, {id: 2, name: 'topic'}, {id: 3, name: 'page'}]
+                    var: [{id: 1, name: 'topic'}, {id: 2, name: 'page'}]
                 }
             ]
         }

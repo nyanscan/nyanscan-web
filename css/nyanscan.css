@@ -85,7 +85,11 @@ body {
     background-color: var(--ns-color-gray);
     height: 150px;
     width: 150px;
-    border-radius: 15em;
+    border-radius: 50%;
+}
+.ns-avatar-md {
+    height: 80px;
+    width: 80px;
 }
 .ns-avatar-sm {
     height: 32px;
@@ -236,6 +240,8 @@ body {
     background-color: var(--ns-color-tickle-me-pink);
     border-radius: 1.5rem;
     padding: 0.5rem 2rem;
+    font-size: 1.2rem;
+    color: var(--ns-color-theme-text);
 }
 
 .ns-tickle-pink-btn:hover {
@@ -1188,6 +1194,104 @@ body {
 #topics-container:empty {
     background-color: var(--ns-color-deep-mauve);;
     height: 100vh;
+}
+
+#nsf-messages-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 5rem;
+}
+
+#nsf-messages-container:empty {
+    background-color: var(--ns-color-deep-mauve);
+    height: 100vh;
+}
+
+.ns-rounded-text {
+    border-radius: 1.5rem;
+    padding: 0.5rem 2rem;
+    font-weight: 400;
+    line-height: 1.5;
+    margin: 0;
+    font-size: 1.2rem;
+    border: 1px solid transparent;
+}
+
+.nsf-message {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    grid-template-rows: 32px auto auto;
+    grid-column-gap: 2rem;
+    grid-row-gap: 1rem;
+
+    padding: 2rem;
+    background-color: var(--ns-color-purpureus);
+    border-radius: 1rem;
+
+}
+
+.nsf-message-user {
+    grid-area: 1 / 1 / 4 / 2;
+    display: flex;
+    row-gap: .8rem;
+    flex-direction: column;
+    align-items: center;
+}
+.nsf-message-user img {
+
+}
+
+.nsf-message-user .nsf-message-username {
+
+}
+
+.nsf-message-date {
+    grid-area: 1 / 2 / 2 / 3;
+    font-size: 12px;
+    font-style: italic;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nsf-message-content {
+    grid-area: 2 / 2 / 3 / 3;
+}
+
+.nsf-message-show-replay {
+    grid-area: 3 / 2 / 4 / 3;
+}
+
+.nsf-message-reply {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+}
+
+.nsf-message-reply-more {
+
+}
+
+.nsf-message-reply-less {
+
+}
+
+.nsf-message-reply-container {
+
+}
+
+.nsf-message-reply-hide .nsf-message-reply-more {
+
+}
+
+.nsf-message-reply-hide .nsf-message-reply-less {
+    display: none;
+}
+
+.nsf-message-reply-hide .nsf-message-reply-container {
+    display: none;
 }
 
 @media (max-width: 576px) {

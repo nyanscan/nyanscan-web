@@ -13,7 +13,7 @@ export default class extends Pages {
                         <section class="flex-row d-flex">
                             <div class="col-md-8 d-flex justify-content-start align-items-center gap-3">
                                 <div class="p-2">
-                                    <img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive">
+                                    <img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive">
                                 </div>
                                 <div class="p-2">
                                     <h3><ns-api-data field="username"></ns-api-data></h3>

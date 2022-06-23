@@ -181,7 +181,7 @@ ns-pagination .nsp-current {
 ns-pagination[placeholder] {
     min-height: 1em;
     vertical-align: middle;
-    cursor: wait;
+    cursor: wait !important;
     background-color: var(--ns-color-tickle-me-pink);
     background-clip: content-box;
     opacity: 0.5;
