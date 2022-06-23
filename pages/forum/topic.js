@@ -34,12 +34,12 @@ class ForumMessage extends Component {
                 <span>Le ${this.data['date_inserted']}</span>
                 <button class="btn ns-tickle-pink-btn ns-btn-sm ns-hide-disconnected nsf-message-reply-btn"><i class="bi bi-reply-fill"></i></button>
             </div>
-            <p class="nsf-message-content">${escapeHtml(this.data.content)}</p>
+            <p class="nsf-message-content">${formatMessage(this.data.content)}</p>
             <div class="nsf-message-reply nsf-message-reply-hide">
-                <button class="nsf-message-reply-less">Afficher moins de réponses</button>
+                <button class="nsf-message-reply-less btn ns-tickle-pink-btn btn-sm">Afficher moins de réponses</button>
                 <div class="nsf-message-reply-container"></div>
                 <div class="ns-placeholder" style="height: 50vh; background-color: var(--ns-color-deep-mauve); display: none"></div>
-                <button class="nsf-message-reply-more">Afficher plus de réponses ( ${this.data['reply_count']} )</button>
+                <button class="nsf-message-reply-more btn ns-tickle-pink-btn btn-sm">Afficher plus de réponses ( ${this.data['reply_count']} )</button>
             </div>
         `;
     }
@@ -81,7 +81,6 @@ class ForumMessage extends Component {
 
     newReplyClick(e) {
         e.preventDefault();
-        console.log(e);
         if (this.app.user.isLog)
             this.page.createReply(this.data['id'], this.data['content']);
     }
@@ -96,7 +95,7 @@ class ForumMessage extends Component {
             <div class="nsf-message-date">
                 <span>Le ${data['date_inserted']}</span>
             </div>
-            <p class="nsf-message-content">${escapeHtml(data.content)}</p>
+            <p class="nsf-message-content">${formatMessage(data.content)}</p>
         `;
     }
 
@@ -136,6 +135,8 @@ class ForumMessage extends Component {
 
 export default class extends Pages {
 
+    lengthError = 'Le message doit contenir au minimum 1 caractére et au maximum 2000 !';
+
     firstLoad = true;
     topic = 0;
     countPerPage = 10;
@@ -153,6 +154,10 @@ export default class extends Pages {
             this.sendMessageError.innerText = v;
         }
         else this.sendMessageError.style.display = 'none';
+    }
+
+    get isError() {
+        return this.sendMessageError.style.display !== 'none';
     }
 
     set page(v) {
@@ -175,7 +180,7 @@ export default class extends Pages {
                     <div class="p-4 justify-content-start">
                         <h2 class="ns-text-red fw-bold ns-fs-1"><ns-api-data field="topic.name" class="ns-empty-placeholder"></ns-api-data></h2>
                         <div class="d-flex flex-row align-items-center gap-3">
-                            <p class="ns-tickle-pink-bg ns-rounded-text d-inline-flex">Nombre total de postes :&nbsp;<span id="ns-topic-total" class="d-inline-block ns-empty-placeholder"></span></p>
+                            <p class="ns-tickle-pink-bg ns-rounded-text">Nombre de postes :&nbsp;<span id="ns-topic-total" class="d-inline-block ns-empty-placeholder"></span></p>
                         </div>
                     </div>
                 </div>
@@ -186,17 +191,19 @@ export default class extends Pages {
                     <ns-pagination id="ns-topic-page-top" min="1" value="1" max-show="5"></ns-pagination>
                 </div>
                 <div id="nsf-messages-container" class="d-flex flex-column ns-categ-center ns-empty-placeholder"></div>
-                <div class="ns-center mb-5">
+                <div class="ns-categ-center">
                     <ns-a href="/forum" class="btn ns-tickle-pink-btn">Retourner à la liste des catégories</ns-a>
                 </div>
-                <div id="nsf-message-compose" class="ns-hide-disconnected">
+                <div id="nsf-message-compose" class="ns-hide-disconnected ns-categ-center ns-text-white">
                     <div id="nsf-message-compose-reply">
-                        <div><span>Reply to </span><span id="nsf-message-compose-reply-short"></span></div>
-                        <button><i class="bi bi-x-circle"></i></button>
+                        <div><span class="ns-text-light-gray">Répondre à </span><span id="nsf-message-compose-reply-short"></span></div>
+                        <button><i class="bi bi-x-circle-fill"></i></button>
                     </div>
-                    <textarea id="nsf-message-compose-area" name="message"></textarea>
-                    <span id="nsf-message-compose-error">Message trop long ou vide</span>
-                    <button id="nsf-message-compose-send" type="button">Envoyer</button>
+                    <div id="sf-message-compose-area-container">
+                        <span id="nsf-message-compose-error"></span>
+                        <textarea id="nsf-message-compose-area" name="message" placeholder="Envoyer un message" rows="1"></textarea>
+                        <button id="nsf-message-compose-send" type="button" title="Envoyre" aria-label="send"><i class="bi bi-send-fill"></i></button>
+                    </div>
                 </div>
             </ns-api-data-block>
         </section>
@@ -220,6 +227,15 @@ export default class extends Pages {
         }
         this.sendMessageBtn = _('#nsf-message-compose-send');
         this.sendMessageArea = _('#nsf-message-compose-area');
+        this.sendMessageArea.addEventListener('input', (e => {
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.max(32, Math.min(176, e.target.scrollHeight)) + 'px';
+            if (e.target.value.length > 2000) {
+                if (!this.isError) this.showError = this.lengthError;
+            } else {
+                if (this.isError) this.showError = false;
+            }
+        }).bind(this));
         this.sendMessageError = _('#nsf-message-compose-error');
         this.sendMessageReply = _('#nsf-message-compose-reply');
         this.sendMessageReply.style.display = 'none';
@@ -268,15 +284,16 @@ export default class extends Pages {
     }
 
     createReply(id, content) {
-        console.log(id, content.length);
-        if (content.length > 30) {
-            content = content.substring(0, 27);
+        if (content.length > 40) {
+            content = content.substring(0, 37);
             content += '...';
         }
+        content = content.replace(/[\r\n]/g, ' ');
         this.sendMessageReplyShort.innerText = escapeHtml(content);
         this.sendMessageReply.style.display = '';
         this.currentReplyId = id;
         this.sendMessageReply.scrollIntoView();
+        this.sendMessageArea.focus({preventScroll:true});
     }
 
     removeReply() {
@@ -291,7 +308,6 @@ export default class extends Pages {
             return;
         }
         if (msg.length > 2000) {
-            this.showError = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
             return;
         }
         const fd = new FormData();
@@ -313,7 +329,7 @@ export default class extends Pages {
             }
             this.dataBlock.refresh();
         }).catch(r => {
-            if (r?.status === 400) this.showError = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
+            if (r?.status === 400) this.showError = this.lengthError;
             else {
                 this.showError = 'Une erreur est survenue merci de ressayer plus tard'
             }

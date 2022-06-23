@@ -72,7 +72,7 @@ export default class extends Pages {
             <div class="ns-forum-banner">
             
             </div>
-            <div class="mx-auto ns-forum-center flex-row justify-content-between mt-2">
+            <div class="mx-auto ns-forum-center flex-column flex-md-row justify-content-between mt-2">
                 <div class="p-1 justify-content-start">
                     <h2>Forum</h2>
                 </div>
@@ -91,7 +91,7 @@ export default class extends Pages {
             <template id="category-template">
                 <div class="ns-categ-topic">
                     <div class="ps-2 ns-a-categ ns-forum-categ-title">
-                        <div class="d-flex flex-row justify-content-between">
+                        <div class="d-flex flex-column flex-md-row justify-content-between">
                             <h3 class="ns-text-red ns-fs-3">
                                 <ns-api-data field="$id$.name" class="ns-template-var-attr"></ns-api-data>
                             </h3>

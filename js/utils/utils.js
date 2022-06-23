@@ -929,6 +929,10 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
+function formatMessage(message) {
+    return escapeHtml(message).replace(/\n/g, "<br>");
+}
+
 function pickHex(color1, color2, weight) {
     let w1 = weight;
     let w2 = 1. - w1;

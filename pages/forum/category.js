@@ -75,10 +75,10 @@ export default class extends Pages {
             <ns-api-data-block id="topics-container-data" href="forum/category/${vars['category']}/topics?offset=0&limit=${this.countPerPage}&count=1">
                 <div class="ns-categ-center">
                     <div class="p-4 justify-content-start">
-                        <h2 class="ns-text-red fw-bold ns-fs-1"><ns-api-data field="category.name" class="ns-empty-placeholder"></ns-api-data></h2>
-                        <p class="ns-fs-3"><ns-api-data field="category.description" class="ns-empty-placeholder"></ns-api-data></p> 
-                        <div class="d-flex flex-row align-items-center gap-3">
-                            <p class="ns-tickle-pink-bg ns-rounded-text d-inline-flex">Nombre total de postes :&nbsp;<span id="ns-categ-total" class="d-inline-block ns-empty-placeholder"></span></p>
+                        <h2 class="ns-text-red fw-bold ns-fs-2"><ns-api-data field="category.name" class="ns-empty-placeholder"></ns-api-data></h2>
+                        <p class="ns-fs-3 ns-md-fs-4 "><ns-api-data field="category.description" class="ns-empty-placeholder"></ns-api-data></p> 
+                        <div class="d-flex flex-column flex-md-row align-items-md-center align-items-stretch gap-3">
+                            <p class="ns-tickle-pink-bg ns-rounded-text text-center">Nombre de postes :&nbsp;<span id="ns-categ-total" class="d-inline-block ns-empty-placeholder"></span></p>
                             <button id="ns-forum-add-topic" ns-perm-level="255" class="btn ns-tickle-pink-btn">Nouveau sujet de discussion</button>
                         </div>
                     </div>

@@ -35,6 +35,10 @@
     --ns-color-theme-invert-bg: #ffffff;
 }
 
+.ns-text-light-gray {
+    color: #aaa;
+}
+
 ns-api-data {
     display: inline-block;
 }

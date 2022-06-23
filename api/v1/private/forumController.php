@@ -246,12 +246,17 @@ function _get_reply(string $message, array $query) {
 	$messageData = getDB()->select(VIEW_FULL_FORUM_MESSAGE, ['*'], ['id' => $message, 'category_permission_view' => ['v' => $perm, 'o' => '<=']], 1);
 	if (!$messageData) bad_request("invalid message");
 
-	$reply = getDB()->select(TABLE_FORUM_REPLY, ['id', 'author', 'content', 'date_inserted', 'status'], ['message' => $message], $limit, 'date_inserted ASC', $offset, true);
+	$reply = getDB()->select(VIEW_FORUM_REPLY_AUTHOR, ['*'], ['message' => $message], $limit, 'date_inserted ASC', $offset, true);
+
+    $elements = [];
+    foreach ($reply as $d) {
+        $elements[] = concatenate_array_by_prefix($d, ["author"]);
+    }
 
 	$data = [
 		"total" => $messageData["reply_count"]??0,
 		"message" => concatenate_array_by_prefix($messageData, ["replay", "author", "topic"]),
-		"elements" => $reply
+		"elements" => $elements
 	];
 	$url = 'forum/message/' . $message . '/reply';
 	if ($data["total"] > $offset + $limit) {

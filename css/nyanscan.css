@@ -87,10 +87,12 @@ body {
     width: 150px;
     border-radius: 50%;
 }
+
 .ns-avatar-md {
     height: 80px;
     width: 80px;
 }
+
 .ns-avatar-sm {
     height: 32px;
     width: 32px;
@@ -907,26 +909,30 @@ body {
 .ns-success-css {
     margin-top: 90px;
 }
+
 .ns-font-size-success {
     font-size: x-large;
     padding-top: 1rem !important;
 }
+
 .ns-scan-success {
-    background-color: RGBA(112,224,0,0.6);
+    background-color: RGBA(112, 224, 0, 0.6);
     border-radius: 0.5rem;
     width: 80%;
     display: flex;
     flex-direction: column;
     padding: 20px 5%;
 }
+
 .ns-scan-failed {
-    background-color: RGBA(238,45,56,0.76);
+    background-color: RGBA(238, 45, 56, 0.76);
     border-radius: 0.5rem;
     width: 80%;
     display: flex;
     flex-direction: column;
     padding: 20px 5%;
 }
+
 .ns-scan-CGU {
     background-color: #BF61BD;
     border-radius: 0.5rem;
@@ -938,7 +944,7 @@ body {
 
 }
 
-.ns-background-image{
+.ns-background-image {
     background-image: url("../res/ImageCGU.jpg");
 
 }
@@ -1199,7 +1205,7 @@ body {
 #nsf-messages-container {
     display: flex;
     flex-direction: column;
-    row-gap: 5rem;
+    row-gap: 2.5rem;
 }
 
 #nsf-messages-container:empty {
@@ -1223,11 +1229,9 @@ body {
     grid-template-rows: 32px auto auto;
     grid-column-gap: 2rem;
     grid-row-gap: 1rem;
-
     padding: 2rem;
     background-color: var(--ns-color-purpureus);
     border-radius: 1rem;
-
 }
 
 .nsf-message-user {
@@ -1237,12 +1241,11 @@ body {
     flex-direction: column;
     align-items: center;
 }
-.nsf-message-user img {
 
+.nsf-message-user img {
 }
 
 .nsf-message-user .nsf-message-username {
-
 }
 
 .nsf-message-date {
@@ -1260,7 +1263,7 @@ body {
     grid-area: 2 / 2 / 3 / 3;
 }
 
-.nsf-message-show-replay {
+.nsf-message-reply {
     grid-area: 3 / 2 / 4 / 3;
 }
 
@@ -1270,28 +1273,85 @@ body {
     row-gap: 2rem;
 }
 
-.nsf-message-reply-more {
-
-}
-
-.nsf-message-reply-less {
-
-}
-
-.nsf-message-reply-container {
-
-}
-
-.nsf-message-reply-hide .nsf-message-reply-more {
-
-}
-
 .nsf-message-reply-hide .nsf-message-reply-less {
     display: none;
 }
 
 .nsf-message-reply-hide .nsf-message-reply-container {
     display: none;
+}
+
+#nsf-message-compose {
+    width: 100%;
+}
+
+#nsf-message-compose-reply {
+    background-color: var(--ns-color-violet-blue);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 1rem 1rem 0 0;
+    padding: .2em calc(1rem + 9px) .2em 1rem;
+}
+
+#nsf-message-compose-reply button {
+    font-size: 20px;
+    background-color: transparent;
+    border: none;
+    color: var(--ns-color-paradise-pink);
+}
+
+#nsf-message-compose-reply button:hover {
+    opacity: .8;
+}
+
+#nsf-message-compose-reply:not([style*="display: none;"]) + #sf-message-compose-area-container {
+    border-radius: 0 0 1rem 1rem;
+}
+
+
+#sf-message-compose-area-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 32px;
+    grid-auto-columns: auto 24px;
+    column-gap: 1rem;
+    background-color: var(--ns-color-purpureus);
+    border-radius: 1rem;
+    padding: 1rem 1.2rem;
+}
+
+#nsf-message-compose-area {
+    grid-area: 1 / 1 / 2 / 2;
+    resize: none;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    width: 100%;
+    color: var(--ns-color-white);
+}
+
+#nsf-message-compose-error {
+    grid-area: 2 / 1 / 3 / 3;
+    color: var(--ns-color-paradise-pink);
+    font-size: 1em;
+}
+
+#nsf-message-compose-send {
+    grid-area: 1 / 2 / 2 / 3;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    font-size: 12px;
+    background-color: var(--ns-color-deep-mauve);
+    outline: none;
+    border: none;
+    color: var(--ns-color-paradise-pink);
+}
+
+#nsf-message-compose-send:hover {
+    opacity: .8;
 }
 
 @media (max-width: 576px) {
@@ -1307,6 +1367,14 @@ body {
     .ns-fs-2 {
         font-size: 40px;
     }
+
+    .ns-md-fs-1 {
+        font-size: 48px;
+    }
+
+    .ns-md-fs-2 {
+        font-size: 40px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1316,6 +1384,73 @@ body {
 
     .ns-pr-desc {
         width: auto;
+    }
+
+    .ns-categ-center {
+        padding: 10px 4%;
+    }
+
+    .nsf-message {
+        grid-template-columns: 100px 1fr;
+        grid-template-rows: 64px auto auto;
+        grid-column-gap: .5rem;
+        grid-row-gap: 1.5rem .5rem;
+    }
+
+    .nsf-message .nsf-message {
+        padding: 1rem;
+    }
+
+    .nsf-message-user {
+        grid-area: 1 / 1 / 2 / 2;
+        display: flex;
+        row-gap: .8rem;
+        column-gap: .5rem;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .nsf-message-user img {
+        height: 32px;
+        width: 32px;
+    }
+
+    .nsf-message-content {
+        grid-area: 2 / 1 / 3 / 3;
+        margin: 0;
+    }
+
+    .nsf-message-reply {
+        grid-area: 3 / 1 / 4 / 3;
+    }
+
+    .ns-md-fs-1 {
+        font-size: 56px;
+    }
+
+    .ns-md-fs-2 {
+        font-size: 48px;
+    }
+
+    .ns-md-fs-3 {
+        font-size: 32px;
+    }
+
+    .ns-md-fs-4 {
+        font-size: 24px;
+    }
+
+    .ns-md-fs-5 {
+        font-size: 20px;
+    }
+
+    .ns-md-fs-6 {
+        font-size: 16px;
+    }
+
+    .ns-md-avatar-sm {
+        height: 32px;
+        width: 32px;
     }
 
 }
