@@ -1,14 +1,3 @@
-<?php
-require 'private/utils/functions.php';
-session_start();
-$user = get_log_user();
-
-if (!($user->is_connected() && $user->get_permission_level() >= PERMISSION_MODERATOR)){
-    header('Location: /');
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>

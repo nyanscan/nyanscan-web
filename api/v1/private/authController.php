@@ -35,10 +35,10 @@ function _verification($query) {
     }
 }
 
+/**
+ * @deprecated
+ */
 function _logout() {
-    unset($_SESSION["token"]);
-    unset($_SESSION["account-id"]);
-    unset($_SESSION["account-username"]);
     success();
 }
 
@@ -62,7 +62,10 @@ function _log() {
             "mail_token" => $user->get_verification_token()
         ]);
     }
-    success();
+    success([
+		"token" => $user->get_token(),
+	    "id" => $user->getId()
+    ]);
 }
 
 function _register() {
@@ -85,10 +88,12 @@ function _register() {
         $newsLetter = !empty($_POST["newsletter"]);
         $birthday = $_POST["birth"];
 
+		session_start();
         switch (get_captcha_status()) {
             case CAPTCHA_CODE_ERROR: $errors[] = "Captcha invalide."; break;
             case CAPTCHA_CODE_FALSE: $errors[] = "Merci de remplir correctement le captcha."; break;
         }
+		session_abort();
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Format d'e-mail invalide.";

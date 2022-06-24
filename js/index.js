@@ -545,3 +545,4 @@ const STRUCTURE = [
 
 export const APP = new Application(Header, Footer, Index, Error404, STRUCTURE, '');
 window.APP = APP;
+APP.start();

@@ -10,7 +10,7 @@ const LOGIN_LEVEL_DISCONNECT = -1;
 const LOGIN_LEVEL_CONNECT = 1;
 
 
-function _(query, mono=false) {
+function _(query, mono = false) {
     if (query.startsWith('#') && !query.includes(' ')) {
         mono = true;
     }
@@ -58,7 +58,7 @@ function createPromise(type, id = null, parent = null, ...cla) {
  * @param progressCallBack
  * @deprecated
  */
-function sendApiPostRequest(url, formData, callBack = null, progressCallBack=null) {
+function sendApiPostRequest(url, formData, callBack = null, progressCallBack = null) {
     sendApiRequest("POST", url, callBack, progressCallBack, formData);
 }
 
@@ -69,7 +69,7 @@ function sendApiPostRequest(url, formData, callBack = null, progressCallBack=nul
  * @param progressCallBack
  * @deprecated
  */
-function sendApiGetRequest(url,  callBack = null, progressCallBack=null) {
+function sendApiGetRequest(url, callBack = null, progressCallBack = null) {
     sendApiRequest("GET", url, callBack, progressCallBack);
 }
 
@@ -80,7 +80,7 @@ function sendApiGetRequest(url,  callBack = null, progressCallBack=null) {
  * @param progressCallBack
  * @deprecated
  */
-function sendApiDeleteRequest(url,  callBack = null, progressCallBack=null) {
+function sendApiDeleteRequest(url, callBack = null, progressCallBack = null) {
     sendApiRequest("DELETE", url, callBack, progressCallBack);
 }
 
@@ -93,8 +93,10 @@ function sendApiDeleteRequest(url,  callBack = null, progressCallBack=null) {
  * @param sendItem
  * @deprecated
  */
-function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendItem=undefined) {
+function sendApiRequest(method, url, callBack, progressCallBack = undefined, sendItem = undefined) {
     const ajax = new XMLHttpRequest()
+    let auth = window.APP.user.authorization;
+    if (auth !== null) ajax.setRequestHeader('Authorization', auth );
     ajax.open(method, '/api/v1/' + url, true);
 
     if (progressCallBack !== undefined && progressCallBack !== null) {
@@ -115,25 +117,36 @@ function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendI
     }
 }
 
-function sendApiPostFetch(url, fd, method='post') {
-    return sendApiFetch(new Request('/api/v1/' + url, {
-        method: method.toUpperCase(),
-        body: fd
-    }));
+function sendApiPostFetch(url, fd) {
+    return sendApiFetch(url, fd, "POST");
 }
 
 function sendApiGetFetch(url) {
-    return sendApiFetch('/api/v1/' + url);
+    return sendApiFetch( url, null, 'GET');
 }
 
-function sendApiFetch(req) {
-    return  fetch(req).then(response => {
-        if (response.status >= 200 && response.status < 300) {
-            return Promise.resolve(response)
-        } else {
-            return Promise.reject(response);
-        }
-    }).then(r => r.headers.has('Content-Length') ? r.json() : {}).then(e => Promise.resolve(e.data));
+function sendApiFetch(url, body, method) {
+    let auth = window.APP.user.authorization;
+    let header = {
+        'Authorization': auth
+    };
+
+    if (auth === null) delete header.Authorization;
+    // if (body !== null) header['Content-Type'] = 'application/x-www-form-urlencoded'
+    return fetch(new Request('/api/v1/' + url, {
+        method: method,
+        headers: new Headers(header),
+        body: body,
+    })).then(r => r.headers.has('Content-Length') ? r.json() : Promise.resolve({code: r.status, message: r.statusText}))
+        .then(response => {
+            if (response.code === 401 && response.reason === 'Invalid Authorization') {
+                window.APP.user.logout(true);
+            } else if (response.code >= 200 && response.code < 300) {
+                return Promise.resolve(response)
+            } else {
+                return Promise.reject(response);
+            }
+    }).then(e => Promise.resolve(e.data||e));
 }
 
 function checkApiResStatus(event) {
@@ -155,17 +168,17 @@ function getAPIErrorReason(event) {
 }
 
 function loadingScreen(show = true) {
-   window.APP.loading.switchState(show);
+    window.APP.loading.switchState(show);
 }
 
 
 function uuidv4() {
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 }
 
-function importTemplate(template, vars, isString=false) {
+function importTemplate(template, vars, isString = false) {
     let clone;
     if (isString) {
         clone = document.createElement('div');
@@ -196,6 +209,11 @@ class User {
     isLog;
     data;
     id = null;
+    token = null;
+
+    get authorization() {
+        return (this.token !== null && this.id !== null) ? `${this.id} ${this.token}` : null;
+    }
 
     get profile_picture() {
         return '/res/profile.webp';
@@ -205,14 +223,38 @@ class User {
         this.app = app;
         this.isLog = false;
         this.permissionLevel = 0;
+        let storageToken = localStorage.getItem('token');
+        let needResetToken = false;
+        try {
+            storageToken = JSON.parse(storageToken);
+            if (storageToken['id'] !== undefined && storageToken['token'] !== undefined) {
+                this.token = storageToken['token'];
+                this.id = storageToken['id'];
+            } else needResetToken = true;
+        } catch (e) {
+            needResetToken = true;
+        }
+        if (needResetToken) localStorage.removeItem('token');
+    }
+
+    setAuthorization(id, token) {
+        this.id = id;
+        this.token = token;
+        localStorage.setItem('token', JSON.stringify({'id': id, 'token': token}));
     }
 
     log() {
-        sendApiGetRequest('user/me', (function (ev) {
-            if (checkApiResStatus(ev) === API_REP_OK) {
+        if (this.token === null || this.id === null) {
+            this.switchBodyLogValue(false);
+            this.app.dispatchEvent(new CustomEvent('logout', {
+                cancelable: false,
+                bubbles: true,
+                composed: false,
+            }))
+        } else {
+            sendApiGetFetch('user/me').then(data => {
                 this.isLog = true;
-                this.data = getDataAPI(ev);
-                this.id = this.data['id'];
+                this.data = data;
                 this.permissionLevel = parseInt(this.data["permission"]);
                 this.switchBodyLogValue(true);
                 this.app.dispatchEvent(new CustomEvent('log', {
@@ -220,16 +262,8 @@ class User {
                     bubbles: true,
                     composed: false,
                 }))
-            } else {
-                this.id = null;
-                this.switchBodyLogValue(false);
-                this.app.dispatchEvent(new CustomEvent('logout', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                }))
-            }
-        }).bind(this))
+            })
+        }
     }
 
     get loginLevel() {
@@ -237,21 +271,20 @@ class User {
     }
 
     logout(redirectLogin) {
+        localStorage.removeItem('token');
         this.switchBodyLogValue(false);
-        sendApiGetFetch('auth/logout').then(data => {
-            this.isLog = false;
-            this.data = [];
-            this.id = null;
-            this.permissionLevel = 0;
-            this.app.dispatchEvent(new CustomEvent('logout', {
-                cancelable: false,
-                bubbles: true,
-                composed: false,
-            }))
-            if (redirectLogin) {
-                this.app.changePage('/auth/')
-            }
-        }).catch(console.error);
+        this.isLog = false;
+        this.data = [];
+        this.id = null;
+        this.permissionLevel = 0;
+        this.app.dispatchEvent(new CustomEvent('logout', {
+            cancelable: false,
+            bubbles: true,
+            composed: false,
+        }))
+        if (redirectLogin) {
+            this.app.changePage('/auth/')
+        }
     }
 
     switchBodyLogValue(value) {
@@ -286,14 +319,15 @@ class Component {
     }
 
 }
+
 class Pages extends Component {
 
     app;
     haveHeader;
     haveFooter;
     haveDefaultBackground;
-    
-    constructor(app, haveHeader = true, haveFooter = true, haveDefaultBackground =true) {
+
+    constructor(app, haveHeader = true, haveFooter = true, haveDefaultBackground = true) {
         super(app, COMPONENT_TYPE_PAGE);
         this.app = app;
         this.haveHeader = haveHeader;
@@ -345,7 +379,7 @@ class Pages extends Component {
 
     update_permission_item() {
         const perm = this.app.user.permissionLevel;
-        _('[ns-perm-level]').forEach(e =>  e.style.display = ( e.getAttribute('ns-perm-level') > perm ? 'none' : ''));
+        _('[ns-perm-level]').forEach(e => e.style.display = (e.getAttribute('ns-perm-level') > perm ? 'none' : ''));
     }
 
     get_client_url() {
@@ -411,7 +445,7 @@ class LoadingScreen extends Component {
 
     build(parent) {
 
-        this.screen = create('div', 'ns-loading-screen', parent,  'ns-loading-screen-style');
+        this.screen = create('div', 'ns-loading-screen', parent, 'ns-loading-screen-style');
         this.screen.style.display = 'none';
         this.screen.innerHTML = this.raw;
         this.progressDiv = _('#ns-loading-screen-progress');
@@ -459,7 +493,7 @@ class Application extends EventTarget {
     modal;
     loading;
 
-    constructor(header, footer, index, err404, structure, prefix='') {
+    constructor(header, footer, index, err404, structure, prefix = '') {
         super()
         this.prefix = prefix;
         this.structure = structure;
@@ -467,13 +501,17 @@ class Application extends EventTarget {
         this.footer = new footer(this);
         this.caches["index"] = index;
         this.caches["404"] = err404;
+    }
+
+    start() {
         this.session = ["start", new Date()]
 
         this.titleE = _('title', true);
         this.modal = _('#ns-modal');
         try {
             this.setupModal();
-        } catch (err) {}
+        } catch (err) {
+        }
 
         this.user = new User(this);
         this.user.log();
@@ -608,7 +646,7 @@ class Application extends EventTarget {
         this.currentVars = vars;
         page.build(content, vars);
         this.setTitle(page.title);
-        this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader );
+        this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader);
         this.currentPages = page;
         page.send_analytic();
     }
@@ -643,6 +681,7 @@ class Application extends EventTarget {
     }
 
 }
+
 class Captcha extends Component {
 
     block;
@@ -685,10 +724,10 @@ class Captcha extends Component {
 
     setupSettings() {
         const captcha = _('#captcha');
-        captcha.style.setProperty("--ns-captcha-width", this.block.getField('width')+'px');
-        captcha.style.setProperty("--ns-captcha-height", this.block.getField('height')+'px');
-        captcha.style.setProperty("--ns-captcha-piece-size", this.block.getField('piece_size')+'px');
-        captcha.style.setProperty("--ns-captcha-ceil-size", this.block.getField('cell_size')+'px');
+        captcha.style.setProperty("--ns-captcha-width", this.block.getField('width') + 'px');
+        captcha.style.setProperty("--ns-captcha-height", this.block.getField('height') + 'px');
+        captcha.style.setProperty("--ns-captcha-piece-size", this.block.getField('piece_size') + 'px');
+        captcha.style.setProperty("--ns-captcha-ceil-size", this.block.getField('cell_size') + 'px');
         captcha.style.setProperty("--ns-captcha-piece-count", this.block.getField('number_piece'));
         this.setUUID();
 
@@ -700,8 +739,7 @@ class Captcha extends Component {
         if (main_image.complete) {
             if (main_image.naturalWidth === 0) {
                 document.getElementById("captcha-error").style.display = 'flex';
-            }
-            else {
+            } else {
                 this.setup_captcha(cap, main_image);
             }
         } else {
@@ -726,7 +764,7 @@ class Captcha extends Component {
         for (let i = 0; i < this.block.getField('number_piece') * 1; i++) {
             let cont = create('div', null, storage, 'captcha-piece');
             let img = create('img', null, cont);
-            img.src =  '/captchaGet.php?id=' + uuid;
+            img.src = '/captchaGet.php?id=' + uuid;
             img.alt = 'captcha_piece';
         }
     }
@@ -734,7 +772,7 @@ class Captcha extends Component {
     constructor(app) {
         super(app, COMPONENT_TYPE_FLOAT);
     }
-    
+
     setup_captcha(captcha) {
         // GET var
         const numberPiece = this.block.getField('number_piece') * 1;
@@ -777,7 +815,7 @@ class Captcha extends Component {
 
             target.oldLeft = window.getComputedStyle(target).getPropertyValue('left').split('px')[0] * 1;
             target.oldTop = window.getComputedStyle(target).getPropertyValue('top').split('px')[0] * 1;
-            
+
             function endDrag() {
                 target.moving = false;
             }
@@ -795,17 +833,19 @@ class Captcha extends Component {
                     target.distY = ev.touches[0].clientY - target.oldY;
                 }
                 let x = Captcha.validateCord(target.oldLeft + target.distX, captchaWidth, captchaHeight, ceilSize, pieceSize);
-                let y = Captcha.validateCord(target.oldTop + target.distY, captchaWidth, captchaHeight, ceilSize, pieceSize,false);
+                let y = Captcha.validateCord(target.oldTop + target.distY, captchaWidth, captchaHeight, ceilSize, pieceSize, false);
                 target.style.left = x + "px";
                 target.style.top = y + "px";
 
                 input.value = Captcha.newStringCord(input.value, target.pieceCont, x, y);
             }
+
             document.onmouseup = endDrag;
             document.ontouchend = endDrag;
             document.onmousemove = dr;
             document.ontouchmove = dr;
         }
+
         document.onmousedown = move;
         document.ontouchstart = move;
     }
@@ -813,8 +853,8 @@ class Captcha extends Component {
     static validateCord(pos, captchaWidth, captchaHeight, ceilSize, pieceSize, isx = true) {
         return Math.min(isx ? (captchaWidth - ceilSize) : (captchaHeight + ceilSize + pieceSize), Math.max(0, Math.floor(pos / ceilSize) * ceilSize));
     }
-    
-    static newStringCord(old="", index=0, x=0, y=0) {
+
+    static newStringCord(old = "", index = 0, x = 0, y = 0) {
         if (!old) {
             old = '0';
         }
@@ -914,11 +954,20 @@ function image_id_to_patch(id) {
 
 function project_status_to_html($status) {
     switch ($status) {
-        case '0': return '<span class="project-status-wait">Attente de vérification</span>'; break;
-        case '1': return '<span class="project-status-denied">Rejeté</span>'; break;
-        case '2': return '<span class="project-status-accept">Accepté en attente de contenu</span>'; break;
-        case '3': return '<span class="project-status-publish">Publié</span>'; break;
-        default: return '';
+        case '0':
+            return '<span class="project-status-wait">Attente de vérification</span>';
+            break;
+        case '1':
+            return '<span class="project-status-denied">Rejeté</span>';
+            break;
+        case '2':
+            return '<span class="project-status-accept">Accepté en attente de contenu</span>';
+            break;
+        case '3':
+            return '<span class="project-status-publish">Publié</span>';
+            break;
+        default:
+            return '';
     }
 }
 
@@ -930,7 +979,9 @@ function escapeHtml(text) {
         '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    return text.replace(/[&<>"']/g, function (m) {
+        return map[m];
+    });
 }
 
 function formatMessage(message) {

@@ -118,3 +118,12 @@ const STRUCTURE = [
 
 export const APP = new Application(Header, Footer, Index, Error404, STRUCTURE, 'admin');
 window.APP = APP;
+APP.addEventListener('log', e => {
+    console.log(e);
+    if (APP.user.permissionLevel < 200) document.location.href = '/';
+})
+APP.addEventListener('logout', e => {
+    console.log(e);
+    document.location.href = '/';
+});
+APP.start();

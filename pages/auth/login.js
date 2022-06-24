@@ -59,32 +59,26 @@ export default class extends Pages {
             fd.append('password', _('#mdp').value);
 
             _("#mdp").value = '';
-            sendApiPostRequest('auth/login', fd, this.loginResult.bind(this));
-        }
-    }
-
-    loginResult(event) {
-        const repType = checkApiResStatus(event);
-        if (repType === API_REP_OK) {
-            const rep = getDataAPI(event);
-            console.log(rep);
-            if (rep["invalid"] !== undefined) {
-                this.app.session["mail_token"] = rep["mail_token"];
-                this.app.session["user_id"] = rep["user_id"];
-                this.app.changePage('/auth/wait-verification');
-            } else {
-                this.app.user.log();
-                this.app.changePage('/');
-            }
-        } else {
-            this.isSending = false;
-            const error =  _('#ns-log-error');
-            error.style.display = 'inherit';
-            if (repType === API_REP_BAD) {
-                error.innerText = getAPIErrorReason(event);
-            } else {
-                error.innerText = 'Une erreur de connexion est survenue';
-            }
+            sendApiPostFetch('auth/login', fd).then(data => {
+                if (data["invalid"] !== undefined) {
+                    this.app.session["mail_token"] = data["mail_token"];
+                    this.app.session["user_id"] = data["user_id"];
+                    this.app.changePage('/auth/wait-verification');
+                } else {
+                    this.app.user.setAuthorization(data['id'], data['token']);
+                    this.app.user.log();
+                    this.app.changePage('/');
+                }
+            }).catch(r => {
+                const error =  _('#ns-log-error');
+                error.style.display = 'inherit';
+                if (r.code > 0) {
+                    this.isSending = false;
+                    error.innerText = r.reason;
+                } else {
+                    error.innerText = 'Une erreur de connexion est survenue';
+                }
+            })
         }
     }
 }

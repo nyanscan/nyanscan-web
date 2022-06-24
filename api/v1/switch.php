@@ -4,8 +4,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
-
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/forum.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/mailer.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
@@ -44,8 +42,8 @@ function bad_request($reason = "") {
     json_exit(400, "Bad Request", $reason);
 }
 
-function unauthorized() {
-    json_exit(401, "Unauthorized", "Authentication is required to access ressources");
+function unauthorized($invalid_token = false) {
+    json_exit(401, "Unauthorized",  $invalid_token ? "Invalid Authorization" : "Authentication is required to access ressources");
 }
 
 function forbidden() {
