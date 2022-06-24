@@ -954,7 +954,7 @@ body {
     background-color: #ec6a87;
     background-image: url("/res/baner-alice.jpg");
     position: relative;
-    height: 150px;
+    min-height: 150px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -963,14 +963,12 @@ body {
 
 .ns-reading-head h1 {
     color: black;
-    font-size: 64px;
     text-shadow: 0 0 5px var(--ns-color-tickle-me-pink);
 }
 
 
 .ns-reading-head h2 {
     color: black;
-    font-size: 48px;
     text-shadow: 0 0 5px var(--ns-color-tickle-me-pink);
 }
 
@@ -1353,33 +1351,29 @@ body {
 #nsf-message-compose-send:hover {
     opacity: .8;
 }
-
-@media (max-width: 576px) {
-    .ns-pr-picture {
-        width: 296px;
-        height: 420px;
+@media (max-width: 992px) {
+    #mainNav {
+        grid-template-columns: 40px 40px 1fr;
+        grid-template-rows: 1fr;
+        padding: 0 24px;
     }
 
     .ns-fs-1 {
-        font-size: 48px;
-    }
-
-    .ns-fs-2 {
-        font-size: 40px;
-    }
-
-    .ns-md-fs-1 {
-        font-size: 48px;
-    }
-
-    .ns-md-fs-2 {
-        font-size: 40px;
+        font-size: 56px;
     }
 }
 
 @media (max-width: 768px) {
     .ns-container {
         width: 95%;
+    }
+
+    .ns-reading-head ns-api-data {
+        text-align: center;
+    }
+
+    .ns-reading-nav, .ns-reading-progress {
+        width: 90%;
     }
 
     .ns-pr-desc {
@@ -1452,19 +1446,44 @@ body {
         height: 32px;
         width: 32px;
     }
-
 }
 
-@media (max-width: 992px) {
-    #mainNav {
-
-        grid-template-columns: 40px 40px 1fr;
-        grid-template-rows: 1fr;
-        padding: 0 24px;
+@media (max-width: 576px) {
+    .ns-pr-picture {
+        width: 296px;
+        height: 420px;
     }
 
     .ns-fs-1 {
-        font-size: 56px;
+        font-size: 48px;
+    }
+
+    .ns-fs-2 {
+        font-size: 40px;
+    }
+
+    .ns-md-fs-1 {
+        font-size: 48px;
+    }
+
+    .ns-md-fs-2 {
+        font-size: 40px;
+    }
+
+    .ns-md-fs-3 {
+        font-size: 32px;
+    }
+
+    .ns-md-fs-4 {
+        font-size: 24px;
+    }
+
+    .ns-md-fs-5 {
+        font-size: 20px;
+    }
+
+    .ns-md-fs-6 {
+        font-size: 16px;
     }
 }
 

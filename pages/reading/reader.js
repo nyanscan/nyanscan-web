@@ -20,8 +20,8 @@ export default class extends Pages {
         <section>
             <ns-api-data-block id="ns-reading-data" href="project/${this.project}/${this.volume}">
                 <div class="ns-reading-head">
-                    <h1><ns-api-data field="project_title"></ns-api-data></h1>
-                    <h2><ns-api-data field="volume_title"></ns-api-data></h2>
+                    <h1 class="ns-fs-1 ns-md-fs-2"><ns-api-data field="project_title"></ns-api-data></h1>
+                    <h2 class="ns-fs-2 ns-md-fs-3"><ns-api-data field="volume_title"></ns-api-data></h2>
                 </div>
                 <div  class="ns-reading-view-contain">
                     <div class="ns-reading-zoom-btn">
@@ -92,7 +92,13 @@ export default class extends Pages {
             pr.addEventListener('mousemove', this.progressHover.bind(this, pr));
             pr.addEventListener('click', this.progressHoverClick.bind(this, pr));
         }
+        if (window.innerWidth < 768){
+            this.zoomValue = 0.6;
+            this.updateZoomBtn();
+            this.calculateViewSize();
+        }
     }
+
 
     preloadImage(url) {
         if (!this.caches[url]) {
