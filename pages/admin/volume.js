@@ -116,7 +116,7 @@ export default class extends SimpleTablePages {
     collCallback(name, e, value, rowData) {
         switch (name) {
             case 'status':
-                e.innerHTML = project_status_to_html(value);
+                e.innerHTML = event_status_to_html(value);
                 break;
             case 'action':
                 const group = create('div', null, e, 'btn-group');

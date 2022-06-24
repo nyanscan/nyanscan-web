@@ -12,7 +12,7 @@ class Header extends Component {
             <nav class="navbar navbar-dark bg-dark">
                 <div class="px-5 d-flex flex-row gap-5 w-100">
                     <ns-a class="c-nav-link" aria-current="page" href="/" aria-label="home" title="Home"><i class="bi bi-house"></i></ns-a>
-                    <ns-a class="c-nav-link" href="/project" aria-label="switch" title="Switch"><i class="bi bi-book"></i></ns-a>
+                    <ns-a class="c-nav-link" href="/event" aria-label="switch" title="Switch"><i class="bi bi-book"></i></ns-a>
                     <ns-a class="c-nav-link" href="/volume" aria-label="device" title="Device"><i class="bi bi-file-earmark-break"></i></ns-a>
                     <ns-a class="c-nav-link" href="/image" aria-label="user" title="User"><i class="bi bi-image"></i></ns-a>
                     <ns-a class="c-nav-link" href="/users" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
@@ -46,9 +46,9 @@ class Index extends Pages {
                     <span>
                     
                     </span>
-                    <ns-a class="content" href="project">
+                    <ns-a class="content" href="event">
                         <i class="bi bi-book"></i>
-                        <ns-api-data field="project">0</ns-api-data>
+                        <ns-api-data field="event">0</ns-api-data>
                         <h3>Projet</h3>
                     </ns-a>
                 </div>
@@ -102,12 +102,12 @@ const STRUCTURE = [
         rel: "index"
     },
     {
-        re: /^project$/,
-        rel: "admin/project"
+        re: /^event$/,
+        rel: "admin/event"
     },
     {
         re: /^volume(?:\/(.*))?$/,
-        var: [{id: 1, name: 'project'}],
+        var: [{id: 1, name: 'event'}],
         rel: "admin/volume"
     },
     {

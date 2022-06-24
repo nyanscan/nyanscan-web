@@ -421,9 +421,11 @@ body {
     background-color: var(--ns-color-deep-mauve);
     border: none;
     height: 32px;
-    width: 100%;
+    width: 90%;
     padding: 0 24px;
     border-radius: 16px;
+    margin-left: 25px;
+    margin-right: 25px;
 }
 
 .ns-search:focus + .ns-search-result {

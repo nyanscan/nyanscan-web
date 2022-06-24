@@ -85,7 +85,7 @@ export default class extends Pages {
         const volumes = this.data.rawData["volumes"];
         for (const volID in volumes) {
             const clone = importTemplate(template, {"id": volID, 'vol': volumes[volID].volume});
-            clone.querySelector('.ns-pr-volume-img').src = image_id_to_patch(volumes[volID]["picture"]);
+            clone.querySelector('.ns-pr-volume-img').src = image_id_to_path(volumes[volID]["picture"]);
             container.appendChild(clone);
         }
         template.remove();

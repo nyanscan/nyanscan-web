@@ -72,6 +72,7 @@ class Header extends Component {
             <div class="d-flex gap-3 justify-content-center align-items-center">
                 <ns-a href="/" class=""><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
+                <ns-a  class="ns-a-1 ns-d-none-mlg" href="/events">Évènements</ns-a>
                 <ns-a  class="ns-a-1 ns-hide-disconnected ns-d-none-mlg" href="/publish">Publier</ns-a>
             </div>
             <div>
@@ -193,7 +194,7 @@ class Header extends Component {
             const data = getDataAPI(e);
             this.searchRes.innerHTML = '';
 
-            for (const cat of [{id: 'user', display: "Membre", href: '/u/', field: 'username'}, {id: 'project', display: 'Projet', href: '/p/', field: 'title'}]) {
+            for (const cat of [{id: 'user', display: "Membre", href: '/u/', field: 'username'}, {id: 'event', display: 'Projet', href: '/p/', field: 'title'}]) {
                 if (data[cat.id] !== undefined && data[cat.id].length > 0) {
                     const li = create('li', null, this.searchRes, 'ns-search-category');
                     createPromise('span', null, li).then(e => e.innerText = cat.display);
@@ -234,7 +235,7 @@ class Index extends Pages {
             </div>
         </section>
         <section class="ns-min-vh-100 ns-theme-bg ns-text-black">
-            <ns-api-data-block id="ns-index-data" href="project/index">
+            <ns-api-data-block id="ns-index-data" href="event/index">
                 <div class="ns-min-vh-50 ns-center pb-5">
                     <div class="ns-scan-preview">
                         <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
@@ -414,7 +415,7 @@ class Index extends Pages {
                     const ns_a = create('ns-a', null, box);
                     ns_a.href = '/p/' + item['id'];
                     const img = create('img', null, ns_a);
-                    img.src = image_id_to_patch(item['picture']);
+                    img.src = image_id_to_path(item['picture']);
                     const span = create('span', null, box)
                     span.innerText = item['title'];
                 }
@@ -473,8 +474,16 @@ const STRUCTURE = [
                     rel: "user"
                 },
                 {
-                    re: /^(projet|project)$/,
+                    re: /^(projet|event)$/,
                     rel: "reading/userProject"
+                },
+                {
+                    re: /^(|myEvent)$/,
+                    rel: "events/userCreatedEvent"
+                },
+                {
+                    re: /^(|participate)$/,
+                    rel: "events/userEvent"
                 }
             ]
         }
@@ -517,13 +526,13 @@ const STRUCTURE = [
     },
     {
         re: /^p\/([0-9]+)(?:\/(.*))?$/,
-        var: [{id: 1, name: 'project'}],
+        var: [{id: 1, name: 'event'}],
         child: {
             path_var: [2],
             elements: [
                 {
                     re: /^(|view)$/,
-                    rel: 'reading/project'
+                    rel: 'reading/event'
                 },
                 {
                     re: /^(edit)$/,
@@ -533,6 +542,33 @@ const STRUCTURE = [
                     re: /^([0-9]+)(?:\/([0-9]+)?)?$/,
                     rel: 'reading/reader',
                     var: [{id: 1, name: 'volume'}, {id: 2, name: 'page'}]
+                }
+            ]
+        }
+    },
+    {
+        re: /^createEvent$/,
+        rel: "events/addEvent",
+        // loginLevel: LOGIN_LEVEL_CONNECT,
+    },
+    {
+        re: /^(e|events)(\/.*)?$/,
+        var: [{id: 1, name: 'event'}],
+        child: {
+            path_var: [2],
+            elements: [
+                {
+                    re: /^(|list)$/,
+                    rel: 'events/list'
+                },
+                {
+                    re: /^([0-9]+)$/,
+                    rel: 'events/eventFromList',
+                    var: [{id: 1, name: 'category'}]
+                },
+                {
+                    re: /^(edit)$/,
+                    rel: 'events/editEvent',
                 }
             ]
         }

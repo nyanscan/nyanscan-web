@@ -510,7 +510,7 @@ class Application extends EventTarget {
         if (url.startsWith('/')) {
             url = url.substring(1);
         }
-        // remove .html .js and .php
+        // remove file extension from URL
         url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
         let current_url = url;
         let current = this.structure;
@@ -867,19 +867,28 @@ class Captcha extends Component {
 //         footer.innerText = message;
 // }
 
-function image_id_to_patch(id) {
-    const format = id.substr(0, 1);
+//This function get the path of an image with its ID
+//String.prototype.substr() is deprecated and is not in web standard anymore
+//replaced with String.prototype.substring()
+function image_id_to_path(id) {
+    const format = id.substring(0, 1);
     const ext = '.' + ({'w': 'webp', 'p': 'png', 'j': 'jpg', 'g': 'gif', 'n': ''}[format]);
-    return `/picture/${id.substr(0, 5)}/${id.substr(5)}${ext}`
+    return `/picture/${id.substring(0, 5)}/${id.substring(5)}${ext}`
 }
 
-function project_status_to_html($status) {
+//Return a html span with message from the status of a project
+function event_status_to_html($status) {
     switch ($status) {
-        case '0': return '<span class="project-status-wait">Attente de vérification</span>'; break;
-        case '1': return '<span class="project-status-denied">Rejeté</span>'; break;
-        case '2': return '<span class="project-status-accept">Accepté en attente de contenu</span>'; break;
-        case '3': return '<span class="project-status-publish">Publié</span>'; break;
-        default: return '';
+        case '0':
+            return '<span class="project-status-wait">Attente de vérification</span>';
+        case '1':
+            return '<span class="project-status-denied">Rejeté</span>';
+        case '2':
+            return '<span class="project-status-accept">Accepté en attente de contenu</span>';
+        case '3':
+            return '<span class="project-status-publish">Publié</span>';
+        default:
+            return '';
     }
 }
 

@@ -12,7 +12,7 @@ function invokeAdmin($method, $function, $query) {
 
 function _admin_stats() {
     success([
-        "project" => getDB()->count(TABLE_PROJECT, "id"),
+        "project" => getDB()->count(TABLE_EVENT, "id"),
         "picture" => getDB()->count(TABLE_PICTURE, "id"),
         "user" => getDB()->count(TABLE_USER, "id"),
         "volume" => getDB()->count(TABLE_VOLUME, "data")
