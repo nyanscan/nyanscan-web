@@ -84,7 +84,7 @@ class DBAdapter {
         }
         $statement = "DELETE FROM " .DB_PREFIX.$table . " WHERE " . join(' AND ', $condition);
         $req = $this->pdo->prepare($statement);
-        return $req->execute($to_bind);
+	    return $req->execute($to_bind);
     }
 
     public function insert($table, $data): bool {

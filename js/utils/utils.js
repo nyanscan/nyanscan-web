@@ -125,6 +125,10 @@ function sendApiGetFetch(url) {
     return sendApiFetch( url, null, 'GET');
 }
 
+function sendApiDeleteFetch(url) {
+    return sendApiFetch( url, null, 'DELETE');
+}
+
 function sendApiFetch(url, body, method) {
     let auth = window.APP.user.authorization;
     let header = {

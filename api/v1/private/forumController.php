@@ -36,6 +36,11 @@ function invokeForm(string $method, array $function, array $query)
 			if ($function[1] === "message") _edit_message(false);
 			if ($function[1] === "reply") _edit_message(true);
 		}
+    }  elseif ($method === "DELETE") {
+		if (count($function) === 2) {
+			if ($function[0] === 'message') _delete_message($function[1], false);
+			if ($function[0] === 'reply') _delete_message($function[1], true);
+		}
     } elseif ($method === "GET") {
 	    if (count($function) === 2 && $function[0] == "category") {
 		    if ($function[1] === "all") _get_all_category();
@@ -354,7 +359,16 @@ function _create_reply()
 
 }
 
-// content ; reply ;
+/**
+ * edit message or reply
+ * @api POST forum/edit/message
+ * @api POST forum/edit/reply
+ * @version 1.0.0
+ * @author Alice.B
+ *
+ * @post message string not null =>  content
+ * @post ref string not null => id of message/reply to edit
+ */
 function _edit_message(bool $isReply)
 {
 	$user = get_log_user();
@@ -375,7 +389,6 @@ function _edit_message(bool $isReply)
 	getDB()->update($table, $data, ['id' => $ref]);
 	success();
 }
-
 
 /**
  * Create new topic
@@ -467,19 +480,29 @@ function _create_category()
     } else bad_request($errors);
 }
 
-// like / dislike
-function _like_message()
-{
-}
-
 // DELETE
-
-function _block_message()
+/**
+ * Create new category
+ * permission need  @return void
+ * @api DELETE forum/message/{id}
+ * @api DELETE forum/reply/{}
+ * @version 1.0.0
+ * @author Alice.B
+ */
+function _delete_message($id, $isReply)
 {
-}
+	$user = get_log_user();
+	if (!$user->is_connected()) unauthorized();
+	if ($id === null) bad_request("invalid id");
+	$table = $isReply ? TABLE_FORUM_REPLY : TABLE_FORUM_MESSAGE;
+	$refData = getDB()->select($table, ['author', 'status'], ['id' => $id], 1);
+	if (!$refData) bad_request('invalid ref');
+	if ($refData['author'] !== $user->getId() && $user->get_permission_level() < PERMISSION_MODERATOR) unauthorized();
 
-function _delete_message()
-{
+	if (!$isReply) getDB()->delete(TABLE_FORUM_REPLY, ['message' => $id]);
+	getDB()->delete($table, ['id' => $id]);
+
+	success();
 }
 
 function _delete_topic()

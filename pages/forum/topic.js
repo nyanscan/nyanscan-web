@@ -1,3 +1,42 @@
+class ModalDeleteMessage extends Component {
+
+    id;
+    isReply;
+
+    get raw() {
+        return `
+        <form id="nsf-modal-delete-message">
+        <h3>Suprimer un message ?</h3>
+        <div class="ns-form-group d-flex flex-column gap-2">
+            <p>Voulez-vous vraiment supprimer le message .</p>
+        </div>
+        <div class="mt-3 ns-modal-btn-container">
+            <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
+            <button type="submit" class="ns-tickle-pink-bg">Supprimer</button>
+        </div>
+        </form>
+        `;
+    }
+    build(parent) {
+        super.build(parent);
+        _('#nsf-modal-delete-message').addEventListener('submit', this.sendRequest.bind(this));
+    }
+
+    constructor(app, id, isReply) {
+        super(app, COMPONENT_TYPE_MODAL);
+        this.id = id;
+        this.isReply = isReply;
+    }
+
+    sendRequest(event) {
+        event.preventDefault();
+        loadingScreen(true);
+        this.app.closeModal();
+        sendApiDeleteFetch(`forum/${this.isReply ? 'reply' : 'message'}/${this.id}`).then(d => this.app.reload()).catch(console.error).finally(() => loadingScreen(false));
+    }
+
+}
+
 class ForumMessage extends Component {
 
     id;
@@ -8,7 +47,6 @@ class ForumMessage extends Component {
     isShort = true;
     isLoading = false;
     isEdit = false;
-    totalMessage = 0;
     next;
     first;
     moreBtn;
@@ -16,7 +54,7 @@ class ForumMessage extends Component {
     replyContainer;
     replyBlock;
     placeHolder;
-    currentReplyId = null;
+    isAuthor;
 
     set loading(v) {
         this.isLoading = v;
@@ -36,6 +74,7 @@ class ForumMessage extends Component {
                 <div class="btn-group" role="group">
                     <button class="btn ns-tickle-pink-btn ns-btn-sm ns-hide-disconnected nsf-message-reply-btn"><i class="bi bi-reply-fill"></i></button>
                     <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-edit-btn"><i class="bi bi-pencil-fill"></i></button>
+                    <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-delete-btn"><i class="bi bi-trash-fill"></i></button>
                 </div>
             </div>
             <p class="nsf-message-content">${formatMessage(this.data.content)}</p>
@@ -60,6 +99,7 @@ class ForumMessage extends Component {
         this.id = id;
         this.data = data;
         this.isEdit = this.data['status'] && (parseInt(this.data['status']) & 1);
+        this.isAuthor = this.app.user.isLog && this.app.user.id.toString() === this.data['author']['id'];
     }
 
     build(parent) {
@@ -82,17 +122,31 @@ class ForumMessage extends Component {
         }
         const replyBtn = this.mainDiv.querySelector('.nsf-message-reply-btn');
         const editBtn = this.mainDiv.querySelector('.nsf-message-edit-btn');
+        const deleteBtn = this.mainDiv.querySelector('.nsf-message-delete-btn');
         if (editBtn) {
-            if (this.app.user.isLog && this.app.user.id.toString() === this.data['author']['id']) {
+            if (this.isAuthor) {
                 editBtn.addEventListener('click', this.newEditClick.bind(this, this.data['id'], this.data['content'], false), true);
             } else editBtn.remove();
+        }
+        if (deleteBtn) {
+            console.log(this.app.user.permissionLevel);
+            if (this.isAuthor || this.app.user.permissionLevel >= 200) {
+                deleteBtn.addEventListener('click', this.newDeleteClick.bind(this, this.data['id'], false), true);
+            } else deleteBtn.remove();
         }
         if (replyBtn) replyBtn.addEventListener('click', this.newReplyClick.bind(this), true);
     }
 
+    newDeleteClick(id, isReply, e) {
+        e.preventDefault();
+        if (this.isAuthor || this.app.user.permissionLevel >= 200) {
+            this.page.createDelete(id, isReply);
+        }
+    }
+
     newEditClick(id, content, isReply, e) {
         e.preventDefault();
-        if (this.app.user.isLog && this.app.user.id.toString()  === this.data['author']['id']) {
+        if (this.isAuthor) {
             this.page.createEdit(id, content, isReply);
         }
     }
@@ -116,15 +170,22 @@ class ForumMessage extends Component {
                 <span>Le ${data['date_inserted']} ${isEdit ? '(modifié)' : ''}</span>
                 <div class="btn-group" role="group">
                     <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-edit-btn"><i class="bi bi-pencil-fill"></i></button>
+                    <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-delete-btn"><i class="bi bi-trash-fill"></i></button>
                 </div>
             </div>
             <p class="nsf-message-content">${formatMessage(data.content)}</p>
         `;
         let editBtn = block.querySelector('.nsf-message-edit-btn');
+        let deleteBtn = block.querySelector('.nsf-message-delete-btn');
         if (editBtn) {
             if (isAuthor)
                 editBtn.addEventListener('click', this.newEditClick.bind(this, data['id'], data['content'], true), true);
             else editBtn.remove();
+        }
+        if (deleteBtn) {
+            if (isAuthor || this.app.user.permissionLevel >= 200) {
+                deleteBtn.addEventListener('click', this.newDeleteClick.bind(this, this.data['id'], false), true);
+            } else deleteBtn.remove();
         }
     }
 
@@ -329,6 +390,10 @@ export default class extends Pages {
         this.currentComposeID = id;
         this.sendMessagePop.scrollIntoView();
         this.sendMessageArea.focus({preventScroll:true});
+    }
+
+    createDelete(id, isReply) {
+        this.app.openModal(new ModalDeleteMessage(this.app, id, isReply));
     }
 
     createReply(id, content) {
