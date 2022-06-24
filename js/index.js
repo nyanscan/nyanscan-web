@@ -7,22 +7,22 @@ class Footer extends Component {
         <footer class="w-100 p-0 m-0">
             <div id="ns-footer">
                 <div id="ns-footer-logo">
-                    <ns-a href="/" class="ns-a-clear">
+                    <ns-a href="/" class="ns-center flex-column">
                         <img class="ns-logo" src="../res/logo-ns.png" alt="nyanscan-logo">
                         <div>
-                            <h3>NyanScan</h3>
-                            <p>Ton site de scan préféré</p>
+                            <h3 class="ns-fs-4 text-center">NyanScan</h3>
+                            <p class="ns-fs-4 text-center">Ton site de scan préféré</p>
                         </div>
                     </ns-a>
                 </div>
                 <div id="ns-footer-link">
-                    <a href="/">Mon compte</a>
-                    <a href="/">Catalogue</a>
+                    <ns-a href="/u/me">Mon compte</ns-a>
+                    <ns-a href="/catalogue">Catalogue</ns-a>
                     <a href="/">A propos</a>
                     <a href="/">Contact</a>
                     <a href="/">FAQ</a>
                     <a href="/">RGPD</a>
-                    <a href="/">CGU</a>
+                    <ns-a href="/information/cgu">CGU</ns-a>
                 </div>
                 <div id="ns-footer-social">
                     <a href="/" class="ns-a-clear">
@@ -538,6 +538,18 @@ const STRUCTURE = [
                     rel: 'reading/reader',
                     var: [{id: 1, name: 'volume'}, {id: 2, name: 'page'}]
                 }
+            ]
+        }
+    },
+    {
+        re: /^information(\/.*)?$/,
+        child: {
+            path_var: [1],
+            elements: [
+                {
+                    re: /^cgu$/,
+                    rel: 'information/cgu',
+                },
             ]
         }
     }
