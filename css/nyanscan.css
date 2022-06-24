@@ -197,20 +197,20 @@ body {
     color: var(--ns-color-white) !important;
 }
 
-.ns-f-bg-auth {
-    background: linear-gradient(
-            rgba(0, 0, 0, 0.4),
-            rgba(0, 0, 0, 0.4)
-    ), url(/res/background.jpg) no-repeat center center fixed;
-}
-
 .ns-f-bg-err {
     background: linear-gradient(
             rgba(0, 0, 0, 0.4),
             rgba(0, 0, 0, 0.4)
-    ), url(/res/background_404.jpg) no-repeat center center fixed;
+    ), url(/res/background_8.jpg) no-repeat center center fixed;
 }
 
+
+.ns-f-bg-random {
+    background-position: center;
+    background-repeat: no-repeat no-repeat;
+    background-attachment: fixed;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("/res/background_1.jpg");
+}
 
 .ns-f-bg {
     -webkit-background-size: cover;
@@ -382,11 +382,9 @@ body {
     width: 1em;
 }
 
-
 .ns-nav-logo {
 
 }
-
 
 .ns-404-h1 {
     font-size: 60px;
@@ -539,7 +537,7 @@ body {
     max-height: 220px;
 }
 
-#ns-footer-link > a, #ns-footer-link  > ns-a {
+#ns-footer-link > a, #ns-footer-link > ns-a {
     color: var(--ns-color-black);
     text-decoration: none;
     font-size: 20px;
@@ -548,7 +546,7 @@ body {
     flex-shrink: 4;
 }
 
-#ns-footer-link a:hover, #ns-footer-link  > ns-a:hover {
+#ns-footer-link a:hover, #ns-footer-link > ns-a:hover {
     color: var(--ns-color-deep-mauve);
 }
 
@@ -907,13 +905,17 @@ body {
     margin-top: 90px;
 }
 
-.ns-font-size-success {
-    font-size: x-large;
-    padding-top: 1rem !important;
+.ns-scan-success {
+    background-color: rgba(112, 224, 0, 0.6);
+    border-radius: 0.5rem;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 5%;
 }
 
-.ns-scan-success {
-    background-color: RGBA(112, 224, 0, 0.6);
+.ns-scan-wait {
+    background-color: rgba(0, 134, 224, 0.6);
     border-radius: 0.5rem;
     width: 80%;
     display: flex;
@@ -922,7 +924,7 @@ body {
 }
 
 .ns-scan-failed {
-    background-color: RGBA(238, 45, 56, 0.76);
+    background-color: rgba(238, 45, 56, 0.76);
     border-radius: 0.5rem;
     width: 80%;
     display: flex;
@@ -1348,6 +1350,7 @@ body {
 #nsf-message-compose-send:hover {
     opacity: .8;
 }
+
 @media (max-width: 992px) {
     #mainNav {
         grid-template-columns: 40px 40px 1fr;
@@ -1457,6 +1460,7 @@ body {
     .ns-carousel-images {
         height: 50.625vw;
     }
+
     .ns-carousel .ns-carousel-1 {
         transform: scale(0.8, 0.8) translateX(-20vw);
     }

@@ -9,7 +9,7 @@ const API_REP_CONNECTION_ERROR = -1;
 const LOGIN_LEVEL_DISCONNECT = -1;
 const LOGIN_LEVEL_CONNECT = 1;
 
-const VERSION = 'BETA-2.0.2';
+const VERSION = 'BETA-2.0.3';
 
 
 function _(query, mono = false) {
@@ -403,7 +403,7 @@ class Error404 extends Pages {
     get raw() {
         return `
         <section id="error-404">
-            <div class="ns-f-bg ns-f-bg-err">
+            <div class="ns-f-bg ns-f-bg-random">
             
             </div>
             <div class="container vh-100">
@@ -416,7 +416,7 @@ class Error404 extends Pages {
                             <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
                             <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
                             <div class="w-100 ns-center py-2">
-                                <p>Retourner à la <ns-aa href="/">page d'accueil</ns-aa></p>
+                                <p>Retourner à la <ns-aa href="/" class="btn ns-btn-sm ns-tickle-pink-btn">page d'accueil</ns-aa></p>
                             </div>
                         </div>
                     </div>
@@ -428,6 +428,10 @@ class Error404 extends Pages {
 
     constructor(app) {
         super(app, false, false, false);
+    }
+    build(parent, vars) {
+        super.build(parent, vars);
+        loadRandomBackGround();
     }
 
 }
@@ -1099,4 +1103,15 @@ function setCarouselActiveElements(carousel, index) {
             if (i === index) points[i].classList.add("ns-carousel-point-active");
         }
     }
+}
+
+function loadRandomBackGround() {
+    _('.ns-f-bg-random').forEach(e => {
+        console.log(e.style.background.length);
+        if (e.style.backgroundImage.length === 0) {
+            const url = `/res/background_${Math.floor(Math.random() * (9 - 1) + 1)}.jpg`;
+            console.log(url)
+            e.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("${url}")`;
+        }
+    })
 }

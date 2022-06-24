@@ -93,7 +93,7 @@ function _register() {
             case CAPTCHA_CODE_ERROR: $errors[] = "Captcha invalide."; break;
             case CAPTCHA_CODE_FALSE: $errors[] = "Merci de remplir correctement le captcha."; break;
         }
-		session_abort();
+		session_destroy();
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Format d'e-mail invalide.";
@@ -101,8 +101,8 @@ function _register() {
         if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $username)) {
             $errors[] = "Le pseudo ne peut contenir que des minuscules, majuscules, chiffres ou un \"_\" avec une longueur maximale de 20 caractères.";
         }
-        if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
-            $errors[] = "Le mots de passe doit contenir au minimum 8 caractères dont 1 majuscule, 1 majuscule, 1 chiffres et 1 caractère spéciale.";
+        if (strlen($password) < 8) {
+            $errors[] = "Le mots de passe doit contenir au minimum 8 caractères";
         }
         if ($password !== $password_v) {
             $errors[] = "Les mots de passes ne correspondent pas !";

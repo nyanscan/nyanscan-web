@@ -1,5 +1,5 @@
-ErrorDocument 404 /error/404.php
-ErrorDocument 403 /error/404.php
+ErrorDocument 404 /index.html/404
+ErrorDocument 403 /index.html/404
 
 <FilesMatch "^composer\.">
 Order allow,deny

@@ -5,7 +5,7 @@ export default class extends Pages {
     get raw() {
         return `
         <section>
-            <div class="ns-f-bg ns-f-bg-auth">
+            <div class="ns-f-bg ns-f-bg-random">
             
             </div>
             <div class="container min-vh-100">
@@ -30,7 +30,7 @@ export default class extends Pages {
                                     <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">Se connecter</button>
                                 </form>
                             </div>
-                            <div class="row"><p>Nouveau sur NyanScan ? <ns-a href="/auth/register">S'inscrire</ns-a></p></div>
+                            <div class="row"><p>Nouveau sur NyanScan ? <ns-a href="/auth/register" class="btn ns-btn-sm ns-tickle-pink-btn">S'inscrire</ns-a></p></div>
                         </div>
                     </div>
                 </div>
@@ -47,6 +47,7 @@ export default class extends Pages {
     build(parent, vars) {
         super.build(parent, vars);
         _('#ns-log-form').addEventListener('submit', this.sendLogin.bind(this));
+        loadRandomBackGround();
     }
 
     sendLogin(ev) {
