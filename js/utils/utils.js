@@ -115,9 +115,9 @@ function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendI
     }
 }
 
-function sendApiPostFetch(url, fd) {
+function sendApiPostFetch(url, fd, method='post') {
     return sendApiFetch(new Request('/api/v1/' + url, {
-        method: 'post',
+        method: method.toUpperCase(),
         body: fd
     }));
 }
@@ -133,7 +133,7 @@ function sendApiFetch(req) {
         } else {
             return Promise.reject(response);
         }
-    }).then(r => r.json()).then(e => Promise.resolve(e.data));
+    }).then(r => r.headers.has('Content-Length') ? r.json() : {}).then(e => Promise.resolve(e.data));
 }
 
 function checkApiResStatus(event) {
@@ -195,6 +195,7 @@ class User {
     app;
     isLog;
     data;
+    id = null;
 
     get profile_picture() {
         return '/res/profile.webp';
@@ -211,6 +212,7 @@ class User {
             if (checkApiResStatus(ev) === API_REP_OK) {
                 this.isLog = true;
                 this.data = getDataAPI(ev);
+                this.id = this.data['id'];
                 this.permissionLevel = parseInt(this.data["permission"]);
                 this.switchBodyLogValue(true);
                 this.app.dispatchEvent(new CustomEvent('log', {
@@ -219,6 +221,7 @@ class User {
                     composed: false,
                 }))
             } else {
+                this.id = null;
                 this.switchBodyLogValue(false);
                 this.app.dispatchEvent(new CustomEvent('logout', {
                     cancelable: false,
@@ -238,6 +241,7 @@ class User {
         sendApiGetFetch('auth/logout').then(data => {
             this.isLog = false;
             this.data = [];
+            this.id = null;
             this.permissionLevel = 0;
             this.app.dispatchEvent(new CustomEvent('logout', {
                 cancelable: false,

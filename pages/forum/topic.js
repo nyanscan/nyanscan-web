@@ -7,6 +7,7 @@ class ForumMessage extends Component {
     haveReply = true;
     isShort = true;
     isLoading = false;
+    isEdit = false;
     totalMessage = 0;
     next;
     first;
@@ -31,8 +32,11 @@ class ForumMessage extends Component {
                 <span class="nsf-message-username">${this.data['author']?.['username']}</span>  
             </ns-a>
             <div class="nsf-message-date">
-                <span>Le ${this.data['date_inserted']}</span>
-                <button class="btn ns-tickle-pink-btn ns-btn-sm ns-hide-disconnected nsf-message-reply-btn"><i class="bi bi-reply-fill"></i></button>
+                <span>Le ${this.data['date_inserted']} ${this.isEdit ? '(modifié)' : ''}</span>
+                <div class="btn-group" role="group">
+                    <button class="btn ns-tickle-pink-btn ns-btn-sm ns-hide-disconnected nsf-message-reply-btn"><i class="bi bi-reply-fill"></i></button>
+                    <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-edit-btn"><i class="bi bi-pencil-fill"></i></button>
+                </div>
             </div>
             <p class="nsf-message-content">${formatMessage(this.data.content)}</p>
             <div class="nsf-message-reply nsf-message-reply-hide">
@@ -55,6 +59,7 @@ class ForumMessage extends Component {
         this.page = page;
         this.id = id;
         this.data = data;
+        this.isEdit = this.data['status'] && (parseInt(this.data['status']) & 1);
     }
 
     build(parent) {
@@ -76,7 +81,20 @@ class ForumMessage extends Component {
             this.lessBtn.addEventListener('click', this.lessReply.bind(this));
         }
         const replyBtn = this.mainDiv.querySelector('.nsf-message-reply-btn');
+        const editBtn = this.mainDiv.querySelector('.nsf-message-edit-btn');
+        if (editBtn) {
+            if (this.app.user.isLog && this.app.user.id.toString() === this.data['author']['id']) {
+                editBtn.addEventListener('click', this.newEditClick.bind(this, this.data['id'], this.data['content'], false), true);
+            } else editBtn.remove();
+        }
         if (replyBtn) replyBtn.addEventListener('click', this.newReplyClick.bind(this), true);
+    }
+
+    newEditClick(id, content, isReply, e) {
+        e.preventDefault();
+        if (this.app.user.isLog && this.app.user.id.toString()  === this.data['author']['id']) {
+            this.page.createEdit(id, content, isReply);
+        }
     }
 
     newReplyClick(e) {
@@ -87,16 +105,27 @@ class ForumMessage extends Component {
 
     createReplyHtml(data) {
         const block = create('div', null, this.replyContainer, 'nsf-message', 'ns-text-white');
+        let isEdit = this.data['status'] && (parseInt(this.data['status']) & 1);
+        let isAuthor = this.app.user.isLog && this.app.user.id.toString() === data['author']['id'];
         block.innerHTML = `
              <ns-a href="/u/${data['author']?.['id']}" class="nsf-message-user">
                 <img class="ns-avatar ns-avatar-md" src="/res/profile.webp">
                 <span class="nsf-message-username">${data['author']?.['username']}</span>  
             </ns-a>
             <div class="nsf-message-date">
-                <span>Le ${data['date_inserted']}</span>
+                <span>Le ${data['date_inserted']} ${isEdit ? '(modifié)' : ''}</span>
+                <div class="btn-group" role="group">
+                    <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-edit-btn"><i class="bi bi-pencil-fill"></i></button>
+                </div>
             </div>
             <p class="nsf-message-content">${formatMessage(data.content)}</p>
         `;
+        let editBtn = block.querySelector('.nsf-message-edit-btn');
+        if (editBtn) {
+            if (isAuthor)
+                editBtn.addEventListener('click', this.newEditClick.bind(this, data['id'], data['content'], true), true);
+            else editBtn.remove();
+        }
     }
 
     moreReply(e) {
@@ -133,6 +162,11 @@ class ForumMessage extends Component {
 
 }
 
+const COMPOSE_TYPE_SEND = 0;
+const COMPOSE_TYPE_EDIT = 1;
+const COMPOSE_TYPE_EDIT_REPLY = 2;
+const COMPOSE_TYPE_REPLY = 3;
+
 export default class extends Pages {
 
     lengthError = 'Le message doit contenir au minimum 1 caractére et au maximum 2000 !';
@@ -142,11 +176,16 @@ export default class extends Pages {
     countPerPage = 10;
     dataBlock;
     messages = [];
+
+    currentComposeID = null;
+    composeType = COMPOSE_TYPE_SEND;
+
     sendMessageBtn;
     sendMessageArea;
     sendMessageError;
-    sendMessageReply;
-    sendMessageReplyShort;
+
+    sendMessagePop;
+    sendMessagePopText;
 
     set showError(v) {
         if (v) {
@@ -195,8 +234,8 @@ export default class extends Pages {
                     <ns-a href="/forum" class="btn ns-tickle-pink-btn">Retourner à la liste des catégories</ns-a>
                 </div>
                 <div id="nsf-message-compose" class="ns-hide-disconnected ns-categ-center ns-text-white">
-                    <div id="nsf-message-compose-reply">
-                        <div><span class="ns-text-light-gray">Répondre à </span><span id="nsf-message-compose-reply-short"></span></div>
+                    <div id="nsf-message-compose-pop">
+                        <div id="nsf-message-compose-pop-text"></div>
                         <button><i class="bi bi-x-circle-fill"></i></button>
                     </div>
                     <div id="sf-message-compose-area-container">
@@ -227,23 +266,25 @@ export default class extends Pages {
         }
         this.sendMessageBtn = _('#nsf-message-compose-send');
         this.sendMessageArea = _('#nsf-message-compose-area');
-        this.sendMessageArea.addEventListener('input', (e => {
-            e.target.style.height = 'auto';
-            e.target.style.height = Math.max(32, Math.min(176, e.target.scrollHeight)) + 'px';
-            if (e.target.value.length > 2000) {
-                if (!this.isError) this.showError = this.lengthError;
-            } else {
-                if (this.isError) this.showError = false;
-            }
-        }).bind(this));
+        this.sendMessageArea.addEventListener('input', this.updateComposeAreaSize.bind(this));
         this.sendMessageError = _('#nsf-message-compose-error');
-        this.sendMessageReply = _('#nsf-message-compose-reply');
-        this.sendMessageReply.style.display = 'none';
-        this.sendMessageReplyShort = _('#nsf-message-compose-reply-short');
-        this.sendMessageReply.querySelector('button').addEventListener('click', this.removeReply.bind(this));
+        this.sendMessagePop = _('#nsf-message-compose-pop');
+        this.sendMessagePop.style.display = 'none';
+        this.sendMessagePopText = _('#nsf-message-compose-pop-text');
+        this.sendMessagePop.querySelector('button').addEventListener('click', this.resetComposeStatus.bind(this));
 
         this.sendMessageBtn.addEventListener('click', this.sendMessage.bind(this));
         this.showError = false;
+    }
+
+    updateComposeAreaSize() {
+        this.sendMessageArea.style.height = 'auto';
+        this.sendMessageArea.style.height = Math.max(32, Math.min(176, this.sendMessageArea.scrollHeight)) + 'px';
+        if (this.sendMessageArea.value.length > 2000) {
+            if (!this.isError) this.showError = this.lengthError;
+        } else {
+            if (this.isError) this.showError = false;
+        }
     }
 
     changePage(e) {
@@ -283,23 +324,45 @@ export default class extends Pages {
         }
     }
 
+    enableComposePop(id) {
+        this.sendMessagePop.style.display = '';
+        this.currentComposeID = id;
+        this.sendMessagePop.scrollIntoView();
+        this.sendMessageArea.focus({preventScroll:true});
+    }
+
     createReply(id, content) {
         if (content.length > 40) {
             content = content.substring(0, 37);
             content += '...';
         }
         content = content.replace(/[\r\n]/g, ' ');
-        this.sendMessageReplyShort.innerText = escapeHtml(content);
-        this.sendMessageReply.style.display = '';
-        this.currentReplyId = id;
-        this.sendMessageReply.scrollIntoView();
-        this.sendMessageArea.focus({preventScroll:true});
+        this.sendMessagePopText.innerHTML = `<span class="ns-text-light-gray">Répondre à </span><span>${escapeHtml(content)}</span>`;
+        if (this.composeType === COMPOSE_TYPE_EDIT || this.composeType === COMPOSE_TYPE_EDIT_REPLY) {
+            this.sendMessageArea.value = '';
+            this.updateComposeAreaSize();
+        }
+        this.composeType = COMPOSE_TYPE_REPLY;
+        this.enableComposePop(id);
     }
 
-    removeReply() {
-        this.sendMessageReplyShort.innerText = '';
-        this.sendMessageReply.style.display = 'none';
-        this.currentReplyId = null;
+    createEdit(id, content, isReply) {
+        this.sendMessagePopText.innerHTML = `Modifier votre message`;
+        this.sendMessageArea.value = content;
+        this.updateComposeAreaSize();
+        this.composeType = isReply ? COMPOSE_TYPE_EDIT_REPLY : COMPOSE_TYPE_EDIT;
+        this.enableComposePop(id);
+    }
+
+    resetComposeStatus() {
+        this.sendMessagePopText.innerText = '';
+        this.sendMessagePop.style.display = 'none';
+        this.currentComposeID = null;
+        if (this.composeType === COMPOSE_TYPE_EDIT || this.composeType === COMPOSE_TYPE_EDIT_REPLY) {
+            this.sendMessageArea.value = '';
+            this.updateComposeAreaSize();
+        }
+        this.composeType = COMPOSE_TYPE_SEND;
     }
 
     sendMessage() {
@@ -313,25 +376,39 @@ export default class extends Pages {
         const fd = new FormData();
         fd.set('message', msg)
         let url;
-        if (this.currentReplyId === null) {
-            url = 'forum/message';
-            fd.set('topic', this.topic.toString());
-        } else {
-            url = 'forum/reply';
-            fd.set('reply', this.currentReplyId.toString());
+        switch (this.composeType) {
+
+            case COMPOSE_TYPE_SEND:
+                url = 'forum/message';
+                fd.set('topic', this.topic.toString());
+                break
+            case COMPOSE_TYPE_REPLY:
+                url = 'forum/reply';
+                fd.set('reply', this.currentComposeID.toString());
+                break;
+            case COMPOSE_TYPE_EDIT:
+                url = 'forum/edit/message';
+                fd.set('ref', this.currentComposeID.toString());
+                break;
+            case COMPOSE_TYPE_EDIT_REPLY:
+                url = 'forum/edit/reply';
+                fd.set('ref', this.currentComposeID.toString());
+                break;
+            default:
+                this.composeType = COMPOSE_TYPE_SEND;
+                this.showError = 'Une erreur est survenue merci de ressayer';
+                return;
         }
 
         sendApiPostFetch(url, fd).then(data => {
             this.showError = false;
             this.sendMessageArea.value = '';
-            if (this.currentReplyId) {
-                this.removeReply();
-            }
+            this.resetComposeStatus();
             this.dataBlock.refresh();
         }).catch(r => {
             if (r?.status === 400) this.showError = this.lengthError;
             else {
-                this.showError = 'Une erreur est survenue merci de ressayer plus tard'
+                this.showError = 'Une erreur est survenue merci de ressayer plus tard';
             }
         }).finally();
     }

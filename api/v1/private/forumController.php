@@ -18,16 +18,24 @@
  * @api GET forum/messages
  * @api GET forum/message/{msg-id}/reply?offset=[0-9]+?limit=[0-9]+
  *
+ * @api PATH forum/message
+ * @api PATH forum/reply
+ *
  *
  * invoker
  */
 function invokeForm(string $method, array $function, array $query)
 {
     if ($method === "POST") {
-        if (count($function) === 1 && $function[0] === "category") _create_category();
-        elseif (count($function) === 1 && $function[0] === "topic") _create_topic();
-        elseif (count($function) === 1 && $function[0] === "message") _create_message();
-        elseif (count($function) === 1 && $function[0] === "reply") _create_reply();
+	    if (count($function) === 1) {
+		    if ($function[0] === "category") _create_category();
+			elseif ($function[0] === "topic") _create_topic();
+		    elseif ($function[0] === "message") _create_message();
+		    elseif ($function[0] === "reply") _create_reply();
+	    } elseif (count($function) === 2 && $function[0] === "edit") {
+			if ($function[1] === "message") _edit_message(false);
+			if ($function[1] === "reply") _edit_message(true);
+		}
     } elseif ($method === "GET") {
 	    if (count($function) === 2 && $function[0] == "category") {
 		    if ($function[1] === "all") _get_all_category();
@@ -346,6 +354,29 @@ function _create_reply()
 
 }
 
+// content ; reply ;
+function _edit_message(bool $isReply)
+{
+	$user = get_log_user();
+	if (!$user->is_connected()) unauthorized();
+	$table = $isReply ? TABLE_FORUM_REPLY : TABLE_FORUM_MESSAGE;
+
+	$content = $_POST["message"] ?? "";
+	$ref = $_POST["ref"] ?? null;
+	if ($ref === null) bad_request('invalid ref');
+
+	$refData = getDB()->select($table, ['author', 'status'], ['id' => $ref], 1);
+	if (!$refData) bad_request('invalid ref');
+	if ($refData['author'] !== $user->getId()) unauthorized();
+
+	if (strlen($content) < 1 || strlen($content) > 2000) bad_request('Le message doit contenir au minimum 1 caractére et au maximum 2000 !');
+
+	$data = ["content" => $content, "status" => (intval($refData['status']) | MESSAGE_STATUS_EDITED)];
+	getDB()->update($table, $data, ['id' => $ref]);
+	success();
+}
+
+
 /**
  * Create new topic
  * permission depends on category permission  @return void
@@ -468,7 +499,3 @@ function _edit_topic()
 {
 }
 
-// content ; reply ;
-function _edit_message()
-{
-}

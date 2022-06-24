@@ -103,6 +103,7 @@ $function = array_slice($uri, 4);
 parse_str($_SERVER['QUERY_STRING'], $query);
 $method = strtoupper($_SERVER["REQUEST_METHOD"]);
 
+
 if ($controller === 'analytic') {
     $path = join('/', $function);
 } else {

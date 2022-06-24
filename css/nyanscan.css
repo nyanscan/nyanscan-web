@@ -1285,7 +1285,7 @@ body {
     width: 100%;
 }
 
-#nsf-message-compose-reply {
+#nsf-message-compose-pop {
     background-color: var(--ns-color-violet-blue);
     display: flex;
     flex-direction: row;
@@ -1295,18 +1295,18 @@ body {
     padding: .2em calc(1rem + 9px) .2em 1rem;
 }
 
-#nsf-message-compose-reply button {
+#nsf-message-compose-pop button {
     font-size: 20px;
     background-color: transparent;
     border: none;
     color: var(--ns-color-paradise-pink);
 }
 
-#nsf-message-compose-reply button:hover {
+#nsf-message-compose-pop button:hover {
     opacity: .8;
 }
 
-#nsf-message-compose-reply:not([style*="display: none;"]) + #sf-message-compose-area-container {
+#nsf-message-compose-pop:not([style*="display: none;"]) + #sf-message-compose-area-container {
     border-radius: 0 0 1rem 1rem;
 }
 
