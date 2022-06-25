@@ -16,6 +16,7 @@ class Header extends Component {
                     <ns-a class="c-nav-link" href="/volume" aria-label="device" title="Device"><i class="bi bi-file-earmark-break"></i></ns-a>
                     <ns-a class="c-nav-link" href="/image" aria-label="user" title="User"><i class="bi bi-image"></i></ns-a>
                     <ns-a class="c-nav-link" href="/users" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
+                    <ns-a class="c-nav-link" href="/log-root" aria-label="log" title="Log"><i class="bi bi-journal"></i></ns-a>
                 </div>
             </nav>
         </header>
@@ -52,7 +53,7 @@ class Index extends Pages {
                         <h3>Projet</h3>
                     </ns-a>
                 </div>
-                <div class="box">
+                <div class="box" style="--color-one: #4ca5ad; --color-two: #1d8cd1">
                     <span>
                     
                     </span>
@@ -82,6 +83,16 @@ class Index extends Pages {
                         <h3>Utilisateurs</h3>
                     </ns-a>
                 </div>
+                 <div class="box" style="--color-one: #ad4ca0; --color-two: #d11dad">
+                    <span>
+                    
+                    </span>
+                    <ns-a class="content" href="/log-root">
+                        <i class="bi bi-journal"></i>
+                        <ns-api-data field="log-root">0</ns-api-data>
+                        <h3>Log</h3>
+                    </ns-a>
+                </div>
             </ns-api-data-block>
         </section>
         `;
@@ -100,6 +111,10 @@ const STRUCTURE = [
     {
         re: /^(|index|home)$/,
         rel: "index"
+    },
+    {
+        re: /^log-root$/,
+        rel: 'admin/log_root'
     },
     {
         re: /^project$/,

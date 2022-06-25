@@ -63,11 +63,11 @@ export default class extends SimpleTablePages {
 
     COLUMN = [
         {name: 'id', display: 'ID', force: true, default: 'null', isDefault: true, isPrimary: true},
-        {name: 'username', display: 'Pseudo', force: false, default: 'null', isDefault: true, href: ''},
-        {name: 'email', display: 'E-mail', force: false, default: 'null', isDefault: true},
+        {name: 'username', display: 'Pseudo', force: false, default: 'null', isDefault: true, href: '', isSearchable: true},
+        {name: 'email', display: 'E-mail', force: false, default: 'null', isDefault: true, isSearchable: true},
         {name: 'birthday', display: 'Anniversaire', force: false, default: 'null'},
         {name: 'status', display: 'Statut', force: false, default: '0'},
-        {name: 'permission', display: 'Permission', force: false, default: '0', isDefault: true, needCallback: true},
+        {name: 'permission', display: 'Permission', force: false, default: '0', isDefault: true, needCallback: true, isSearchable: true},
         {name: 'date_inserted', display: 'Créé le', force: false, default: 'never'},
         {name: 'date_updated', display: 'Dernière connection', force: false, default: 'never'}
     ];

@@ -2,14 +2,20 @@
 
 function invokeProject($method, $function, $query) {
     if ($method === "POST") {
-        if ($function[0] === 'create') {
-            _new_project();
-        }
-        if ($function[0] === 'validation') {
-            _change_status_project();
-        }
-        if ($function[0] === 'volume') {
-            _new_volume();
+        if (count($function) === 1) {
+            if ($function[0] === 'create') {
+                _new_project();
+            }
+            if ($function[0] === 'validation') {
+                _change_status_project();
+            }
+            if ($function[0] === 'volume') {
+                _new_volume();
+            }
+        } elseif (count($function) === 2) {
+            if ($function[0] === 'volume' && $function[1] === "validation") {
+                _change_status_volume();
+            }
         }
     } elseif ($method === "GET") {
         if ($function[0] === 'user' && count($function) === 2) {
@@ -165,12 +171,19 @@ function _fetch_project_with_volumes($id) {
         if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $project["author"])) {
             forbidden();
         }
-    } else {
-        //$where["status"] = PROJECT_STATUS_PUBLISHED;
     }
 
-    $volumes = getDB()->select(TABLE_VOLUME, ['volume', 'picture', 'title', 'page_count', 'status'], $where);
-    $project["volumes"] = $volumes;
+    $volumes = getDB()->select(TABLE_VOLUME, ['volume', 'picture', 'author', 'title', 'page_count', 'status'], $where);
+    $project["volumes"] = [];
+    foreach ($volumes as $v) {
+        if ($v['status'] != PROJECT_STATUS_PUBLISHED) {
+            $user = get_log_user();
+            if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $v["author"])) {
+                continue;
+            }
+        }
+        $project["volumes"][] = $v;
+    }
 
     success($project);
 }
@@ -215,11 +228,11 @@ function _fetch_volume($project, $tome) {
 }
 
 function _admin_fetch_projects($query) {
-    admin_fetch(TABLE_PROJECT, ['id', 'author', 'picture', 'title', 'description', 'reading_direction', 'format', 'status', 'date_inserted'], $query, 'id');
+    admin_fetch(TABLE_PROJECT, ['id', 'author', 'picture', 'title', 'description', 'reading_direction', 'format', 'status', 'date_inserted'], $query, 'id', ['title', 'author']);
 }
 
 function _admin_fetch_volume($query) {
-    admin_fetch(TABLE_VOLUME, ['project', 'volume', 'picture', 'data', 'author', 'title', 'page_count', 'status', 'date_inserted'], $query, 'data');
+    admin_fetch(TABLE_VOLUME, ['project', 'volume', 'picture', 'data', 'author', 'title', 'page_count', 'status', 'date_inserted'], $query, 'data', ['title', 'project']);
 }
 
 function _change_status_project() {
@@ -263,6 +276,45 @@ function _change_status_project() {
         }
     }
     success();
+}
+
+function _change_status_volume() {
+    $status = $_POST["status"]??null;
+    $volumeOD = $_POST["volume"]??null;
+    $projectID = $_POST["project"]??null;
+    $reason = $_POST["reason"]??null;
+    if ($reason === null) {
+        $reason = "";
+    }
+    if (!is_numeric($status) || intval($status) < 0 || $status > PROJECT_STATUS_PUBLISHED) {
+        bad_request("wrong status");
+    }
+    $project = getDB()->select(TABLE_VOLUME, ['volume', 'project', 'author', 'title'], ["project" => $projectID, "volume" => $volumeOD], 1);
+    if (!$project) {
+        bad_request("wrong project");
+    }
+    if (strlen($reason) > 255) {
+        bad_request("La raison ne doit pas dépasser les 255 caractères.");
+    }
+    getDB()->update(TABLE_VOLUME, ["status" => $status], ["project" => $projectID, "volume" => $volumeOD]);
+
+    // send mail
+    $text_status = "";
+    switch ($status) {
+        case PROJECT_STATUS_WAIT_VERIFICATION: $text_status = "Attente de vérification"; break;
+        case PROJECT_STATUS_REJECT: $text_status = "Rejeté"; break;
+        case PROJECT_STATUS_ACCEPTED_NO_CONTENT: $text_status = "Accepté en attente de contenue"; break;
+        case PROJECT_STATUS_PUBLISHED: $text_status = "Publié"; break;
+    }
+
+    if ($project["author"]) {
+        $user = getDB()->select(TABLE_USER, ['username', 'email'], ['id' => $project["author"]], 1);
+        if ($user) {
+            send_project_status_change_mail($text_status, $project['title'], $user["email"], $user["username"]);
+        }
+    }
+    success();
+
 }
 
 function _delete_volume($project, $tome) {
@@ -312,7 +364,6 @@ function _new_volume() {
     $title = $_POST["title"] ?? null;
     $volume = $_POST["volume"] ?? null;
     $project = $_POST["project"] ?? null;
-    //$page_count = $_POST["page_count"] ?? null;
 
     $error = [];
 

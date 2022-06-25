@@ -61,7 +61,6 @@ class DBAdapter {
             }
         }
         $req = $this->pdo->prepare($statement);
-
         $req->execute($to_bind);
 
         if ($limit === 1 && !$force_multi) {
@@ -113,7 +112,7 @@ class DBAdapter {
             $rowsSQL = array_map(function ($k) {
                 return $k . ' = :' . $k;
             }, array_keys($data));
-            $statement = "UPDATE " . DB_PREFIX.$table . " SET " . join(', ', $rowsSQL) . ' WHERE ' . join(', ', $condition);
+            $statement = "UPDATE " . DB_PREFIX.$table . " SET " . join(', ', $rowsSQL) . ' WHERE ' . join(' AND ', $condition);
             $req =$this->pdo->prepare($statement);
             return $req->execute(array_merge($data, $to_bind));
         }

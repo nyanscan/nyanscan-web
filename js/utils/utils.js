@@ -97,9 +97,9 @@ function sendApiDeleteRequest(url, callBack = null, progressCallBack = null) {
  */
 function sendApiRequest(method, url, callBack, progressCallBack = undefined, sendItem = undefined) {
     const ajax = new XMLHttpRequest()
+    ajax.open(method, '/api/v1/' + url, true);
     let auth = window.APP.user.authorization;
     if (auth !== null) ajax.setRequestHeader('Authorization', auth );
-    ajax.open(method, '/api/v1/' + url, true);
 
     if (progressCallBack !== undefined && progressCallBack !== null) {
         ajax.addEventListener('progress', progressCallBack);

@@ -65,7 +65,7 @@ function internal_error() {
     json_exit(500, "Internal Server Error", "Internal Server Error");
 }
 
-function admin_fetch($table, $col, $query, $primary) {
+function admin_fetch($table, $col, $query, $primary, $search_col=[]) {
     if (!isConnected()) {
         unauthorized();
     }
@@ -79,6 +79,14 @@ function admin_fetch($table, $col, $query, $primary) {
     $order = $query["order"]??null;
     $order_reverse = isset($query["reverse"]) && !$query["reverse"] == '0';
 
+    $where = [];
+
+    foreach ($search_col as $s) {
+        if (isset($query[$s])) {
+            $where[$s] = ['v' => $query[$s], "o" => " LIKE "];
+        }
+    }
+
     $order_v = null;
 
     if ($order) {
@@ -88,8 +96,8 @@ function admin_fetch($table, $col, $query, $primary) {
     }
     $data = [];
 
-    $data["element"] = getDB()->select($table, $col, [], $limit, $order_v, $offset);
-    $data["total_count"] = getDB()->count($table, $primary);
+    $data["element"] = getDB()->select($table, $col, $where, $limit, $order_v, $offset);
+    $data["total_count"] = getDB()->count($table, $primary, $where);
     success($data);
 }
 

@@ -29,7 +29,7 @@ function invokeUser($method, $function, $query) {
  * @example limit, offset, order, reverse
  */
 function _admin_fetch_user($query) {
-    admin_fetch(TABLE_USER, ['id', 'username', 'email', 'birthday', 'status', 'permission', 'date_updated', 'date_inserted'], $query, 'id');
+    admin_fetch(TABLE_USER, ['id', 'username', 'email', 'birthday', 'status', 'permission', 'date_updated', 'date_inserted'], $query, 'id', ['username', 'email', 'permission']);
 }
 
 /**

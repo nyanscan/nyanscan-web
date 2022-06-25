@@ -54,9 +54,9 @@ export default class extends SimpleTablePages {
 
     COLUMN = [
         {name: 'id', display: 'ID', force: true, default: 'null', isDefault: true, isPrimary: true},
-        {name: 'author', display: 'Auteur', force: false, default: 'null', isDefault: true, href: ''},
+        {name: 'author', display: 'Auteur', force: false, default: 'null', isDefault: true, href: '', isSearchable: true},
         {name: 'picture', display: 'Vignette', force: false, default: 'null', isDefault: true, href: ''},
-        {name: 'title', display: 'Titre', force: false, default: 'null', isDefault: true},
+        {name: 'title', display: 'Titre', force: false, default: 'null', isDefault: true, isSearchable: true},
         {name: 'description', display: 'Description', force: false, default: 'null'},
         {name: 'reading_direction', display: 'Sens De lecture', force: false, default: '0', needCallback: true},
         {name: 'format', display: 'Format', force: false, default: '0', needCallback: true},
