@@ -1092,6 +1092,28 @@ body {
     max-width: 100vw;
 }
 
+.ns-reading-like {
+
+}
+
+.ns-reading-like > .bi {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    font-size: 48px;
+    width: 67px;
+    text-align: center;
+}
+.ns-reading-like > .bi:first-child {
+    margin-right: 2rem;
+}
+
+.ns-reading-like > .bi:hover {
+    background-color: #4d4b4b;
+    transition: background-color 0.5s ease-out;
+}
+
 .ns-pr-picture {
     width: 444px;
     height: 630px;

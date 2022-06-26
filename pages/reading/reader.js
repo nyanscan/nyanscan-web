@@ -12,6 +12,8 @@ export default class extends Pages {
     zoomValue = 1;
     zoomMoreBtn;
     zoomLessBtn;
+    likeBTN;
+    dislikeBTN;
 
     progress;
 
@@ -55,6 +57,10 @@ export default class extends Pages {
                         <button id="ns-reading-next" class="ns-reading-btn">Suivant</button>
                         <button id="ns-reading-previous" class="ns-reading-btn">Précédent</button>
                     </div>
+                    <div class="ns-reading-like ns-hide-disconnected my-3">
+                        <i id="ns-reading-like" class="bi text-success bi-hand-thumbs-up"></i>
+                        <i id="ns-reading-dislike" class="bi text-danger bi-hand-thumbs-down"></i>
+                    </div>
                     <div class="mb-4">
                         <ns-a class="ns-reading-btn" href="/p/${this.project}">Revenir au projet</ns-a>
                     </div>
@@ -66,7 +72,8 @@ export default class extends Pages {
 
     build(parent, vars) {
         if (!vars["project"] || !vars["volume"]) {
-            this.app.do404();
+            // this.app.do404();
+            // return;
         }
         this.project = vars["project"];
         this.volume = vars["volume"];
@@ -97,6 +104,10 @@ export default class extends Pages {
             this.updateZoomBtn();
             this.calculateViewSize();
         }
+        this.likeBTN = _('#ns-reading-like');
+        this.dislikeBTN = _('#ns-reading-dislike');
+        this.likeBTN.addEventListener('click', this.likeClick.bind(this, false));
+        this.dislikeBTN.addEventListener('click', this.likeClick.bind(this, true));
     }
 
 
@@ -155,16 +166,43 @@ export default class extends Pages {
         }
     }
 
+    likeClick(isNegative) {
+        if (!this.app.user.isLog) return;
+        const current = (isNegative ? this.dislikeBTN : this.likeBTN).classList.contains(isNegative ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-up-fill');
+        this.data.rawData['user_like_status'] = current ? null : isNegative ? '1' : '0';
+        sendApiGetFetch(`project/${current ? 'unlike' : isNegative ? 'dislike' : 'like'}/${this.project}/${this.volume}`).catch(console.error);
+        this.updateLike();
+    }
+
     setup() {
         if (this.data.isError) {
-            this.app.do404();
+            // this.app.do404();
         } else {
             this.directionJP = this.data.rawData['reading_direction'] === '1';
             if (!this.directionJP) _('.ns-reading-view-contain').forEach(value => value.classList.add('classic'));
             this.maxPage = this.data.rawData["page_count"];
             this.pages = this.data.rawData["data"]["pages"];
             this.page = Math.min(this.maxPage, this.page);
+            this.updateLike();
             this.update();
+        }
+    }
+
+    updateLike() {
+        this.likeBTN.classList.remove('bi-hand-thumbs-up');
+        this.dislikeBTN.classList.remove('bi-hand-thumbs-down');
+        this.likeBTN.classList.remove('bi-hand-thumbs-up-fill');
+        this.dislikeBTN.classList.remove('bi-hand-thumbs-down-fill');
+        const like_status = this.data.rawData['user_like_status'];
+        if (like_status == '1') {
+            this.likeBTN.classList.add('bi-hand-thumbs-up')
+            this.dislikeBTN.classList.add('bi-hand-thumbs-down-fill')
+        } else if (like_status == '0') {
+            this.likeBTN.classList.add('bi-hand-thumbs-up-fill')
+            this.dislikeBTN.classList.add('bi-hand-thumbs-down')
+        } else if (like_status === null) {
+            this.likeBTN.classList.add('bi-hand-thumbs-up')
+            this.dislikeBTN.classList.add('bi-hand-thumbs-down')
         }
     }
 
@@ -194,7 +232,7 @@ export default class extends Pages {
 
         const currentIMG = this.pages[this.page];
 
-        this.view.src = `volume/${currentIMG.substr(0, 3)}/${currentIMG.substr(3)}.webp`
+        this.view.src = `volume/${currentIMG.substring(0, 3)}/${currentIMG.substring(3)}.webp`;
         this.cacheNext();
 
         window.history.pushState("", "",  `${(this.app.prefix ? `/${this.app.prefix}/` : '/')}p/${this.project}/${this.volume}/${this.page}`);

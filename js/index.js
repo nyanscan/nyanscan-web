@@ -168,6 +168,8 @@ class Header extends Component {
         }, true);
 
         _('#ns-mobile-nav-close').addEventListener('click', () => {_('#horizontal-mobile-nav').style.display = 'none'});
+        this.app.addEventListener('pageLoad', () => {_('#horizontal-mobile-nav').style.display = 'none'});
+
         _('#horizontal-mobile-nav').addEventListener('click', (e) => { if(e.target && e.target.id === 'horizontal-mobile-nav') _('#horizontal-mobile-nav').style.display = 'none'});
     }
 
@@ -376,7 +378,7 @@ class Index extends Pages {
     <form id="ns-index-join" class="form-inline ns-news-form w-100 container-lg">
         <div class="row">
             <div class="d-none d-lg-block col-lg-3"></div>
-            <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton amil"></div>
+            <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton e-mail"></div>
             <div class="col-lg-auto ns-center"><button class="ns-news-btn" type="submit"> Rejoindre </button></div>
             <div class="d-none d-lg-block col-lg"></div>
         </div>

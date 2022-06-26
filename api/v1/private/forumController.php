@@ -320,7 +320,6 @@ function _create_message()
     $data = ["author" => $user->getId(), "topic" => $sql_topic["id"], "content" => $message];
 
     getDB()->insert(TABLE_FORUM_MESSAGE, $data);
-    update_topic_last_message($sql_topic["id"]);
     success();
 }
 
@@ -425,7 +424,6 @@ function _create_topic()
     getDB()->insert(TABLE_FORUM_TOPIC, ["name" => $title, "category" => $cat["id"]]);
     $id = getDB()->select(TABLE_FORUM_TOPIC, ['id'], ["name" => $title], 1, 'date_inserted DESC')['id'];
     getDB()->insert(TABLE_FORUM_MESSAGE, ["author" => $user->getId(), "topic" => $id, "content" => $message]);
-    update_topic_last_message($id);
     success();
 }
 

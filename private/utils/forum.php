@@ -25,9 +25,14 @@ function get_all_visible_category($view_level, $column = ["id", "name", "descrip
     return $req->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/**
+ * @deprecated mange by sql TRIGGER
+ * @param $topic
+ * @return void
+ */
 function update_topic_last_message($topic) {
-    $req = getDB()->get_pdo()->prepare("UPDATE ".DB_PREFIX.TABLE_FORUM_TOPIC." SET last_message=(SELECT id FROM ".DB_PREFIX.TABLE_FORUM_MESSAGE." WHERE topic=:topic ORDER BY date_inserted DESC LIMIT 1) WHERE id=:topic;");
-    $req->execute(["topic" => $topic]);
+//    $req = getDB()->get_pdo()->prepare("UPDATE ".DB_PREFIX.TABLE_FORUM_TOPIC." SET last_message=(SELECT id FROM ".DB_PREFIX.TABLE_FORUM_MESSAGE." WHERE topic=:topic ORDER BY date_inserted DESC LIMIT 1) WHERE id=:topic;");
+//    $req->execute(["topic" => $topic]);
 }
 
 function get_all_full_category($view_level) {

@@ -660,6 +660,11 @@ class Application extends EventTarget {
         this.currentVars = vars;
         page.build(content, vars);
         this.setTitle(page.title);
+        this.dispatchEvent(new CustomEvent('pageLoad', {
+            cancelable: false,
+            bubbles: true,
+            composed: false,
+        }))
         this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader);
         this.currentPages = page;
         page.send_analytic();

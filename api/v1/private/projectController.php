@@ -32,6 +32,12 @@ function invokeProject($method, $function, $query) {
             _fetch_project($function[0]);
         } elseif (count($function) === 2) {
             _fetch_volume($function[0], $function[1]);
+        } elseif (count($function) === 3 && $function[0] === "like") {
+            _like_volume($function[1], $function[2], 0);
+        } elseif (count($function) === 3 && $function[0] === "dislike") {
+            _like_volume($function[1], $function[2], 1);
+        } elseif (count($function) === 3 && $function[0] === "unlike") {
+            _like_volume($function[1], $function[2], -1);
         }
     } elseif ($method === "DELETE") {
         if (count($function) === 2) {
@@ -40,6 +46,29 @@ function invokeProject($method, $function, $query) {
     } else {
         bad_method();
     }
+}
+
+function _like_volume($project, string $volume, int $isDislike)
+{
+    $user = get_log_user();
+    if (!$user->is_connected()) unauthorized();
+
+    if ($isDislike === -1) getDB()->delete(TABLE_VOLUME_LIKE, [
+        "user_id" => $user->getId(),
+        "fk_volume" => $volume,
+        "fk_project" => $project
+    ]);
+    else {
+        $req = getDB()->get_pdo()->prepare("INSERT IGNORE INTO PAE_VOLUME_LIKE(user_id, fk_volume, fk_project, is_negative) VALUES (:user_id, :fk_volume, :fk_project, :is_negative) ON DUPLICATE KEY UPDATE is_negative=:is_negative;");
+        $req->execute([
+            "user_id" => $user->getId(),
+            "fk_volume" => $volume,
+            "fk_project" => $project,
+            "is_negative" => $isDislike
+        ]);
+    }
+    success();
+
 }
 
 function fetch_index() {
@@ -173,7 +202,7 @@ function _fetch_project_with_volumes($id) {
         }
     }
 
-    $volumes = getDB()->select(TABLE_VOLUME, ['volume', 'picture', 'author', 'title', 'page_count', 'status'], $where);
+    $volumes = getDB()->select(TABLE_VOLUME, ['volume', 'picture', 'author', 'title', 'page_count', 'status', 'like_count', 'dislike_count'], $where);
     $project["volumes"] = [];
     foreach ($volumes as $v) {
         if ($v['status'] != PROJECT_STATUS_PUBLISHED) {
@@ -189,6 +218,7 @@ function _fetch_project_with_volumes($id) {
 }
 
 function _fetch_volume($project, $tome) {
+    $user = get_log_user();
     $req = getDB()->get_pdo()->prepare("
             SELECT     
                 project,
@@ -205,13 +235,15 @@ function _fetch_volume($project, $tome) {
                 V.date_inserted as volume_date_inserted,
                 description,
                 reading_direction,
-                format 
+                format,
+                L.is_negative AS user_like_status 
             FROM PAE_VOLUME AS V 
             LEFT JOIN PAE_PROJECT P ON V.project = P.id 
+            LEFT JOIN PAE_VOLUME_LIKE L ON L.fk_volume = V.volume AND L.fk_project = V.project AND L.user_id = :user 
             WHERE V.project=:project AND V.volume=:volume 
             LIMIT 1
     ");
-    $req->execute(["project" => $project, "volume" => $tome]);
+    $req->execute(["project" => $project, "volume" => $tome, "user" => $user->is_connected() ? $user->getId() : null]);
     $data = $req->fetch(PDO::FETCH_ASSOC);
 
     if ($data["project_status"] != PROJECT_STATUS_PUBLISHED || $data["volume_status"] != PROJECT_STATUS_PUBLISHED){
@@ -221,8 +253,9 @@ function _fetch_volume($project, $tome) {
         }
     }
 
-    $json = file_get_contents(VOLUME_PATH . 'header_data/' . $data["data"] . '.json');
-    $data["data"] = json_decode($json, true);
+//    $json = file_get_contents(VOLUME_PATH . 'header_data/' . $data["data"] . '.json');
+//    $data["data"] = json_decode($json, true);
+    $data["data"] = [];
 
     success($data);
 }
@@ -357,9 +390,6 @@ function _new_volume() {
     if (!$user->is_connected()) {
         unauthorized();
     }
-
-    print_r($_POST);
-    print_r($_FILES);
 
     $title = $_POST["title"] ?? null;
     $volume = $_POST["volume"] ?? null;
