@@ -5,7 +5,7 @@ export default class extends Pages {
     getBookTemplate(project) {
         let html = `  
         <div>
-            <ns-a href="/p/${project["id"]}"><img src="${image_id_to_patch(project["picture"])}" alt="${project["title"]}"></ns-a>
+            <ns-a href="/p/${project["id"]}"><img src="${image_id_to_path(project["picture"])}" alt="${project["title"]}"></ns-a>
             <div>
                 <span>${ escapeHtml(project["title"])}</span>
             </div>
@@ -13,7 +13,7 @@ export default class extends Pages {
             if (this.isSelf) {
                 html += `
                     <div>
-                        <span>Status: ${project_status_to_html(project.status)}</span>
+                        <span>Status: ${event_status_to_html(project.status)}</span>
                         <ns-a href="/p/${project["id"]}/edit">Edit</ns-a>
                     </div>
                 `;

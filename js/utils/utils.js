@@ -11,8 +11,12 @@ const LOGIN_LEVEL_CONNECT = 1;
 
 const VERSION = 'BETA-2.0.4';
 
-
-function _(query, mono = false) {
+//Kind of a selector function :
+//to select html tag
+//Query is the tag
+//Mono tell it has to be an isolated element or not
+//return either the first html element or a list of matching elements
+function _(query, mono=false) {
     if (query.startsWith('#') && !query.includes(' ')) {
         mono = true;
     }
@@ -22,6 +26,10 @@ function _(query, mono = false) {
     return document.querySelectorAll(query);
 }
 
+//Function that create html element
+//type is tag type, id like the id, parent like the parent tag
+//and class where you can give class as much as you want
+//return the created element
 function create(type, id = null, parent = null, ...cla) {
     const e = document.createElement(type);
     if (cla.length > 0) {
@@ -36,6 +44,7 @@ function create(type, id = null, parent = null, ...cla) {
     return e;
 }
 
+//Same as above but with a Promise
 function createPromise(type, id = null, parent = null, ...cla) {
     return new Promise(resolve => {
         const e = document.createElement(type);
@@ -53,7 +62,8 @@ function createPromise(type, id = null, parent = null, ...cla) {
 }
 
 /**
- *
+ * Function to send POST request
+ * with the formData for this one for more context
  * @param url
  * @param formData
  * @param callBack
@@ -65,7 +75,7 @@ function sendApiPostRequest(url, formData, callBack = null, progressCallBack = n
 }
 
 /**
- *
+ * Function to send GET request
  * @param url
  * @param callBack
  * @param progressCallBack
@@ -76,7 +86,7 @@ function sendApiGetRequest(url, callBack = null, progressCallBack = null) {
 }
 
 /**
- *
+ * Function to send DELETE request
  * @param url
  * @param callBack
  * @param progressCallBack
@@ -87,7 +97,8 @@ function sendApiDeleteRequest(url, callBack = null, progressCallBack = null) {
 }
 
 /**
- *
+ * Function that send the request
+ * with the method to use, the url, the callback and the item to send
  * @param method
  * @param url
  * @param callBack
@@ -118,6 +129,7 @@ function sendApiRequest(method, url, callBack, progressCallBack = undefined, sen
         ajax.send();
     }
 }
+
 
 function sendApiPostFetch(url, fd) {
     return sendApiFetch(url, fd, "POST");
@@ -155,6 +167,8 @@ function sendApiFetch(url, body, method) {
     }).then(e => Promise.resolve(e.data||e));
 }
 
+//Function that check the response status of the Api
+//return the state
 function checkApiResStatus(event) {
     if (event.type !== 'load') {
         return API_REP_CONNECTION_ERROR;
@@ -165,25 +179,35 @@ function checkApiResStatus(event) {
     return API_REP_BAD
 }
 
+//Function that get some Api data via event
+//return an object as response
 function getDataAPI(event) {
     return JSON.parse(event.target.responseText)["data"];
 }
 
+//Function that get the reason of an Api error via an event as well
+//return an object as response
 function getAPIErrorReason(event) {
     return JSON.parse(event.target.responseText)["reason"];
 }
 
+//Function that create the loading screen
+//It can be shown or not
 function loadingScreen(show = true) {
     window.APP.loading.switchState(show);
 }
 
-
+//Function that create a very random ID
+//return the ID
 function uuidv4() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 }
 
+  //Function that import fragment of a document into a document
+//with template that is a html element
+//return document fragment
 function importTemplate(template, vars, isString = false) {
     let clone;
     if (isString) {
@@ -208,7 +232,7 @@ function importTemplate(template, vars, isString = false) {
     return clone;
 }
 
-
+//Here, we're creating our User class...
 class User {
     permissionLevel;
     app;
@@ -249,6 +273,7 @@ class User {
         localStorage.setItem('token', JSON.stringify({'id': id, 'token': token}));
     }
 
+    //to get log of the user
     log() {
         if (this.token === null || this.id === null) {
             this.switchBodyLogValue(false);
@@ -272,10 +297,12 @@ class User {
         }
     }
 
+    //Get the status of the user
     get loginLevel() {
         return this.isLog ? LOGIN_LEVEL_CONNECT : LOGIN_LEVEL_DISCONNECT;
     }
 
+    //Redirect on logout
     logout(redirectLogin) {
         localStorage.removeItem('token');
         this.switchBodyLogValue(false);
@@ -299,10 +326,12 @@ class User {
     }
 }
 
+//Over here, we are creating our base component class...
 class Component {
     app;
     type;
 
+    //get html
     get raw() {
         return '';
     }
@@ -312,10 +341,12 @@ class Component {
         this.app = app;
     }
 
+    //return html
     getHTML() {
         return this.raw;
     }
 
+    //create parent node
     build(parent) {
         parent.innerHTML = this.getHTML();
     }
@@ -326,6 +357,7 @@ class Component {
 
 }
 
+//Creating base class pages from component
 class Pages extends Component {
 
     app;
@@ -349,6 +381,7 @@ class Pages extends Component {
         return super.getHTML();
     }
 
+    //construct the pages
     build(parent, vars) {
         const main = _('#ns-main');
         const currentTheme = main.classList.contains('ns-theme-bg');
@@ -486,8 +519,10 @@ class LoadingScreen extends Component {
     }
 }
 
+//Creating class application from EventTarget
+//for our Api (a Homemade one !)
 class Application extends EventTarget {
-    haveSticky = true;
+    haveStickyHeader = true;
     header;
     footer;
     index;
@@ -609,7 +644,7 @@ class Application extends EventTarget {
         if (url.startsWith('/')) {
             url = url.substring(1);
         }
-        // remove .html .js and .php
+        // remove file extension from URL
         url.replace(/^(.*)(\.html|\.js|\.php)(\?.*)?$/, '$1$3');
         let current_url = url;
         let current = this.structure;
@@ -717,6 +752,7 @@ class Application extends EventTarget {
 
 }
 
+//Creating the captcha
 class Captcha extends Component {
 
     block;
@@ -981,26 +1017,26 @@ class Captcha extends Component {
 //         footer.innerText = message;
 // }
 
-function image_id_to_patch(id) {
-    const format = id.substr(0, 1);
+//This function get the path of an image with its ID
+//String.prototype.substr() is deprecated and is not in web standard anymore
+//replaced with String.prototype.substring()
+function image_id_to_path(id) {
+    const format = id.substring(0, 1);
     const ext = '.' + ({'w': 'webp', 'p': 'png', 'j': 'jpg', 'g': 'gif', 'n': ''}[format]);
-    return `/picture/${id.substr(0, 5)}/${id.substr(5)}${ext}`
+    return `/picture/${id.substring(0, 5)}/${id.substring(5)}${ext}`
 }
 
-function project_status_to_html($status) {
+//Return a html span with message from the status of a project
+function event_status_to_html($status) {
     switch ($status) {
         case '0':
             return '<span class="project-status-wait">Attente de vérification</span>';
-            break;
         case '1':
             return '<span class="project-status-denied">Rejeté</span>';
-            break;
         case '2':
             return '<span class="project-status-accept">Accepté en attente de contenu</span>';
-            break;
         case '3':
             return '<span class="project-status-publish">Publié</span>';
-            break;
         default:
             return '';
     }

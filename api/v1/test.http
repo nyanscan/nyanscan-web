@@ -50,9 +50,9 @@ GET localhost:81/api/v1/forum/messages?full=1&author=1&limit=20&offset=0
 ###
 GET localhost:81/api/v1/user/me
 ###
-GET localhost:81/api/v1/project/all
+GET localhost:81/api/v1/event/all
 ###
-GET localhost:81/api/v1/project/2/volumes
+GET localhost:81/api/v1/event/2/volumes
 ###
-GET localhost:81/api/v1/project/2/6
+GET localhost:81/api/v1/event/2/6
 

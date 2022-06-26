@@ -73,6 +73,7 @@ class Header extends Component {
                 <ns-a href="/" class=""><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a>
                 <ns-a class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/catalogue">Catalogue</ns-a>
+                <ns-a  class="ns-a-1 ns-d-none-mlg" href="/events">Évènements</ns-a>
                 <ns-a  class="ns-a-1 ns-hide-disconnected ns-d-none-mlg" href="/publish">Publier</ns-a>
             </div>
             <div>
@@ -112,7 +113,7 @@ class Header extends Component {
                         <ns-a class='ns-a-1' href='/auth'>Se Connecter</ns-a>
                     </li>
                     <li class="ns-hide-disconnected">
-                        <span class='ns-a-1' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
+                        <span class='ns-a-1' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
                     </li>
                     <li class="ns-hide-disconnected">
                         <ns-a class="d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive ns-avatar-sm"></ns-a>
@@ -199,7 +200,7 @@ class Header extends Component {
             const data = getDataAPI(e);
             this.searchRes.innerHTML = '';
 
-            for (const cat of [{id: 'user', display: "Membre", href: '/u/', field: 'username'}, {id: 'project', display: 'Projet', href: '/p/', field: 'title'}]) {
+            for (const cat of [{id: 'user', display: "Membre", href: '/u/', field: 'username'}, {id: 'event', display: 'Projet', href: '/p/', field: 'title'}]) {
                 if (data[cat.id] !== undefined && data[cat.id].length > 0) {
                     const li = create('li', null, this.searchRes, 'ns-search-category');
                     createPromise('span', null, li).then(e => e.innerText = cat.display);
@@ -229,10 +230,10 @@ class Index extends Pages {
         <section class="ns-theme-bg py-5">
             <div class="ns-carousel">
                 <div class="ns-carousel-images">
-                    <img src="/res/banner/b1.jpg">
-                    <img src="/res/banner/b2.jpg">
-                    <img src="/res/banner/b3.jpeg">
-                    <img src="/res/banner/b1.jpg">
+                    <img src="/res/banner/b1.jpg" alt="">
+                    <img src="/res/banner/b2.jpg" alt="">
+                    <img src="/res/banner/b3.jpeg" alt="">
+                    <img src="/res/banner/b1.jpg" alt="">
                 </div>
                 <div class="ns-carousel-points">
                 
@@ -240,7 +241,7 @@ class Index extends Pages {
             </div>
         </section>
         <section class="ns-min-vh-100 ns-theme-bg ns-text-black">
-            <ns-api-data-block id="ns-index-data" href="project/index">
+            <ns-api-data-block id="ns-index-data" href="event/index">
                 <div class="ns-min-vh-50 ns-center pb-5">
                     <div class="ns-scan-preview">
                         <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
@@ -420,7 +421,7 @@ class Index extends Pages {
                     const ns_a = create('ns-a', null, box);
                     ns_a.href = '/p/' + item['id'];
                     const img = create('img', null, ns_a);
-                    img.src = image_id_to_patch(item['picture']);
+                    img.src = image_id_to_path(item['picture']);
                     const span = create('span', null, box)
                     span.innerText = item['title'];
                 }
@@ -479,8 +480,16 @@ const STRUCTURE = [
                     rel: "user"
                 },
                 {
-                    re: /^(projet|project)$/,
+                    re: /^(projet|event)$/,
                     rel: "reading/userProject"
+                },
+                {
+                    re: /^(|myEvent)$/,
+                    rel: "events/userCreatedEvent"
+                },
+                {
+                    re: /^(|participate)$/,
+                    rel: "events/userEvent"
                 }
             ]
         }
@@ -523,13 +532,13 @@ const STRUCTURE = [
     },
     {
         re: /^p\/([0-9]+)(?:\/(.*))?$/,
-        var: [{id: 1, name: 'project'}],
+        var: [{id: 1, name: 'event'}],
         child: {
             path_var: [2],
             elements: [
                 {
                     re: /^(|view)$/,
-                    rel: 'reading/project'
+                    rel: 'reading/event'
                 },
                 {
                     re: /^(edit)$/,
@@ -544,6 +553,29 @@ const STRUCTURE = [
         }
     },
     {
+        re: /^create-event$/,
+        rel: "events/addEvent",
+        //loginLevel: LOGIN_LEVEL_CONNECT,
+    },
+    {
+        re: /^(e|events)(\/.*)?$/,
+        var: [{id: 1, name: 'event'}],
+        child: {
+            path_var: [2],
+            elements: [
+                {
+                    re: /^(|list)$/,
+                    rel: 'events/list'
+                },
+                {
+                    re: /^([0-9]+)$/,
+                    rel: 'events/eventFromList',
+                    var: [{id: 1, name: 'category'}]
+                },
+                {
+                    re: /^(edit)$/,
+                    rel: 'events/editEvent',
+                }
         re: /^information(\/.*)?$/,
         child: {
             path_var: [1],

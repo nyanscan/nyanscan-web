@@ -1,27 +1,29 @@
 <?php
 
+/**
+ * @throws Exception
+ */
 function invokeProject($method, $function, $query) {
-    if ($method === "POST") {
-        if (count($function) === 1) {
-            if ($function[0] === 'create') {
-                _new_project();
-            }
-            if ($function[0] === 'validation') {
-                _change_status_project();
-            }
-            if ($function[0] === 'volume') {
-                _new_volume();
-            }
-        } elseif (count($function) === 2) {
-            if ($function[0] === 'volume' && $function[1] === "validation") {
-                _change_status_volume();
-            }
+    if (count($function) === 1) {
+        if ($function[0] === 'create') {
+            _new_project();
         }
+        if ($function[0] === 'validation') {
+            _change_status_project();
+        }
+        if ($function[0] === 'volume') {
+            _new_volume();
+        }
+    } elseif (count($function) === 2) {
+        if ($function[0] === 'volume' && $function[1] === "validation") {
+            _change_status_volume();
+        }
+    }
     } elseif ($method === "GET") {
         if ($function[0] === 'user' && count($function) === 2) {
-            _fetch_user_projects($function[1]);
+            _fetch_user_events($function[1]);
         } elseif ($function[0] === 'all') {
-            _admin_fetch_projects($query);
+            _admin_fetch_events($query);
         } elseif ($function[0] === 'volumes-all') {
             _admin_fetch_volume($query);
         } elseif ($function[0] === 'index') {
@@ -29,7 +31,7 @@ function invokeProject($method, $function, $query) {
         } elseif (count($function) === 2 && $function[1] === 'volumes') {
             _fetch_project_with_volumes($function[0]);
         }  elseif (count($function) === 1) {
-            _fetch_project($function[0]);
+            _fetch_event($function[0]);
         } elseif (count($function) === 2) {
             _fetch_volume($function[0], $function[1]);
         } elseif (count($function) === 3 && $function[0] === "like") {
@@ -43,7 +45,7 @@ function invokeProject($method, $function, $query) {
         }
     } elseif ($method === "DELETE") {
         if (count($function) === 2) {
-            _delete_volume($function[0], $function[1]);
+            _delete_event($function[0], $function[1]);
         }
     } else {
         bad_method();
@@ -84,9 +86,9 @@ function _like_volume($project, string $volume, ?bool $isDislike)
 function fetch_index() {
     $data = [];
     // todo: change
-    $data["last"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
-    $data["fame"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
-    $data["love"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
+    $data["last"] = getDB()->select(TABLE_EVENT, ['id', 'picture', 'title'], ["status" => EVENT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
+    $data["fame"] = getDB()->select(TABLE_EVENT, ['id', 'picture', 'title'], ["status" => EVENT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
+    $data["love"] = getDB()->select(TABLE_EVENT, ['id', 'picture', 'title'], ["status" => EVENT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
 
     shuffle($data["fame"]);
     shuffle($data["love"]);
@@ -103,8 +105,8 @@ function _new_project() {
         unauthorized();
     }
 
-    if (getDB()->count(TABLE_PROJECT, 'id', ['author' => $user->getId(), 'status' => PROJECT_STATUS_WAIT_VERIFICATION]) > 1) {
-        bad_request("l'utilisateur à deja un projet en attente de vérification.");
+    if (getDB()->count(TABLE_EVENT, 'id', ['author' => $user->getId(), 'status' => PROJECT_STATUS_WAIT_VERIFICATION]) > 1) {
+        bad_request("l'utilisateur a deja un projet en attente de vérification.");
     }
 
     $title = $_POST["title"] ?? null;
@@ -135,10 +137,10 @@ function _new_project() {
                     $error[] = "Pas de vignette";
                     break;
                 case -2:
-                    $error[] = "Vignette trop lourde max 500Ko";
+                    $error[] = "Vignette trop lourde max. 500Ko";
                     break;
                 default:
-                    json_exit(500, "Uploading error", "unknow");
+                    json_exit(500, "Uploading error", "unknown");
                     break;
             }
         } else {
@@ -147,7 +149,7 @@ function _new_project() {
             $img->set_title("Image pour le projet " . substr($title, 0, 24) . '...');
             $img->add_logo();
             $img->save();
-            getDB()->insert(TABLE_PROJECT, [
+            getDB()->insert(TABLE_EVENT, [
                 "author" => $user->getId(),
                 "picture" => $img->get_id(),
                 "title" => $title,
@@ -168,27 +170,27 @@ function _fetch_user_projects($userId) {
     $user = get_log_user();
     // self
     if ($userId === 'me' || ($user->is_connected() && $user->getId() === $userId)) {
-        success(getDB()->select(TABLE_PROJECT,
+        success(getDB()->select(TABLE_EVENT,
             ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
             ["author" => $user->getId()],
             0, "date_inserted DESC"));
     } else {
         success(getDB()->select(
-            TABLE_PROJECT,
+            TABLE_EVENT,
             ["id", "author", "picture", "title", "description", "format", "date_inserted"],
-            ["author" => $userId, "status" => PROJECT_STATUS_PUBLISHED],
+            ["author" => $userId, "status" => EVENT_STATUS_PUBLISHED],
             0, "date_inserted DESC"));
     }
 }
 
 function _fetch_project($id) {
-    $project = getDB()->select(TABLE_PROJECT, ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
+    $project = getDB()->select(TABLE_EVENT, ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
         ["id" => $id], 1);
     if (!$project) {
         bad_method();
     }
 
-    if ($project["status"] != PROJECT_STATUS_PUBLISHED) {
+    if ($project["status"] != EVENT_STATUS_PUBLISHED) {
         $user = get_log_user();
         if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $project["author"])) {
             forbidden();
@@ -198,14 +200,14 @@ function _fetch_project($id) {
 }
 
 function _fetch_project_with_volumes($id) {
-    $project = getDB()->select(TABLE_PROJECT, ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
+    $project = getDB()->select(TABLE_EVENT, ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
         ["id" => $id], 1);
     if (!$project) {
         bad_method();
     }
 
     $where = ["project" => $id];
-    if ($project["status"] != PROJECT_STATUS_PUBLISHED) {
+    if ($project["status"] != EVENT_STATUS_PUBLISHED) {
         $user = get_log_user();
         if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $project["author"])) {
             forbidden();
@@ -260,7 +262,7 @@ function _fetch_volume($project, $tome) {
     $req->execute(["project" => $project, "volume" => $tome, "user" => $user->is_connected() ? $user->getId() : null]);
     $data = $req->fetch(PDO::FETCH_ASSOC);
 
-    if ($data["project_status"] != PROJECT_STATUS_PUBLISHED || $data["volume_status"] != PROJECT_STATUS_PUBLISHED){
+    if ($data["project_status"] != EVENT_STATUS_PUBLISHED || $data["volume_status"] != EVENT_STATUS_PUBLISHED){
         $user = get_log_user();
         if ( !$user->is_connected() || ($user->get_permission_level() < PERMISSION_MODERATOR && $user->getId() !== $data["author"])) {
             forbidden();
@@ -292,11 +294,11 @@ function _change_status_project() {
         $reason = "";
     }
 
-    if (!is_numeric($status) || intval($status) < 0 || $status > PROJECT_STATUS_PUBLISHED) {
+    if (!is_numeric($status) || intval($status) < 0 || $status > EVENT_STATUS_PUBLISHED) {
         bad_request("wrong status");
     }
 
-    $project = getDB()->select(TABLE_PROJECT, ['id', 'author', 'title'], ["id" => $projectID], 1);
+    $project = getDB()->select(TABLE_EVENT, ['id', 'author', 'title'], ["id" => $projectID], 1);
     if (!$project) {
         bad_request("wrong project");
     }
@@ -304,7 +306,7 @@ function _change_status_project() {
         bad_request("La raison ne doit pas dépasser les 255 caractères.");
     }
 
-    getDB()->update(TABLE_PROJECT, ["status" => $status], ["id" => $projectID]);
+    getDB()->update(TABLE_EVENT, ["status" => $status], ["id" => $projectID]);
 
     // send mail
     $text_status = "";
@@ -312,7 +314,7 @@ function _change_status_project() {
         case PROJECT_STATUS_WAIT_VERIFICATION: $text_status = "Attente de vérification"; break;
         case PROJECT_STATUS_REJECT: $text_status = "Rejeté"; break;
         case PROJECT_STATUS_ACCEPTED_NO_CONTENT: $text_status = "Accepté en attente de contenue"; break;
-        case PROJECT_STATUS_PUBLISHED: $text_status = "Publié"; break;
+        case EVENT_STATUS_PUBLISHED: $text_status = "Publié"; break;
     }
 
     if ($project["author"]) {
@@ -426,7 +428,7 @@ function _new_volume() {
         $error[] = "Un fichier PDF est requis.";
     }
 
-    $data_project = (!isset($volume) || !is_numeric($volume)) ? null : getDB()->select(TABLE_PROJECT, ['id', 'author', 'status'], ['id' => $project], 1);
+    $data_project = (!isset($volume) || !is_numeric($volume)) ? null : getDB()->select(TABLE_EVENT, ['id', 'author', 'status'], ['id' => $project], 1);
 
     if (!$data_project) {
         $error[] = "Le project est invalide.";
@@ -436,7 +438,7 @@ function _new_volume() {
         if ($user->get_permission_level() < PERMISSION_MODERATOR && ['author'] != $user->getId()) {
             unauthorized();
         }
-        if ($data_project["status"] != PROJECT_STATUS_ACCEPTED_NO_CONTENT  && $data_project["status"] != PROJECT_STATUS_PUBLISHED) {
+        if ($data_project["status"] != PROJECT_STATUS_ACCEPTED_NO_CONTENT  && $data_project["status"] != EVENT_STATUS_PUBLISHED) {
             $error[] = "Le project n'est pas validé.";
         }
         if (getDB()->select(TABLE_VOLUME, ['project'], ['project' => $data_project['id'], 'volume' => $volume], 1)) {

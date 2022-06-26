@@ -89,7 +89,7 @@ class ApiDataBlock extends HTMLElement {
                 while (matches = regex.exec(value)) {
                     let filedV = '';
                     if (matches[1].startsWith('%picture%.')) {
-                        filedV = image_id_to_patch(this.getField(matches[1].substr(10)));
+                        filedV = image_id_to_path(this.getField(matches[1].substr(10)));
                     }
                     else filedV = this.getField(matches[1]);
                     if (filedV) {
