@@ -1112,7 +1112,6 @@ function setCarouselActiveElements(carousel, index) {
 
 function loadRandomBackGround() {
     _('.ns-f-bg-random').forEach(e => {
-        console.log(e.style.background.length);
         if (e.style.backgroundImage.length === 0) {
             const url = `/res/background_${Math.floor(Math.random() * (9 - 1) + 1)}.jpg`;
             console.log(url)

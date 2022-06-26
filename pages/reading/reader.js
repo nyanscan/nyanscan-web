@@ -14,6 +14,8 @@ export default class extends Pages {
     zoomLessBtn;
     likeBTN;
     dislikeBTN;
+    currentReadingUpdate = null;
+    forcePage = false;
 
     progress;
 
@@ -72,13 +74,14 @@ export default class extends Pages {
 
     build(parent, vars) {
         if (!vars["project"] || !vars["volume"]) {
-            // this.app.do404();
-            // return;
+            this.app.do404();
+            return;
         }
         this.project = vars["project"];
         this.volume = vars["volume"];
         super.build(parent, vars);
         this.page = Math.max(0, vars["page"]||0);
+        this.forcePage = vars["page"] !== undefined;
         this.data = _('#ns-reading-data');
         if (this.data.dataLoad) {
             this.setup();
@@ -176,13 +179,16 @@ export default class extends Pages {
 
     setup() {
         if (this.data.isError) {
-            // this.app.do404();
+            this.app.do404();
         } else {
             this.directionJP = this.data.rawData['reading_direction'] === '1';
             if (!this.directionJP) _('.ns-reading-view-contain').forEach(value => value.classList.add('classic'));
             this.maxPage = this.data.rawData["page_count"];
             this.pages = this.data.rawData["data"]["pages"];
-            this.page = Math.min(this.maxPage, this.page);
+            if (!this.forcePage && this.data.rawData['user_page'] !== null) {
+                this.page = Math.max(0, parseInt(this.data.rawData['user_page']));
+            }
+            this.page = Math.min(this.maxPage - 1, this.page);
             this.updateLike();
             this.update();
         }
@@ -203,6 +209,13 @@ export default class extends Pages {
         } else if (like_status === null) {
             this.likeBTN.classList.add('bi-hand-thumbs-up')
             this.dislikeBTN.classList.add('bi-hand-thumbs-down')
+        }
+    }
+
+    sendReadingUpdate() {
+        if (this.currentReadingUpdate !== null) {
+            sendApiGetFetch(`project/reading/${this.project}/${this.volume}/${this.currentReadingUpdate}`).catch(console.error);
+            this.currentReadingUpdate = null;
         }
     }
 
@@ -227,6 +240,8 @@ export default class extends Pages {
         if (!this.pages) {
             return;
         }
+
+        if (this.page > this.maxPage) this.page = this.maxPage;
         const adv = Math.round((this.page / (this.maxPage - 1)) * 10000) / 100;
         this.progress.forEach(e => e.style.width = `${adv}%`);
 
@@ -236,6 +251,10 @@ export default class extends Pages {
         this.cacheNext();
 
         window.history.pushState("", "",  `${(this.app.prefix ? `/${this.app.prefix}/` : '/')}p/${this.project}/${this.volume}/${this.page}`);
+        if (this.currentReadingUpdate === null) {
+            this.currentReadingUpdate = this.page;
+            setTimeout(this.sendReadingUpdate.bind(this), 5000);
+        } else this.currentReadingUpdate = this.page;
     }
 
     cacheNext() {

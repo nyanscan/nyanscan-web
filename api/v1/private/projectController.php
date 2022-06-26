@@ -33,11 +33,13 @@ function invokeProject($method, $function, $query) {
         } elseif (count($function) === 2) {
             _fetch_volume($function[0], $function[1]);
         } elseif (count($function) === 3 && $function[0] === "like") {
-            _like_volume($function[1], $function[2], 0);
+            _like_volume($function[1], $function[2], false);
         } elseif (count($function) === 3 && $function[0] === "dislike") {
-            _like_volume($function[1], $function[2], 1);
+            _like_volume($function[1], $function[2], true);
         } elseif (count($function) === 3 && $function[0] === "unlike") {
-            _like_volume($function[1], $function[2], -1);
+            _like_volume($function[1], $function[2], null);
+        } elseif (count($function) === 4 && $function[0] === "reading") {
+            _read_progress_volume($function[1], $function[2], $function[3]);
         }
     } elseif ($method === "DELETE") {
         if (count($function) === 2) {
@@ -48,25 +50,33 @@ function invokeProject($method, $function, $query) {
     }
 }
 
-function _like_volume($project, string $volume, int $isDislike)
+function _read_progress_volume(string $project, string $volume, string $page) {
+    $user = get_log_user();
+    if (!$user->is_connected()) unauthorized();
+    if (!is_numeric($page) || $page < 0) bad_request("invalid page");
+    $volumeSql = getDB()->select(TABLE_VOLUME, ['page_count'], ['volume' => $volume, "project" => $project], 1);
+    if (intval($volumeSql['page_count']) < intval($page)) bad_request('invalid page');
+    $req = getDB()->get_pdo()->prepare("INSERT IGNORE INTO PAE_VOLUME_READING(user_id, fk_volume, fk_project, page) VALUES (:user_id, :fk_volume, :fk_project, :page) ON DUPLICATE KEY UPDATE page=:page;");
+    $req->execute([
+        "user_id" => $user->getId(),
+        "fk_volume" => $volume,
+        "fk_project" => $project,
+        "page" => $page
+    ]);
+    success();
+}
+
+function _like_volume($project, string $volume, ?bool $isDislike)
 {
     $user = get_log_user();
     if (!$user->is_connected()) unauthorized();
-
-    if ($isDislike === -1) getDB()->delete(TABLE_VOLUME_LIKE, [
+    $req = getDB()->get_pdo()->prepare("INSERT IGNORE INTO PAE_VOLUME_READING(user_id, fk_volume, fk_project, is_negative) VALUES (:user_id, :fk_volume, :fk_project, :is_negative) ON DUPLICATE KEY UPDATE is_negative=:is_negative;");
+    $req->execute([
         "user_id" => $user->getId(),
         "fk_volume" => $volume,
-        "fk_project" => $project
+        "fk_project" => $project,
+        "is_negative" => $isDislike
     ]);
-    else {
-        $req = getDB()->get_pdo()->prepare("INSERT IGNORE INTO PAE_VOLUME_LIKE(user_id, fk_volume, fk_project, is_negative) VALUES (:user_id, :fk_volume, :fk_project, :is_negative) ON DUPLICATE KEY UPDATE is_negative=:is_negative;");
-        $req->execute([
-            "user_id" => $user->getId(),
-            "fk_volume" => $volume,
-            "fk_project" => $project,
-            "is_negative" => $isDislike
-        ]);
-    }
     success();
 
 }
@@ -202,7 +212,10 @@ function _fetch_project_with_volumes($id) {
         }
     }
 
-    $volumes = getDB()->select(TABLE_VOLUME, ['volume', 'picture', 'author', 'title', 'page_count', 'status', 'like_count', 'dislike_count'], $where);
+    $user = get_log_user();
+
+    $sqlVolumeREQ = "SELECT " . join(', ', ['volume', 'picture', 'author', 'title', 'page_count', 'status', 'like_count', 'dislike_count', 'read_count', 'page']) . ' FROM ' . DB_PREFIX.TABLE_VOLUME . ' AS V LEFT JOIN ' . DB_PREFIX.TABLE_VOLUME_READING . ' L ON L.fk_volume = V.volume AND L.fk_project = V.project AND L.user_id = ' . ($user->is_connected() ? $user->getId() : null);
+    $volumes = getDB()->select_set_settings($sqlVolumeREQ, $where);
     $project["volumes"] = [];
     foreach ($volumes as $v) {
         if ($v['status'] != PROJECT_STATUS_PUBLISHED) {
@@ -236,10 +249,11 @@ function _fetch_volume($project, $tome) {
                 description,
                 reading_direction,
                 format,
-                L.is_negative AS user_like_status 
+                L.is_negative AS user_like_status, 
+                L.page AS user_page 
             FROM PAE_VOLUME AS V 
             LEFT JOIN PAE_PROJECT P ON V.project = P.id 
-            LEFT JOIN PAE_VOLUME_LIKE L ON L.fk_volume = V.volume AND L.fk_project = V.project AND L.user_id = :user 
+            LEFT JOIN PAE_VOLUME_READING L ON L.fk_volume = V.volume AND L.fk_project = V.project AND L.user_id = :user 
             WHERE V.project=:project AND V.volume=:volume 
             LIMIT 1
     ");
@@ -253,8 +267,8 @@ function _fetch_volume($project, $tome) {
         }
     }
 
-//    $json = file_get_contents(VOLUME_PATH . 'header_data/' . $data["data"] . '.json');
-//    $data["data"] = json_decode($json, true);
+    $json = file_get_contents(VOLUME_PATH . 'header_data/' . $data["data"] . '.json');
+    $data["data"] = json_decode($json, true);
     $data["data"] = [];
 
     success($data);

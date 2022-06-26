@@ -15,10 +15,6 @@ export default class extends Pages {
                             
                             </ns-api-data>
                         </h1>
-                        <div class="ns-pr-desc-utils ns-fs-4 ns-text-black">
-                            <span>Lecture : 150 </span>
-                            <span>Publiée par <ns-a>Alice</ns-a></span>
-                        </div>
                         <p class="ns-fs-5 ns-text-black"><ns-api-data field="description"></ns-api-data></p>
                     </div>
                 </div>
@@ -33,14 +29,17 @@ export default class extends Pages {
                 <div class="ns-pr-volume">
                     <ns-a href="/p/${this.project}/$vol$" class="ns-template-var-attr">
                         <img class="ns-pr-volume-img" alt="">
+                        <div class="ns-pr-progress">
+                            <div style="width: 0;"></div>
+                        </div>
                         <div class="ns-pr-vol-desc">
                             <span>Tome n° <ns-api-data field="volumes.$id$.volume" class="ns-template-var-attr"></ns-api-data></span>
-                            
                             <span><ns-api-data field="volumes.$id$.title" class="ns-template-var-attr"></ns-api-data></span>
                             <span>
-                                <span class="text-success"><ns-api-data field="volumes.$id$.like_count" class="ns-template-var-attr"></ns-api-data><i class="bi bi-hand-thumbs-up-fill"></i></span>
+                                <span class="text-primary"><i class="bi bi-eye-fill"> </i><ns-api-data field="volumes.$id$.read_count" class="ns-template-var-attr"></ns-api-data></span>&nbsp;
+                                <span class="text-success"><ns-api-data field="volumes.$id$.like_count" class="ns-template-var-attr"></ns-api-data> <i class="bi bi-hand-thumbs-up-fill"></i></span>
                                 /
-                                <span class="text-danger"><i class="bi bi-hand-thumbs-down-fill"></i><ns-api-data field="volumes.$id$.dislike_count" class="ns-template-var-attr"></ns-api-data></span>
+                                <span class="text-danger"><i class="bi bi-hand-thumbs-down-fill"></i> <ns-api-data field="volumes.$id$.dislike_count" class="ns-template-var-attr"></ns-api-data></span>
                             </span>
                         </div>
                     </ns-a>
@@ -79,6 +78,9 @@ export default class extends Pages {
         for (const volID in volumes) {
             const clone = importTemplate(template, {"id": volID, 'vol': volumes[volID].volume});
             clone.querySelector('.ns-pr-volume-img').src = image_id_to_patch(volumes[volID]["picture"]);
+            const user_page = this.data.rawData['volumes'][volID]['page'];
+            if (user_page !== null)
+                clone.querySelector('.ns-pr-progress > div').style.width = `${Math.max(0, Math.min(100, (user_page / this.data.rawData['volumes'][volID]['page_count'])*100))}%`;
             container.appendChild(clone);
         }
         template.remove();
