@@ -21,7 +21,7 @@ class ModalEditStatus extends Component {
                 <textarea id="nsa-mdoal-pr" name="reason" rows="4" maxlength="255" class="form-control"></textarea>
                 <div class="form-text">Raison de la modification</div>
             </div>
-            <div class="fpp-modal-btn-container">
+            <div class="ns-modal-btn-container">
                 <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
                 <button type="submit" class="bg-danger">Modifier</button>
             </div>
@@ -54,9 +54,9 @@ export default class extends SimpleTablePages {
 
     COLUMN = [
         {name: 'id', display: 'ID', force: true, default: 'null', isDefault: true, isPrimary: true},
-        {name: 'author', display: 'Auteur', force: false, default: 'null', isDefault: true, href: ''},
+        {name: 'author', display: 'Auteur', force: false, default: 'null', isDefault: true, href: '', isSearchable: true},
         {name: 'picture', display: 'Vignette', force: false, default: 'null', isDefault: true, href: ''},
-        {name: 'title', display: 'Titre', force: false, default: 'null', isDefault: true},
+        {name: 'title', display: 'Titre', force: false, default: 'null', isDefault: true, isSearchable: true},
         {name: 'description', display: 'Description', force: false, default: 'null'},
         {name: 'reading_direction', display: 'Sens De lecture', force: false, default: '0', needCallback: true},
         {name: 'format', display: 'Format', force: false, default: '0', needCallback: true},

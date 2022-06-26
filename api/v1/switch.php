@@ -4,8 +4,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
-
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/forum.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/mailer.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
@@ -44,8 +42,8 @@ function bad_request($reason = "") {
     json_exit(400, "Bad Request", $reason);
 }
 
-function unauthorized() {
-    json_exit(401, "Unauthorized", "Authentication is required to access ressources");
+function unauthorized($invalid_token = false) {
+    json_exit(401, "Unauthorized",  $invalid_token ? "Invalid Authorization" : "Authentication is required to access ressources");
 }
 
 function forbidden() {
@@ -67,7 +65,7 @@ function internal_error() {
     json_exit(500, "Internal Server Error", "Internal Server Error");
 }
 
-function admin_fetch($table, $col, $query, $primary) {
+function admin_fetch($table, $col, $query, $primary, $search_col=[]) {
     if (!isConnected()) {
         unauthorized();
     }
@@ -81,6 +79,14 @@ function admin_fetch($table, $col, $query, $primary) {
     $order = $query["order"]??null;
     $order_reverse = isset($query["reverse"]) && !$query["reverse"] == '0';
 
+    $where = [];
+
+    foreach ($search_col as $s) {
+        if (isset($query[$s])) {
+            $where[$s] = ['v' => $query[$s], "o" => " LIKE "];
+        }
+    }
+
     $order_v = null;
 
     if ($order) {
@@ -90,8 +96,8 @@ function admin_fetch($table, $col, $query, $primary) {
     }
     $data = [];
 
-    $data["element"] = getDB()->select($table, $col, [], $limit, $order_v, $offset);
-    $data["total_count"] = getDB()->count($table, $primary);
+    $data["element"] = getDB()->select($table, $col, $where, $limit, $order_v, $offset);
+    $data["total_count"] = getDB()->count($table, $primary, $where);
     success($data);
 }
 
@@ -102,6 +108,7 @@ $controller = $uri[3] ?? null;
 $function = array_slice($uri, 4);
 parse_str($_SERVER['QUERY_STRING'], $query);
 $method = strtoupper($_SERVER["REQUEST_METHOD"]);
+
 
 if ($controller === 'analytic') {
     $path = join('/', $function);

@@ -1,13 +1,15 @@
 class ModalEditStatus extends Component {
 
-    id;
+    volume;
+    project;
 
     get raw() {
         return `
         <form id="nsa-modal-pform">
-            <h3>Changer le statut du projet n° ${this.id} ? </h3>
+            <h3>Changer le statut du volume n° ${this.volume} du projet n° ${this.project} ? </h3>
             <div class="ns-form-group">
-                <input type="hidden" hidden="hidden" name="project" value="${this.id}">
+                <input type="hidden" hidden="hidden" name="volume" value="${this.volume}">
+                <input type="hidden" hidden="hidden" name="project" value="${this.project}">
                 <label for="nsa-mdoal-ps" class="form-label">Status</label>
                 <select id="nsa-mdoal-ps" name="status" class="form-select">
                     <option value="0">En attente de vérification.</option>
@@ -21,7 +23,7 @@ class ModalEditStatus extends Component {
                 <textarea id="nsa-mdoal-pr" name="reason" rows="4" maxlength="255" class="form-control"></textarea>
                 <div class="form-text">Raison de la modification</div>
             </div>
-            <div class="fpp-modal-btn-container">
+            <div class="ns-modal-btn-container">
                 <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
                 <button type="submit" class="bg-danger">Modifier</button>
             </div>
@@ -34,18 +36,17 @@ class ModalEditStatus extends Component {
         _('#nsa-modal-pform').addEventListener('submit', this.sendRequest.bind(this));
     }
 
-    constructor(app, id) {
+    constructor(app, volume, project) {
         super(app, COMPONENT_TYPE_MODAL);
-        this.id = id;
+        this.volume = volume;
+        this.project = project;
     }
 
     sendRequest(event) {
         event.preventDefault();
         loadingScreen(true);
         this.app.closeModal();
-        sendApiPostRequest('project/validation', new FormData(event.target), (e) => {
-            loadingScreen(false);
-        })
+        sendApiPostFetch('project/volume/validation', new FormData(event.target)).then(d => loadingScreen(false));
     }
 }
 
@@ -62,7 +63,7 @@ class ModalDeleteVolume extends Component {
             <div class="alert alert-danger">
                !!! ATTENTION !!! Supprimer un volume entraîne la supression de tous les fichiers liés au volume !!!
             </div>
-            <div class="fpp-modal-btn-container">
+            <div class="ns-modal-btn-container">
                 <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
                 <button id="nsa-modal-vdelete" type="button" class="bg-danger">Supprimer</button>
             </div>
@@ -102,7 +103,7 @@ export default class extends SimpleTablePages {
         {name: 'volume', display: 'Tome', force: true, default: 'null', isDefault: true},
         {name: 'author', display: 'Auteur', force: false, default: 'null', isDefault: true, href: ''},
         {name: 'picture', display: 'Vignette', force: false, default: 'null', isDefault: true, href: ''},
-        {name: 'title', display: 'Titre', force: false, default: 'null', isDefault: true},
+        {name: 'title', display: 'Titre', force: false, default: 'null', isDefault: true, isSearchable: true},
         {name: 'data', display: 'Data', force: false, default: 'null', isDefault: true,  isPrimary: true},
         {name: 'status', display: 'Status', force: false, default: '0', needCallback: true,  isDefault: true},
         {name: 'date_inserted', display: 'Créé le', force: false, default: 'never', isDefault: true}
@@ -127,7 +128,7 @@ export default class extends SimpleTablePages {
                     btn.setAttribute('data-bs-toggle', 'tooltip');
                     btn.title = 'Modifier le status';
                     btn.type = "button";
-                    btn.addEventListener('click', this.openChangeStatusModal.bind(this, rowData['id']));
+                    btn.addEventListener('click', this.openChangeStatusModal.bind(this, rowData['volume'], rowData['project']));
                     create('i', null, btn, 'bi', 'bi-pencil');
                 });
                 createPromise('button', null, group, 'btn', 'btn-danger', 'btn-sm').then((btn) => {
@@ -143,14 +144,14 @@ export default class extends SimpleTablePages {
     }
     
     build(parent, vars) {
-        super.build(parent, vars);
         if (vars["project"]) {
             this.admTable.vars = 'project=' + vars["project"];
         }
+        super.build(parent, vars);
     }
 
-    openChangeStatusModal(id) {
-        this.app.openModal(new ModalEditStatus(this.app, id));
+    openChangeStatusModal(volume, project) {
+        this.app.openModal(new ModalEditStatus(this.app, volume, project));
     }
 
     openDeleteModal(project, id) {

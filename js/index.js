@@ -7,22 +7,22 @@ class Footer extends Component {
         <footer class="w-100 p-0 m-0">
             <div id="ns-footer">
                 <div id="ns-footer-logo">
-                    <ns-a href="/" class="ns-a-clear">
+                    <ns-a href="/" class="ns-center flex-column">
                         <img class="ns-logo" src="../res/logo-ns.png" alt="nyanscan-logo">
                         <div>
-                            <h3>NyanScan</h3>
-                            <p>Ton site de scan préféré</p>
+                            <h3 class="ns-fs-4 text-center">NyanScan</h3>
+                            <p class="ns-fs-4 text-center">Ton site de scan préféré</p>
                         </div>
                     </ns-a>
                 </div>
                 <div id="ns-footer-link">
-                    <a href="/">Mon compte</a>
-                    <a href="/">Catalogue</a>
+                    <ns-a href="/u/me">Mon compte</ns-a>
+                    <ns-a href="/catalogue">Catalogue</ns-a>
                     <a href="/">A propos</a>
                     <a href="/">Contact</a>
                     <a href="/">FAQ</a>
                     <a href="/">RGPD</a>
-                    <a href="/">CGU</a>
+                    <ns-a href="/information/cgu">CGU</ns-a>
                 </div>
                 <div id="ns-footer-social">
                     <a href="/" class="ns-a-clear">
@@ -71,7 +71,7 @@ class Header extends Component {
             </div>
             <div class="d-flex gap-3 justify-content-center align-items-center">
                 <ns-a href="/" class=""><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a>
-                <ns-a  class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
+                <ns-a class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/catalogue">Catalogue</ns-a>
                 <ns-a  class="ns-a-1 ns-hide-disconnected ns-d-none-mlg" href="/publish">Publier</ns-a>
             </div>
@@ -91,7 +91,7 @@ class Header extends Component {
             <div class="ns-d-none-mlg">
                <ns-a class='ns-a-1 nav-link ns-hide-connected' href='/auth'>Se Connecter</ns-a>
                <span class='ns-a-1 nav-link ns-hide-disconnected d-inline' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
-               <ns-a class="ns-hide-disconnected d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive ns-avatar-sm"></ns-a>
+               <ns-a class="ns-hide-disconnected d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive ns-avatar-sm"></ns-a>
             </div>
         </nav>  
         <nav id="horizontal-mobile-nav" style="display: none">
@@ -115,7 +115,7 @@ class Header extends Component {
                         <span class='ns-a-1' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
                     </li>
                     <li class="ns-hide-disconnected">
-                        <ns-a class="d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-circle img-responsive ns-avatar-sm"></ns-a>
+                        <ns-a class="d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive ns-avatar-sm"></ns-a>
                     </li>
                     <li>
                         <div class="form-check form-switch">
@@ -168,6 +168,8 @@ class Header extends Component {
         }, true);
 
         _('#ns-mobile-nav-close').addEventListener('click', () => {_('#horizontal-mobile-nav').style.display = 'none'});
+        this.app.addEventListener('pageLoad', () => {_('#horizontal-mobile-nav').style.display = 'none'});
+
         _('#horizontal-mobile-nav').addEventListener('click', (e) => { if(e.target && e.target.id === 'horizontal-mobile-nav') _('#horizontal-mobile-nav').style.display = 'none'});
     }
 
@@ -371,12 +373,12 @@ class Index extends Pages {
     <span class="text-white ns-fs-3 fw-bold ns-hide-connected">OU</span>
     <a class="btn text-black ns-fs-4 ns-tickle-pink-btn ns-hide-connected" href="auth">Se connecter</a>
 </section>
-<section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5">
+<section class="ns-min-vh-50 ns-theme-bg ns-theme-text d-flex flex-column align-items-center justify-content-around p-5 ns-hide-connected">
     <h3>Tu souhaites nous rejoindre ?</h3>
     <form id="ns-index-join" class="form-inline ns-news-form w-100 container-lg">
         <div class="row">
             <div class="d-none d-lg-block col-lg-3"></div>
-            <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton amil"></div>
+            <div class="col-lg-6 mb-5 mb-lg-0"><input class="ns-news-input w-100" type="email" name="email" placeholder="Entre ton e-mail"></div>
             <div class="col-lg-auto ns-center"><button class="ns-news-btn" type="submit"> Rejoindre </button></div>
             <div class="d-none d-lg-block col-lg"></div>
         </div>
@@ -454,14 +456,14 @@ const STRUCTURE = [
                     rel: 'forum/categories'
                 },
                 {
-                    re: /^([0-9]+)$/,
+                    re: /^(\d+)$/,
                     rel: 'forum/category',
                     var: [{id: 1, name: 'category'}]
                 },
                 {
-                    re: /^([0-9]+)\/([0-9]+)\/?([0-9]*)/,
+                    re: /^t(\d+)-[^/]*\/?(\d*)/,
                     rel: 'forum/topic',
-                    var: [{id: 1, name: 'category'}, {id: 2, name: 'topic'}, {id: 3, name: 'page'}]
+                    var: [{id: 1, name: 'topic'}, {id: 2, name: 'page'}]
                 }
             ]
         }
@@ -540,8 +542,21 @@ const STRUCTURE = [
                 }
             ]
         }
+    },
+    {
+        re: /^information(\/.*)?$/,
+        child: {
+            path_var: [1],
+            elements: [
+                {
+                    re: /^cgu$/,
+                    rel: 'information/cgu',
+                },
+            ]
+        }
     }
 ]
 
 export const APP = new Application(Header, Footer, Index, Error404, STRUCTURE, '');
 window.APP = APP;
+APP.start();

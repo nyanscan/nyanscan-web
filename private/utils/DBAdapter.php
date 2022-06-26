@@ -20,16 +20,16 @@ class DBAdapter {
         return $this->pdo;
     }
 
-    public function select($table, $column, $where, $limit = 0, $order=null, $offset=0) {
+    public function select($table, $column, $where, $limit = 0, $order=null, $offset=0, $force_multi=false) {
         $statement = "SELECT " . join(', ', $column) . ' FROM ' . DB_PREFIX.$table;
-        return $this->select_set_settings($statement, $where, $limit, $order, $offset);
+        return $this->select_set_settings($statement, $where, $limit, $order, $offset, false, $force_multi);
     }
 
     public function count($table, $col, $where=[]) {
         return $this->select_set_settings("SELECT COUNT(" . $col . ") AS amount FROM " . DB_PREFIX.$table, $where, 1)["amount"];
     }
 
-    public function select_set_settings($statement, $where, $limit = 0, $order=null, $offset=0, $no_where=false) {
+    public function select_set_settings($statement, $where, $limit = 0, $order=null, $offset=0, $no_where=false, $force_multi=false) {
         $to_bind = [];
         if (count($where) > 0) {
             $condition = [];
@@ -61,10 +61,9 @@ class DBAdapter {
             }
         }
         $req = $this->pdo->prepare($statement);
-
         $req->execute($to_bind);
 
-        if ($limit === 1) {
+        if ($limit === 1 && !$force_multi) {
             return $req->fetch(PDO::FETCH_ASSOC);
         } else {
             return $req->fetchAll(PDO::FETCH_ASSOC);
@@ -84,7 +83,7 @@ class DBAdapter {
         }
         $statement = "DELETE FROM " .DB_PREFIX.$table . " WHERE " . join(' AND ', $condition);
         $req = $this->pdo->prepare($statement);
-        return $req->execute($to_bind);
+	    return $req->execute($to_bind);
     }
 
     public function insert($table, $data): bool {
@@ -113,7 +112,7 @@ class DBAdapter {
             $rowsSQL = array_map(function ($k) {
                 return $k . ' = :' . $k;
             }, array_keys($data));
-            $statement = "UPDATE " . DB_PREFIX.$table . " SET " . join(', ', $rowsSQL) . ' WHERE ' . join(', ', $condition);
+            $statement = "UPDATE " . DB_PREFIX.$table . " SET " . join(', ', $rowsSQL) . ' WHERE ' . join(' AND ', $condition);
             $req =$this->pdo->prepare($statement);
             return $req->execute(array_merge($data, $to_bind));
         }

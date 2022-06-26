@@ -5,7 +5,7 @@ export default class extends Pages {
         <div class="ns-success-css mb-5">
             <div class="ns-center">
                 <div class="ns-scan-failed align-items-center">
-                    <p class="ns-font-size-success">Lien de vérification invalide ! Essayez de vous <ns-a href="/auth">reconnecter</ns-a> pour recevoir un nouveau mail de vérification.</p>
+                    <p class="ns-fs-4 m-0 text-center">Lien de vérification invalide ! Essayez de vous <ns-a href="/auth" class="btn ns-btn-sm ns-tickle-pink-btn">reconnecter</ns-a> pour recevoir un nouveau mail de vérification.</p>
                 </div>
             </div>
         </div>

@@ -9,8 +9,10 @@ const API_REP_CONNECTION_ERROR = -1;
 const LOGIN_LEVEL_DISCONNECT = -1;
 const LOGIN_LEVEL_CONNECT = 1;
 
+const VERSION = 'BETA-2.0.4';
 
-function _(query, mono=false) {
+
+function _(query, mono = false) {
     if (query.startsWith('#') && !query.includes(' ')) {
         mono = true;
     }
@@ -37,7 +39,7 @@ function create(type, id = null, parent = null, ...cla) {
 function createPromise(type, id = null, parent = null, ...cla) {
     return new Promise(resolve => {
         const e = document.createElement(type);
-        if (cla) {
+        if (cla.length > 0) {
             e.classList.add(...cla);
         }
         if (id) {
@@ -50,24 +52,57 @@ function createPromise(type, id = null, parent = null, ...cla) {
     });
 }
 
-function sendApiPostRequest(url, formData, callBack = null, progressCallBack=null) {
+/**
+ *
+ * @param url
+ * @param formData
+ * @param callBack
+ * @param progressCallBack
+ * @deprecated
+ */
+function sendApiPostRequest(url, formData, callBack = null, progressCallBack = null) {
     sendApiRequest("POST", url, callBack, progressCallBack, formData);
 }
 
-function sendApiGetRequest(url,  callBack = null, progressCallBack=null) {
+/**
+ *
+ * @param url
+ * @param callBack
+ * @param progressCallBack
+ * @deprecated
+ */
+function sendApiGetRequest(url, callBack = null, progressCallBack = null) {
     sendApiRequest("GET", url, callBack, progressCallBack);
 }
 
-function sendApiDeleteRequest(url,  callBack = null, progressCallBack=null) {
+/**
+ *
+ * @param url
+ * @param callBack
+ * @param progressCallBack
+ * @deprecated
+ */
+function sendApiDeleteRequest(url, callBack = null, progressCallBack = null) {
     sendApiRequest("DELETE", url, callBack, progressCallBack);
 }
 
-function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendItem=undefined) {
+/**
+ *
+ * @param method
+ * @param url
+ * @param callBack
+ * @param progressCallBack
+ * @param sendItem
+ * @deprecated
+ */
+function sendApiRequest(method, url, callBack, progressCallBack = undefined, sendItem = undefined) {
     const ajax = new XMLHttpRequest()
     ajax.open(method, '/api/v1/' + url, true);
+    let auth = window.APP.user.authorization;
+    if (auth !== null) ajax.setRequestHeader('Authorization', auth );
 
     if (progressCallBack !== undefined && progressCallBack !== null) {
-        ajax.addEventListener('progress', progressCallBack);
+        ajax.upload.addEventListener('progress', progressCallBack);
     }
 
     if (callBack !== null && callBack !== undefined) {
@@ -82,6 +117,42 @@ function sendApiRequest(method, url, callBack, progressCallBack=undefined, sendI
     } else {
         ajax.send();
     }
+}
+
+function sendApiPostFetch(url, fd) {
+    return sendApiFetch(url, fd, "POST");
+}
+
+function sendApiGetFetch(url) {
+    return sendApiFetch( url, null, 'GET');
+}
+
+function sendApiDeleteFetch(url) {
+    return sendApiFetch( url, null, 'DELETE');
+}
+
+function sendApiFetch(url, body, method) {
+    let auth = window.APP.user.authorization;
+    let header = {
+        'Authorization': auth
+    };
+
+    if (auth === null) delete header.Authorization;
+    // if (body !== null) header['Content-Type'] = 'application/x-www-form-urlencoded'
+    return fetch(new Request('/api/v1/' + url, {
+        method: method,
+        headers: new Headers(header),
+        body: body,
+    })).then(r => r.headers.has('Content-Length') ? r.json() : Promise.resolve({code: r.status, message: r.statusText}))
+        .then(response => {
+            if (response.code === 401 && response.reason === 'Invalid Authorization') {
+                window.APP.user.logout(true);
+            } else if (response.code >= 200 && response.code < 300) {
+                return Promise.resolve(response)
+            } else {
+                return Promise.reject(response);
+            }
+    }).then(e => Promise.resolve(e.data||e));
 }
 
 function checkApiResStatus(event) {
@@ -103,18 +174,22 @@ function getAPIErrorReason(event) {
 }
 
 function loadingScreen(show = true) {
-   window.APP.loading.switchState(show);
+    window.APP.loading.switchState(show);
 }
 
 
 function uuidv4() {
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 }
 
-function importTemplate(template, vars) {
-    let clone = document.importNode(template.content, true);
+function importTemplate(template, vars, isString = false) {
+    let clone;
+    if (isString) {
+        clone = document.createElement('div');
+        clone.innerHTML = template;
+    } else clone = document.importNode(template.content, true);
     const regex = /\$([^$]*)\$/g;
     let matches;
     let couldChangeAttr = clone.querySelectorAll('.ns-template-var-attr');
@@ -133,10 +208,18 @@ function importTemplate(template, vars) {
     return clone;
 }
 
+
 class User {
+    permissionLevel;
     app;
     isLog;
     data;
+    id = null;
+    token = null;
+
+    get authorization() {
+        return (this.token !== null && this.id !== null) ? `${this.id} ${this.token}` : null;
+    }
 
     get profile_picture() {
         return '/res/profile.webp';
@@ -145,28 +228,48 @@ class User {
     constructor(app) {
         this.app = app;
         this.isLog = false;
+        this.permissionLevel = 0;
+        let storageToken = localStorage.getItem('token');
+        let needResetToken = false;
+        try {
+            storageToken = JSON.parse(storageToken);
+            if (storageToken['id'] !== undefined && storageToken['token'] !== undefined) {
+                this.token = storageToken['token'];
+                this.id = storageToken['id'];
+            } else needResetToken = true;
+        } catch (e) {
+            needResetToken = true;
+        }
+        if (needResetToken) localStorage.removeItem('token');
+    }
+
+    setAuthorization(id, token) {
+        this.id = id;
+        this.token = token;
+        localStorage.setItem('token', JSON.stringify({'id': id, 'token': token}));
     }
 
     log() {
-        sendApiGetRequest('user/me', (function (ev) {
-            if (checkApiResStatus(ev) === API_REP_OK) {
+        if (this.token === null || this.id === null) {
+            this.switchBodyLogValue(false);
+            this.app.dispatchEvent(new CustomEvent('logout', {
+                cancelable: false,
+                bubbles: true,
+                composed: false,
+            }))
+        } else {
+            sendApiGetFetch('user/me').then(data => {
                 this.isLog = true;
-                this.data = getDataAPI(ev);
+                this.data = data;
+                this.permissionLevel = parseInt(this.data["permission"]);
                 this.switchBodyLogValue(true);
                 this.app.dispatchEvent(new CustomEvent('log', {
                     cancelable: false,
                     bubbles: true,
                     composed: false,
                 }))
-            } else {
-                this.switchBodyLogValue(false);
-                this.app.dispatchEvent(new CustomEvent('logout', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                }))
-            }
-        }).bind(this))
+            })
+        }
     }
 
     get loginLevel() {
@@ -174,25 +277,25 @@ class User {
     }
 
     logout(redirectLogin) {
+        localStorage.removeItem('token');
         this.switchBodyLogValue(false);
-        sendApiGetRequest('auth/logout', (function (ev) {
-            if (checkApiResStatus(ev) === API_REP_OK) {
-                this.isLog = false;
-                this.data = [];
-                this.app.dispatchEvent(new CustomEvent('logout', {
-                    cancelable: false,
-                    bubbles: true,
-                    composed: false,
-                }))
-                if (redirectLogin) {
-                    this.app.changePage('/auth/')
-                }
-            }
-        }).bind(this))
+        this.isLog = false;
+        this.data = [];
+        this.id = null;
+        this.permissionLevel = 0;
+        this.app.dispatchEvent(new CustomEvent('logout', {
+            cancelable: false,
+            bubbles: true,
+            composed: false,
+        }))
+        if (redirectLogin) {
+            this.app.changePage('/auth/')
+        }
     }
 
     switchBodyLogValue(value) {
         document.body.setAttribute('ns-log-status', value);
+        if (this.app.currentPages) this.app.currentPages.update_permission_item();
     }
 }
 
@@ -222,14 +325,15 @@ class Component {
     }
 
 }
+
 class Pages extends Component {
 
     app;
     haveHeader;
     haveFooter;
     haveDefaultBackground;
-    
-    constructor(app, haveHeader = true, haveFooter = true, haveDefaultBackground =true) {
+
+    constructor(app, haveHeader = true, haveFooter = true, haveDefaultBackground = true) {
         super(app, COMPONENT_TYPE_PAGE);
         this.app = app;
         this.haveHeader = haveHeader;
@@ -276,6 +380,12 @@ class Pages extends Component {
             foot.style.display = 'none';
         }
         parent.innerHTML = this.getHTML(vars);
+        this.update_permission_item();
+    }
+
+    update_permission_item() {
+        const perm = this.app.user.permissionLevel;
+        _('[ns-perm-level]').forEach(e => e.style.display = (e.getAttribute('ns-perm-level') > perm ? 'none' : ''));
     }
 
     get_client_url() {
@@ -283,7 +393,7 @@ class Pages extends Component {
     }
 
     send_analytic() {
-        sendApiGetRequest(`analytic${this.get_client_url()}`);
+        sendApiGetFetch(`analytic${this.get_client_url()}`).catch(console.error);
     }
 
 }
@@ -293,7 +403,7 @@ class Error404 extends Pages {
     get raw() {
         return `
         <section id="error-404">
-            <div class="ns-f-bg ns-f-bg-err">
+            <div class="ns-f-bg ns-f-bg-random">
             
             </div>
             <div class="container vh-100">
@@ -306,7 +416,7 @@ class Error404 extends Pages {
                             <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
                             <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
                             <div class="w-100 ns-center py-2">
-                                <p>Retourner à la <ns-aa href="/">page d'accueil</ns-aa></p>
+                                <p>Retourner à la <ns-aa href="/" class="btn ns-btn-sm ns-tickle-pink-btn">page d'accueil</ns-aa></p>
                             </div>
                         </div>
                     </div>
@@ -318,6 +428,10 @@ class Error404 extends Pages {
 
     constructor(app) {
         super(app, false, false, false);
+    }
+    build(parent, vars) {
+        super.build(parent, vars);
+        loadRandomBackGround();
     }
 
 }
@@ -341,7 +455,7 @@ class LoadingScreen extends Component {
 
     build(parent) {
 
-        this.screen = create('div', 'ns-loading-screen', parent,  'ns-loading-screen-style');
+        this.screen = create('div', 'ns-loading-screen', parent, 'ns-loading-screen-style');
         this.screen.style.display = 'none';
         this.screen.innerHTML = this.raw;
         this.progressDiv = _('#ns-loading-screen-progress');
@@ -382,13 +496,14 @@ class Application extends EventTarget {
     caches = [];
     user;
     currentPages;
+    currentVars = [];
     session = [];
     prefix;
     structure;
     modal;
     loading;
 
-    constructor(header, footer, index, err404, structure, prefix='') {
+    constructor(header, footer, index, err404, structure, prefix = '') {
         super()
         this.prefix = prefix;
         this.structure = structure;
@@ -396,13 +511,17 @@ class Application extends EventTarget {
         this.footer = new footer(this);
         this.caches["index"] = index;
         this.caches["404"] = err404;
+    }
+
+    start() {
         this.session = ["start", new Date()]
 
         this.titleE = _('title', true);
         this.modal = _('#ns-modal');
         try {
             this.setupModal();
-        } catch (err) {}
+        } catch (err) {
+        }
 
         this.user = new User(this);
         this.user.log();
@@ -411,6 +530,26 @@ class Application extends EventTarget {
         this.loadURL(this.actualURL);
         this.loading = new LoadingScreen(this);
         this.loading.build(document.body);
+
+        if (window.localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("ns-dark");
+        }
+        window.addEventListener('popstate', this.popState.bind(this));
+    }
+
+    popState(e) {
+        const href = document.location.pathname;
+        const canceled = !this.dispatchEvent(new CustomEvent('popstate', {
+            cancelable: true,
+            bubbles: true,
+            composed: false,
+            detail: {
+                href: href
+            }
+        }));
+        if (!canceled) {
+            this.loadURL(href);
+        }
     }
 
     setupModal() {
@@ -448,7 +587,7 @@ class Application extends EventTarget {
 
     async load_module(name) {
         if (this.caches[name] === undefined) {
-            const module = await import(`/pages/${name}.js`);
+            const module = await import(`/pages/${name}.js?version=${VERSION}`);
             this.caches[name] = module.default;
         }
         return this.caches[name];
@@ -534,11 +673,26 @@ class Application extends EventTarget {
             this.currentPages.destroy();
         }
         const content = document.querySelector("#ns-main");
+        this.currentVars = vars;
         page.build(content, vars);
         this.setTitle(page.title);
-        this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader );
+        this.dispatchEvent(new CustomEvent('pageLoad', {
+            cancelable: false,
+            bubbles: true,
+            composed: false,
+        }))
+        this.setHeaderSticky(page.haveStickyHeader === undefined ? true : page.haveStickyHeader);
         this.currentPages = page;
         page.send_analytic();
+    }
+
+    reload() {
+        if (!this.currentPages) return;
+        const C = this.currentPages.constructor;
+        console.log(this.currentPages);
+        console.log(C);
+        if (C) this.loadPage(new C(this), this.currentVars);
+
     }
 
     setHeaderSticky(value) {
@@ -562,6 +716,7 @@ class Application extends EventTarget {
     }
 
 }
+
 class Captcha extends Component {
 
     block;
@@ -604,10 +759,10 @@ class Captcha extends Component {
 
     setupSettings() {
         const captcha = _('#captcha');
-        captcha.style.setProperty("--ns-captcha-width", this.block.getField('width')+'px');
-        captcha.style.setProperty("--ns-captcha-height", this.block.getField('height')+'px');
-        captcha.style.setProperty("--ns-captcha-piece-size", this.block.getField('piece_size')+'px');
-        captcha.style.setProperty("--ns-captcha-ceil-size", this.block.getField('cell_size')+'px');
+        captcha.style.setProperty("--ns-captcha-width", this.block.getField('width') + 'px');
+        captcha.style.setProperty("--ns-captcha-height", this.block.getField('height') + 'px');
+        captcha.style.setProperty("--ns-captcha-piece-size", this.block.getField('piece_size') + 'px');
+        captcha.style.setProperty("--ns-captcha-ceil-size", this.block.getField('cell_size') + 'px');
         captcha.style.setProperty("--ns-captcha-piece-count", this.block.getField('number_piece'));
         this.setUUID();
 
@@ -619,8 +774,7 @@ class Captcha extends Component {
         if (main_image.complete) {
             if (main_image.naturalWidth === 0) {
                 document.getElementById("captcha-error").style.display = 'flex';
-            }
-            else {
+            } else {
                 this.setup_captcha(cap, main_image);
             }
         } else {
@@ -645,7 +799,7 @@ class Captcha extends Component {
         for (let i = 0; i < this.block.getField('number_piece') * 1; i++) {
             let cont = create('div', null, storage, 'captcha-piece');
             let img = create('img', null, cont);
-            img.src =  '/captchaGet.php?id=' + uuid;
+            img.src = '/captchaGet.php?id=' + uuid;
             img.alt = 'captcha_piece';
         }
     }
@@ -653,7 +807,7 @@ class Captcha extends Component {
     constructor(app) {
         super(app, COMPONENT_TYPE_FLOAT);
     }
-    
+
     setup_captcha(captcha) {
         // GET var
         const numberPiece = this.block.getField('number_piece') * 1;
@@ -696,7 +850,7 @@ class Captcha extends Component {
 
             target.oldLeft = window.getComputedStyle(target).getPropertyValue('left').split('px')[0] * 1;
             target.oldTop = window.getComputedStyle(target).getPropertyValue('top').split('px')[0] * 1;
-            
+
             function endDrag() {
                 target.moving = false;
             }
@@ -714,17 +868,19 @@ class Captcha extends Component {
                     target.distY = ev.touches[0].clientY - target.oldY;
                 }
                 let x = Captcha.validateCord(target.oldLeft + target.distX, captchaWidth, captchaHeight, ceilSize, pieceSize);
-                let y = Captcha.validateCord(target.oldTop + target.distY, captchaWidth, captchaHeight, ceilSize, pieceSize,false);
+                let y = Captcha.validateCord(target.oldTop + target.distY, captchaWidth, captchaHeight, ceilSize, pieceSize, false);
                 target.style.left = x + "px";
                 target.style.top = y + "px";
 
                 input.value = Captcha.newStringCord(input.value, target.pieceCont, x, y);
             }
+
             document.onmouseup = endDrag;
             document.ontouchend = endDrag;
             document.onmousemove = dr;
             document.ontouchmove = dr;
         }
+
         document.onmousedown = move;
         document.ontouchstart = move;
     }
@@ -732,8 +888,8 @@ class Captcha extends Component {
     static validateCord(pos, captchaWidth, captchaHeight, ceilSize, pieceSize, isx = true) {
         return Math.min(isx ? (captchaWidth - ceilSize) : (captchaHeight + ceilSize + pieceSize), Math.max(0, Math.floor(pos / ceilSize) * ceilSize));
     }
-    
-    static newStringCord(old="", index=0, x=0, y=0) {
+
+    static newStringCord(old = "", index = 0, x = 0, y = 0) {
         if (!old) {
             old = '0';
         }
@@ -833,11 +989,20 @@ function image_id_to_patch(id) {
 
 function project_status_to_html($status) {
     switch ($status) {
-        case '0': return '<span class="project-status-wait">Attente de vérification</span>'; break;
-        case '1': return '<span class="project-status-denied">Rejeté</span>'; break;
-        case '2': return '<span class="project-status-accept">Accepté en attente de contenu</span>'; break;
-        case '3': return '<span class="project-status-publish">Publié</span>'; break;
-        default: return '';
+        case '0':
+            return '<span class="project-status-wait">Attente de vérification</span>';
+            break;
+        case '1':
+            return '<span class="project-status-denied">Rejeté</span>';
+            break;
+        case '2':
+            return '<span class="project-status-accept">Accepté en attente de contenu</span>';
+            break;
+        case '3':
+            return '<span class="project-status-publish">Publié</span>';
+            break;
+        default:
+            return '';
     }
 }
 
@@ -849,7 +1014,13 @@ function escapeHtml(text) {
         '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    return text.replace(/[&<>"']/g, function (m) {
+        return map[m];
+    });
+}
+
+function formatMessage(message) {
+    return escapeHtml(message).replace(/\n/g, "<br>");
 }
 
 function pickHex(color1, color2, weight) {
@@ -870,4 +1041,97 @@ function arrayPop(array, key) {
         delete (array[key]);
     }
     return e;
+}
+
+function isInt(value) {
+    const x = parseFloat(value);
+    return !isNaN(value) && (x | 0) === x;
+}
+
+function registerToggle(toggle) {
+    if (toggle) {
+        toggle.checked = window.localStorage.getItem("theme") === "dark";
+        toggle.addEventListener("change", () => {
+            if (toggle.checked) {
+                if (!document.body.classList.contains("ns-dark")) {
+                    document.body.classList.add("ns-dark")
+                }
+                window.localStorage.setItem("theme", "dark");
+            } else {
+                if (document.body.classList.contains("ns-dark")) {
+                    document.body.classList.remove("ns-dark")
+                }
+                window.localStorage.setItem("theme", "light");
+            }
+        })
+    }
+}
+
+//Create the Carousel
+function setupCarousel(carousel) {
+    const imagesDiv =  carousel.getElementsByClassName("ns-carousel-images")[0];
+    const images = imagesDiv.getElementsByTagName("img");
+    const image_count = images.length;
+    carousel.nsCarouselCount = image_count;
+    const points = carousel.getElementsByClassName("ns-carousel-points");
+    for (let point of points) {
+        for (let i = 0; i < image_count; i++) {
+            const point_div = document.createElement("div");
+            point_div.classList.add("ns-carousel-point");
+            point_div.topCarousel = carousel;
+            point_div.nsCarouselIndex = i;
+            point_div.addEventListener("click", (evt) => {
+                setCarouselActiveElements(evt.currentTarget.topCarousel, evt.currentTarget.nsCarouselIndex)
+            }, false);
+            point.appendChild(point_div);
+        }
+    }
+    for (let i = 0; i < image_count; i++) {
+        images[i].topCarousel = carousel;
+        images[i].nsCarouselIndex = i;
+        images[i].addEventListener("click", (evt) => {
+            setCarouselActiveElements(evt.currentTarget.topCarousel, evt.currentTarget.nsCarouselIndex)
+        }, false);
+    }
+    setCarouselActiveElements(carousel, 0);
+}
+
+//Make it functional and in loop
+function setCarouselActiveElements(carousel, index) {
+    if (carousel.nsCarouselCount <= index) return;
+
+    const imagesDiv =  carousel.getElementsByClassName("ns-carousel-images")[0];
+    const images = imagesDiv.getElementsByTagName("img");
+    for (let image of images) {
+        image.classList.remove("ns-carousel-1");
+        image.classList.remove("ns-carousel-2");
+        image.classList.remove("ns-carousel-3");
+        image.classList.remove("ns-carousel-off");
+        image.classList.add("ns-carousel-off");
+    }
+    images[index].classList.add("ns-carousel-2");
+    images[index].classList.remove("ns-carousel-off");
+    images[(index === 0 ? images.length : index) - 1].classList.add("ns-carousel-1");
+    images[(index === 0 ? images.length : index) - 1].classList.remove("ns-carousel-off");
+    images[(index + 1 < carousel.nsCarouselCount) ? (index + 1) : 0].classList.add("ns-carousel-3");
+    images[(index + 1 < carousel.nsCarouselCount) ? (index + 1) : 0].classList.remove("ns-carousel-off");
+
+    const points = carousel.getElementsByClassName("ns-carousel-points");
+    for (let point of points) {
+        const points = point.children;
+        for (let i = 0; i < points.length; i++) {
+            points[i].classList.remove("ns-carousel-point-active");
+            if (i === index) points[i].classList.add("ns-carousel-point-active");
+        }
+    }
+}
+
+function loadRandomBackGround() {
+    _('.ns-f-bg-random').forEach(e => {
+        if (e.style.backgroundImage.length === 0) {
+            const url = `/res/background_${Math.floor(Math.random() * (9 - 1) + 1)}.jpg`;
+            console.log(url)
+            e.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("${url}")`;
+        }
+    })
 }
