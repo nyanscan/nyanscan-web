@@ -9,7 +9,7 @@ const API_REP_CONNECTION_ERROR = -1;
 const LOGIN_LEVEL_DISCONNECT = -1;
 const LOGIN_LEVEL_CONNECT = 1;
 
-const VERSION = 'BETA-2.0.3';
+const VERSION = 'BETA-2.0.4';
 
 
 function _(query, mono = false) {

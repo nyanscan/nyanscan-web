@@ -269,7 +269,6 @@ function _fetch_volume($project, $tome) {
 
     $json = file_get_contents(VOLUME_PATH . 'header_data/' . $data["data"] . '.json');
     $data["data"] = json_decode($json, true);
-    $data["data"] = [];
 
     success($data);
 }

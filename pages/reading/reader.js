@@ -265,7 +265,6 @@ export default class extends Pages {
     }
 
     calculateViewSize() {
-
         if (this.view.naturalHeight > this.view.naturalWidth) {
             this.view.style.height = (1000 * this.zoomValue) + 'px';
             this.view.style.width = '';
