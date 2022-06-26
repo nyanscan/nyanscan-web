@@ -534,6 +534,22 @@ class Application extends EventTarget {
         if (window.localStorage.getItem("theme") === "dark") {
             document.body.classList.add("ns-dark");
         }
+        window.addEventListener('popstate', this.popState.bind(this));
+    }
+
+    popState(e) {
+        const href = document.location.pathname;
+        const canceled = !this.dispatchEvent(new CustomEvent('popstate', {
+            cancelable: true,
+            bubbles: true,
+            composed: false,
+            detail: {
+                href: href
+            }
+        }));
+        if (!canceled) {
+            this.loadURL(href);
+        }
     }
 
     setupModal() {

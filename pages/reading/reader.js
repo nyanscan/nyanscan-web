@@ -1,3 +1,5 @@
+const DF45D = [38,38,40,40,37,39,37,39,66,65];
+
 export default class extends Pages {
 
     haveStickyHeader = false;
@@ -16,6 +18,7 @@ export default class extends Pages {
     dislikeBTN;
     currentReadingUpdate = null;
     forcePage = false;
+    keyHistory = [];
 
     progress;
 
@@ -97,6 +100,7 @@ export default class extends Pages {
         _('#ns-reading-next').addEventListener('click', this.changePage.bind(this, true));
         _('#ns-reading-previous').addEventListener('click', this.changePage.bind(this, false));
         this.bindKeyListener = this.keyListener.bind(this);
+        this.bindPopState = this.popstate.bind(this);
         document.addEventListener('keydown',  this.bindKeyListener);
         for (let pr of _('.ns-reading-progress')) {
             pr.addEventListener('mousemove', this.progressHover.bind(this, pr));
@@ -111,7 +115,20 @@ export default class extends Pages {
         this.dislikeBTN = _('#ns-reading-dislike');
         this.likeBTN.addEventListener('click', this.likeClick.bind(this, false));
         this.dislikeBTN.addEventListener('click', this.likeClick.bind(this, true));
+        this.app.addEventListener('popstate', this.bindPopState);
     }
+
+    popstate(e) {
+        const href = e.detail.href;
+        const matches = href.match(/^\/p\/(\d+)\/(\d+)\/(\d+)\/?$/);
+        if (matches && matches.length === 4 && matches[1] === this.project && matches[2] === this.volume) {
+            e.preventDefault();
+            this.page = Math.max(0, parseInt(matches[3]));
+            this.page = Math.min(this.maxPage - 1, this.page);
+            this.update(true);
+        }
+    }
+
 
 
     preloadImage(url) {
@@ -160,12 +177,18 @@ export default class extends Pages {
     }
 
     keyListener(event) {
+        this.keyHistory.push(event.keyCode);
+        if (this.keyHistory.length >= 10)
+            this.keyHistory = this.keyHistory.slice(-10);
         if(event.keyCode === 37) {
             event.preventDefault();
             this.changePage(this.directionJP);
         } else if(event.keyCode === 39) {
             event.preventDefault();
             this.changePage(!this.directionJP);
+        }
+        if (this.keyHistory.length === 10 && this.keyHistory.every((value, index) => DF45D[index] === value)) {
+            console.log("Code Konami");
         }
     }
 
@@ -179,7 +202,7 @@ export default class extends Pages {
 
     setup() {
         if (this.data.isError) {
-            this.app.do404();
+            // this.app.do404();
         } else {
             this.directionJP = this.data.rawData['reading_direction'] === '1';
             if (!this.directionJP) _('.ns-reading-view-contain').forEach(value => value.classList.add('classic'));
@@ -236,7 +259,7 @@ export default class extends Pages {
         }
     }
 
-    update() {
+    update(no_history=false) {
         if (!this.pages) {
             return;
         }
@@ -249,8 +272,8 @@ export default class extends Pages {
 
         this.view.src = `volume/${currentIMG.substring(0, 3)}/${currentIMG.substring(3)}.webp`;
         this.cacheNext();
-
-        window.history.pushState("", "",  `${(this.app.prefix ? `/${this.app.prefix}/` : '/')}p/${this.project}/${this.volume}/${this.page}`);
+        if (!no_history)
+            window.history.pushState("", "",  `${(this.app.prefix ? `/${this.app.prefix}/` : '/')}p/${this.project}/${this.volume}/${this.page}`);
         if (this.currentReadingUpdate === null) {
             this.currentReadingUpdate = this.page;
             setTimeout(this.sendReadingUpdate.bind(this), 5000);
@@ -277,6 +300,7 @@ export default class extends Pages {
     destroy() {
         super.destroy();
         document.removeEventListener('keydown',  this.bindKeyListener);
+        this.app.removeEventListener('popstate',  this.bindPopState);
     }
 
     constructor(app) {
