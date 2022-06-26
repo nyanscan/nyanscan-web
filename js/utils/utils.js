@@ -9,7 +9,7 @@ const API_REP_CONNECTION_ERROR = -1;
 const LOGIN_LEVEL_DISCONNECT = -1;
 const LOGIN_LEVEL_CONNECT = 1;
 
-const VERSION = 'BETA-2.0.4';
+const VERSION = 'BETA-2.1.1';
 
 //Kind of a selector function :
 //to select html tag

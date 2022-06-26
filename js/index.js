@@ -44,7 +44,7 @@ class Footer extends Component {
                 <div id="ns-footer-copyright"><span class="text-black">Copyright© NyanScan 2022</span></div>
             </div>
         </footer>
-        `
+        `;
     }
 
     constructor(app) {
@@ -126,7 +126,7 @@ class Header extends Component {
                 </ul>
             </div>
         </nav>
-        `
+        `;
     }
 
     getHTML() {
@@ -135,7 +135,7 @@ class Header extends Component {
 
     updateLogStatus() {
 
-        const login = _('#ns-h-log')
+        const login = _('#ns-h-log');
         if (!login) {
             return;
         }
@@ -147,7 +147,7 @@ class Header extends Component {
             btn.addEventListener('click', this.app.user.logout.bind(this.app.user, true));
             btn.innerText = 'Se Déconnecter';
         } else {
-            login.innerHTML = "<ns-a class='ns-a-1 nav-link' href='/auth'>Se Connecter</ns-a>"
+            login.innerHTML = "<ns-a class='ns-a-1 nav-link' href='/auth'>Se Connecter</ns-a>";
         }
     }
 
@@ -168,10 +168,16 @@ class Header extends Component {
             _('#horizontal-mobile-nav').style.display = current ? 'block' : 'none';
         }, true);
 
-        _('#ns-mobile-nav-close').addEventListener('click', () => {_('#horizontal-mobile-nav').style.display = 'none'});
-        this.app.addEventListener('pageLoad', () => {_('#horizontal-mobile-nav').style.display = 'none'});
+        _('#ns-mobile-nav-close').addEventListener('click', () => {
+            _('#horizontal-mobile-nav').style.display = 'none';
+        });
+        this.app.addEventListener('pageLoad', () => {
+            _('#horizontal-mobile-nav').style.display = 'none';
+        });
 
-        _('#horizontal-mobile-nav').addEventListener('click', (e) => { if(e.target && e.target.id === 'horizontal-mobile-nav') _('#horizontal-mobile-nav').style.display = 'none'});
+        _('#horizontal-mobile-nav').addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'horizontal-mobile-nav') _('#horizontal-mobile-nav').style.display = 'none';
+        });
     }
 
     constructor(app) {
@@ -200,7 +206,12 @@ class Header extends Component {
             const data = getDataAPI(e);
             this.searchRes.innerHTML = '';
 
-            for (const cat of [{id: 'user', display: "Membre", href: '/u/', field: 'username'}, {id: 'event', display: 'Projet', href: '/p/', field: 'title'}]) {
+            for (const cat of [{id: 'user', display: "Membre", href: '/u/', field: 'username'}, {
+                id: 'project',
+                display: 'Projet',
+                href: '/p/',
+                field: 'title'
+            }]) {
                 if (data[cat.id] !== undefined && data[cat.id].length > 0) {
                     const li = create('li', null, this.searchRes, 'ns-search-category');
                     createPromise('span', null, li).then(e => e.innerText = cat.display);
@@ -210,7 +221,7 @@ class Header extends Component {
                         createPromise('ns-a', null, elli).then(e => {
                             e.innerText = el[cat.field];
                             e.href = cat.href + el['id'];
-                        })
+                        });
                     }
                 }
             }
@@ -241,7 +252,7 @@ class Index extends Pages {
             </div>
         </section>
         <section class="ns-min-vh-100 ns-theme-bg ns-text-black">
-            <ns-api-data-block id="ns-index-data" href="event/index">
+            <ns-api-data-block id="ns-index-data" href="project/index">
                 <div class="ns-min-vh-50 ns-center pb-5">
                     <div class="ns-scan-preview">
                         <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
@@ -399,7 +410,7 @@ class Index extends Pages {
             e.preventDefault();
             window.APP.session['register_email'] = join.querySelector('.ns-news-input').value;
             window.APP.changePage('/auth/register');
-        }))
+        }));
 
         if (this.data.dataLoad) {
             this.updateSelection();
@@ -422,7 +433,7 @@ class Index extends Pages {
                     ns_a.href = '/p/' + item['id'];
                     const img = create('img', null, ns_a);
                     img.src = image_id_to_path(item['picture']);
-                    const span = create('span', null, box)
+                    const span = create('span', null, box);
                     span.innerText = item['title'];
                 }
             }
@@ -441,7 +452,7 @@ class Index extends Pages {
 const STRUCTURE = [
     {
         re: /^(|index|home)$/,
-        rel: "index",
+        rel: "index"
     },
     {
         re: /^(catalogue|catalog)$/,
@@ -480,15 +491,15 @@ const STRUCTURE = [
                     rel: "user"
                 },
                 {
-                    re: /^(projet|event)$/,
+                    re: /^(projet)$/,
                     rel: "reading/userProject"
                 },
                 {
-                    re: /^(|myEvent)$/,
+                    re: /^(myEvent)$/,
                     rel: "events/userCreatedEvent"
                 },
                 {
-                    re: /^(|participate)$/,
+                    re: /^(participate)$/,
                     rel: "events/userEvent"
                 }
             ]
@@ -502,17 +513,17 @@ const STRUCTURE = [
                 {
                     re: /^(|login)$/,
                     rel: 'auth/login',
-                    loginLevel: LOGIN_LEVEL_DISCONNECT,
+                    loginLevel: LOGIN_LEVEL_DISCONNECT
                 },
                 {
                     re: /^wait-verification$/,
                     rel: 'auth/loginSuccess',
-                    loginLevel: LOGIN_LEVEL_DISCONNECT,
+                    loginLevel: LOGIN_LEVEL_DISCONNECT
                 },
                 {
                     re: /^register$/,
                     rel: 'auth/register',
-                    loginLevel: LOGIN_LEVEL_DISCONNECT,
+                    loginLevel: LOGIN_LEVEL_DISCONNECT
                 },
                 {
                     re: /^verification-success$/,
@@ -527,18 +538,18 @@ const STRUCTURE = [
     },
     {
         re: /^publish$/,
-        rel: "reading/publish",
+        rel: "reading/publish"
         // loginLevel: LOGIN_LEVEL_CONNECT,
     },
     {
         re: /^p\/([0-9]+)(?:\/(.*))?$/,
-        var: [{id: 1, name: 'event'}],
+        var: [{id: 1, name: 'project'}],
         child: {
             path_var: [2],
             elements: [
                 {
                     re: /^(|view)$/,
-                    rel: 'reading/event'
+                    rel: 'reading/project'
                 },
                 {
                     re: /^(edit)$/,
@@ -554,7 +565,7 @@ const STRUCTURE = [
     },
     {
         re: /^create-event$/,
-        rel: "events/addEvent",
+        rel: "events/addEvent"
         //loginLevel: LOGIN_LEVEL_CONNECT,
     },
     {
@@ -574,20 +585,24 @@ const STRUCTURE = [
                 },
                 {
                     re: /^(edit)$/,
-                    rel: 'events/editEvent',
+                    rel: 'events/editEvent'
                 }
+            ]
+        }
+    },
+    {
         re: /^information(\/.*)?$/,
         child: {
             path_var: [1],
             elements: [
                 {
                     re: /^cgu$/,
-                    rel: 'information/cgu',
-                },
+                    rel: 'information/cgu'
+                }
             ]
         }
     }
-]
+];
 
 export const APP = new Application(Header, Footer, Index, Error404, STRUCTURE, '');
 window.APP = APP;

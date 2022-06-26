@@ -47,9 +47,9 @@ class Index extends Pages {
                     <span>
                     
                     </span>
-                    <ns-a class="content" href="event">
+                    <ns-a class="content" href="project">
                         <i class="bi bi-book"></i>
-                        <ns-api-data field="event">0</ns-api-data>
+                        <ns-api-data field="project">0</ns-api-data>
                         <h3>Projet</h3>
                     </ns-a>
                 </div>
@@ -126,7 +126,7 @@ const STRUCTURE = [
     },
     {
         re: /^volume(?:\/(.*))?$/,
-        var: [{id: 1, name: 'event'}],
+        var: [{id: 1, name: 'project'}],
         rel: "admin/volume"
     },
     {

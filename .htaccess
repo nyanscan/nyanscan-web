@@ -11,6 +11,11 @@ Order allow,deny
 Deny from all
 </FilesMatch>
 
+<FilesMatch ".http$">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
 Options All -Indexes
 
 RewriteEngine On

@@ -202,7 +202,7 @@ export default class extends Pages {
 
     setup() {
         if (this.data.isError) {
-            // this.app.do404();
+            this.app.do404();
         } else {
             this.directionJP = this.data.rawData['reading_direction'] === '1';
             if (!this.directionJP) _('.ns-reading-view-contain').forEach(value => value.classList.add('classic'));
