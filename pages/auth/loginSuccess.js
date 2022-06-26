@@ -7,11 +7,20 @@ export default class extends Pages {
 
     get raw() {
         return `
-            <div>
-                Votre compte a bien été créé. Un email de vérification a été envoyé ! <br>
-                Pas de mail reçu ? Cliquez <button id="ns-resend-mail" type="button" class="btn btn-primary">ici</button> pour en recevoir un nouveau !
+            <div class="ns-success-css mb-5">
+            <div class="ns-center">
+                <div class="ns-scan-wait align-items-center">
+                    <p class="ns-fs-4 m-0 text-center">
+                        Votre compte a bien été créé. Un email de vérification a été envoyé ! <br>
+                        Pas de mail reçu ? Cliquez <button id="ns-resend-mail" type="button" class="btn ns-btn-sm ns-tickle-pink-btn">ici</button> pour en recevoir un nouveau !
+                    </p>
+                </div>
             </div>
-        `
+        </div>
+        <div class="mx-3 pb-5">
+            <img src="../../res/success.png" class="img-fluid mx-auto d-block" width="400" alt="image fail">
+        </div>
+        `;
     }
 
     build(parent, vars) {
@@ -32,7 +41,7 @@ export default class extends Pages {
         if (!this.click) {
             this.click = true;
             this.btn.disabled = true;
-            sendApiGetRequest(`auth/verification?t=${this.mail_token}&user=${this.user_id}`);
+            sendApiGetFetch(`auth/verification?t=${this.mail_token}&user=${this.user_id}`).catch(console.error);
             // todo: toast
         }
     }

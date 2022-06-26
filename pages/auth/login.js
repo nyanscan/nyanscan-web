@@ -5,7 +5,7 @@ export default class extends Pages {
     get raw() {
         return `
         <section>
-            <div class="ns-f-bg ns-f-bg-auth">
+            <div class="ns-f-bg ns-f-bg-random">
             
             </div>
             <div class="container min-vh-100">
@@ -30,7 +30,7 @@ export default class extends Pages {
                                     <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">Se connecter</button>
                                 </form>
                             </div>
-                            <div class="row"><p>Nouveau sur NyanScan ? <ns-a href="/auth/register">S'inscrire</ns-a></p></div>
+                            <div class="row"><p>Nouveau sur NyanScan ? <ns-a href="/auth/register" class="btn ns-btn-sm ns-tickle-pink-btn">S'inscrire</ns-a></p></div>
                         </div>
                     </div>
                 </div>
@@ -47,6 +47,7 @@ export default class extends Pages {
     build(parent, vars) {
         super.build(parent, vars);
         _('#ns-log-form').addEventListener('submit', this.sendLogin.bind(this));
+        loadRandomBackGround();
     }
 
     sendLogin(ev) {
@@ -59,32 +60,26 @@ export default class extends Pages {
             fd.append('password', _('#mdp').value);
 
             _("#mdp").value = '';
-            sendApiPostRequest('auth/login', fd, this.loginResult.bind(this));
-        }
-    }
-
-    loginResult(event) {
-        const repType = checkApiResStatus(event);
-        if (repType === API_REP_OK) {
-            const rep = getDataAPI(event);
-            console.log(rep);
-            if (rep["invalid"] !== undefined) {
-                this.app.session["mail_token"] = rep["mail_token"];
-                this.app.session["user_id"] = rep["user_id"];
-                this.app.changePage('/auth/wait-verification');
-            } else {
-                this.app.user.log();
-                this.app.changePage('/');
-            }
-        } else {
-            this.isSending = false;
-            const error =  _('#ns-log-error');
-            error.style.display = 'inherit';
-            if (repType === API_REP_BAD) {
-                error.innerText = getAPIErrorReason(event);
-            } else {
-                error.innerText = 'Une erreur de connexion est survenue';
-            }
+            sendApiPostFetch('auth/login', fd).then(data => {
+                if (data["invalid"] !== undefined) {
+                    this.app.session["mail_token"] = data["mail_token"];
+                    this.app.session["user_id"] = data["user_id"];
+                    this.app.changePage('/auth/wait-verification');
+                } else {
+                    this.app.user.setAuthorization(data['id'], data['token']);
+                    this.app.user.log();
+                    this.app.changePage('/');
+                }
+            }).catch(r => {
+                const error =  _('#ns-log-error');
+                error.style.display = 'inherit';
+                if (r.code > 0) {
+                    this.isSending = false;
+                    error.innerText = r.reason;
+                } else {
+                    error.innerText = 'Une erreur de connexion est survenue';
+                }
+            })
         }
     }
 }

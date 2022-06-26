@@ -1,5 +1,5 @@
-ErrorDocument 404 /error/404.php
-ErrorDocument 403 /error/404.php
+ErrorDocument 404 /index.html/404
+ErrorDocument 403 /index.html/404
 
 <FilesMatch "^composer\.">
 Order allow,deny
@@ -16,7 +16,7 @@ Options All -Indexes
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(admin.*)$ /admin.php [NC,L,QSA]
+RewriteRule ^(admin.*)$ /admin.html [NC,L,QSA]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ /index.html [NC,L,QSA]

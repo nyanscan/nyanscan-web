@@ -171,8 +171,6 @@ function download_volume_from_post($from_name, $max_size=5e8) {
         if ($e->getCode() !== 1) {
             $data["error"] = true;
         }
-        print_r($pager_count);
-        print_r($e->getMessage());
     } catch (Exception $e) {
         //for uniqidReal function
     } finally {

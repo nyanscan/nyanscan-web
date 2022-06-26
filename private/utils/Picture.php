@@ -146,27 +146,26 @@ class Picture {
         return true;
     }
 
-    public function resize(int $n_width, int $n_height): bool {
-        if (!$this->id || !$this->resource) {
-            return false;
-        }
+    public function resize(int $n_width, int $n_height)
+    {
+        if (!$this->id || !$this->resource) return false;
         $width = imagesx($this->resource);
         $height = imagesy($this->resource);
-        //resize source picture
-        //Extracted common part
-        $ratio = max($width / $n_width, $height / $n_height);
-        if ($width >= $height) {
-            //horizontal visual
-            $new_width = $n_width;
-            $new_height = $height / $ratio;
-        } else {
-            //vertical visual
-            $new_width = $width / $ratio;
-            $new_height = $n_height;
-        }
+        //redimention de l'image source
+//        if ($width >= $height) //visuel horizontal
+//        {
+//            $ratio = max($width / $n_width, $height / $n_height);
+//            $new_width = $n_width;
+//            $new_height = $height / $ratio;
+//        } else //visuel vertical
+//        {
+//            $ratio = max($width / $n_width, $height / $n_height);
+//            $new_width = $width / $ratio;
+//            $new_height = $n_height;
+//        }
 
         $thumb=imagecreatetruecolor($n_width,$n_height);
-        imagecopyresampled($thumb,$this->resource, 0,0,0,0,$new_width,$new_height,$width,$height);
+        imagecopyresampled($thumb,$this->resource, 0,0,0,0,$n_width,$n_height,$width,$height);
         imagedestroy($this->resource);
         $this->resource = $thumb;
         return true;

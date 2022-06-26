@@ -7,7 +7,8 @@ class AdminTable extends Component {
 
     idCol;
 
-    // search_v = '';
+    search_v = [];
+
     order_v = '';
     reverse = false;
     page=0;
@@ -22,12 +23,18 @@ class AdminTable extends Component {
     selectAmount;
     columSettings;
     totalAmountSpan;
+    search;
+
     colCallback;
+    createLink;
 
     get raw() {
         return `
         <div class="ns-adm-table">
             <div class="ns-adm-table-settings">
+                <form id="${this.id}-table-search" class="ns-adm-table-settings-search">
+                    <input type="submit" hidden>
+                </form>
                 <select id="${this.id}-table-select-amount" class="ns-adm-table-settings-amount">
                     <option value="25">Eléments par page : 25</option>
                     <option value="50">Eléments par page : 50</option>
@@ -43,7 +50,7 @@ class AdminTable extends Component {
                     </div>
                     <button type="button" class="ns-table-next"">Suivant</button>
                 </nav>
-                <!--<a href="/device_view_edit" class="device-view-settings-add"><i class="bi bi-plus-circle"></i> Create</a>-->
+                ${this.createLink ? `<a href="${this.createLink}" class="device-view-settings-add"><i class="bi bi-plus-circle"></i> Create</a>` : '' }
                 <div class="ns-adm-table-total-amount">
                     <span id="${this.id}-table-total-amount"></span>
                 </div>
@@ -51,28 +58,24 @@ class AdminTable extends Component {
             </div>
             <div id="${this.id}-table-colum" class="ns-adm-table-settings-col">
             </div>
-                <ns-api-data-block id="${this.id}-data-block">
+            <ns-api-data-block id="${this.id}-data-block">
                 <table class="table table-dark table-striped table-hover">
                     <thead>
-                        <tr id="${this.id}-admin-thead">
-                        
-                        </tr>
+                        <tr id="${this.id}-admin-thead"></tr>
                     </thead>
-                    <tbody id="${this.id}-admin-tbody" class="ns-monospaced">
-        
-                    </tbody>
+                    <tbody id="${this.id}-admin-tbody" class="ns-monospaced"></tbody>
                 </table>
             </ns-api-data-block>
         </div>
         `;
     }
 
-    constructor(app, id, colum, baseURL, colCallback) {
+    constructor(app, id, colum, baseURL, colCallback, createLink=null) {
         super(app, COMPONENT_TYPE_FLOAT);
         this.id = id;
         this.colum = colum;
+        this.createLink = createLink;
         this.current_colum = colum.filter(col => col.isDefault).map(col => col.name);
-        console.log(this.current_colum);
         this.baseURL = baseURL;
         this.colCallback = colCallback;
         this.idCol = colum.find(e => e.isPrimary).name;
@@ -80,15 +83,16 @@ class AdminTable extends Component {
 
     build(parent) {
         super.build(parent);
-
+        this.defaultSearch = this.vars.split('&').map(e => e.split('=')).reduce((previousValue, currentValue) => ({ ...previousValue, [currentValue[0]]: currentValue[1] }), {});
+        this.search_v = this.defaultSearch;
         this.block = _('#' + this.id + '-data-block');
-        // this.search = _(this.id + '-mac-search');
         this.tbody = _('#' + this.id + '-admin-tbody');
         this.thead = _('#' + this.id + '-admin-thead');
         this.totalAmountSpan = _('#' + this.id + '-table-total-amount');
         this.columSettings = _('#' + this.id + '-table-colum');
         this.pagination = _('.' + this.id + '-table-pagination');
         this.selectAmount = _('#' + this.id + '-table-select-amount');
+        this.search = _('#' + this.id + '-table-search');
         _('#' + this.id + '-table-refresh').addEventListener('click', ((e) => {
             e.preventDefault();
             this.refresh();
@@ -96,7 +100,60 @@ class AdminTable extends Component {
         this.block.addEventListener('dataLoad', this.setup.bind(this));
         this.setupColumnBtn();
         this.setupPagination();
+        this.setupSearch();
         this.updateAmount(null, true);
+        this.update();
+    }
+
+    setupSearch() {
+        let count = 0;
+        for (let col of this.colum) {
+            if (col.isSearchable) {
+                count++;
+                let input = undefined;
+                if (col.searchList) {
+                    input = create('select', null, this.search);
+                    if (this.defaultSearch[col.name]) {
+                        input.readOnly = true;
+                    }
+                    col.searchList.forEach(value => {
+                        createPromise('option', null, input).then(v => {
+                            if (value.v !== undefined) {
+                                v.value = value.v;
+                                if (this.defaultSearch[col.name] === value.v) v.select = true;
+                            } else v.value = '';
+                            v.innerText = value.d;
+
+                        })
+                    })
+                    input.onchange = this.apply_filter.bind(this);
+                } else {
+                    input = create('input', null, this.search);
+                    input.type = 'text';
+                    input.placeholder = col.display + ' filter...';
+                    if (this.defaultSearch[col.name]) {
+                        input.value = this.defaultSearch[col.name];
+                        input.readOnly = true;
+                    }
+                }
+                input.setAttribute('table_search_col', col.name);
+                if (col.hide) input.hidden = true;
+            }
+        }
+        if (count === 0) this.search.style.display = 'none';
+        else {
+            this.search.addEventListener('submit', this.apply_filter.bind(this));
+        }
+    }
+
+
+    apply_filter(event) {
+        event.preventDefault();
+        this.search_v = [];
+        for (let se of this.search.querySelectorAll("input[type=text], select")) {
+            if (se.value) this.search_v[se.getAttribute('table_search_col')] = se.value;
+        }
+        this.page = 0;
         this.update();
     }
 
@@ -236,7 +293,9 @@ class AdminTable extends Component {
         if (this.vars) path += this.vars + '&';
         path += 'limit=' + this.amountView;
         path += '&offset=' + (this.amountView * this.page);
-        // if (this.search_v) path += '&mac=' + this.search_v;
+        for (let se in this.search_v) {
+            path += `&${se}=${encodeURI(this.search_v[se])}`;
+        }
         if (this.order_v) path += '&order=' + this.order_v;
         if (this.reverse) path += '&reverse=1';
         this.block.href = path;
@@ -266,6 +325,7 @@ class SimpleTablePages extends Pages {
         this.admTable.build(_('#ns-simple-adm-table'));
     }
 
+    collCallback(name, e, value, rowData) {}
 
     refresh() {
         this.admTable.refresh();

@@ -14,26 +14,42 @@ class User {
     private $join;
     private $last_sean;
     private ?string $verification_token = null;
-    private int $permission = -1;
+    private int $permission = PERMISSION_DISCONNECT;
 
     /**
      * @param string|null $user id or username of the user: If null, get the current logged user
      */
     public function __construct(string $user = null) {
-        $this->db_adapter = getDB();
+
+		$have_authorisation = false;
+	    $token = null;
+		$id = null;
+	    $headers = apache_request_headers();
+		$auth = $headers['authorization']??$headers['Authorization']??null;
+	    if($auth !== null){
+		    $matches = array();
+		    preg_match('/(\d+) (.*)/', $auth, $matches);
+		    if(isset($matches[1]) && isset($matches[2])){
+			    $id = $matches[1];
+			    $token = $matches[2];
+				$have_authorisation = true;
+		    }
+	    }
+
+	    $this->db_adapter = getDB();
         if ($user === null) {
             $this->is_current_user = true;
             User::$current_user = $this;
-            if(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) {
+            if(!$have_authorisation) {
                 return;
             }
             $this->fetch_data([
-                "token"=>$_SESSION["token"],
-                "id"=>$_SESSION["account-id"]
+                "token"=>$token,
+                "id"=>$id
             ]);
         } else {
             $this->fetch_data( is_numeric($user)? ["id"=>$user] : ["username" => $user]);
-            if($this->is_log && $this->token !== null && !(empty($_SESSION["token"]) || empty($_SESSION["account-id"])) && $this->id == $_SESSION["account-id"] && $this->token === $_SESSION["token"]) {
+            if($this->is_log && $this->token !== null && $have_authorisation && $this->id === $id && $this->token === $token) {
                 $this->is_current_user = true;
                 if (User::$current_user === null) {
                     User::$current_user = $this;
@@ -56,6 +72,8 @@ class User {
             $this->join = $raw["date_inserted"];
             $this->last_sean = $raw["date_updated"]??$this->join;
             $this->permission = $raw["permission"];
+        } elseif (isset($where["token"])) {
+			unauthorized(true);
         }
     }
 
@@ -101,11 +119,11 @@ class User {
         $this->email = $email;
 
         if ($this->is_verified()) {
-            $this->token = createMD5Token();
-            $this->db_adapter->update("USER", ["token" => $this->token], ["id" => $this->id]);
-            $_SESSION["account-id"] = $this->id;
-            $_SESSION["account-username"] = $this->username;
-            $_SESSION["token"] = $this->token;
+			if ($this->token === null)
+			{
+				$this->token = createMD5Token();
+				$this->db_adapter->update("USER", ["token" => $this->token], ["id" => $this->id]);
+			}
         } else {
             $r = $this->db_adapter->select(TABLE_VERIFICATION, ["id"], ["user_id" => $this->id], 1);
             if ($r) {
@@ -165,8 +183,12 @@ class User {
         return $data;
     }
 
-    public function getForumViewLevel(): int {
-        return $this->is_connected() ? FORUM_PERMISSION_VIEW_ADMIN : FORUM_PERMISSION_VIEW_EVERYONE;
+    /**
+     * @deprecated
+     */
+    public function getForumViewLevel(): int
+    {
+        return 0;
     }
 
     public function is_verified(): bool {
@@ -178,14 +200,19 @@ class User {
     }
 
     public function get_permission_level() : int {
-        return $this->permission;
+        return $this->permission & PERMISSION_MASK;
     }
 
     public function set_permission($permission): bool {
-        if (!is_numeric($permission) || $permission < 0 || $permission > 255) {
+        if (!is_numeric($permission) || $permission < 1 || $permission > 255) {
             return false;
         }
         $this->permission = $permission;
         return getDB()->update(TABLE_USER, ["permission" => $permission], ["id" => $this->id]);
     }
+
+	public function get_token(): string {
+		return $this->token;
+	}
+
 }

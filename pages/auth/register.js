@@ -6,7 +6,7 @@ export default class extends Pages {
     get raw() {
         return `
         <section id="register">
-            <div class="ns-f-bg ns-f-bg-auth">
+            <div class="ns-f-bg ns-f-bg-random">
             
             </div>
             <div class="container min-vh-100">
@@ -61,7 +61,7 @@ export default class extends Pages {
                                 </form>
                             </div>
                             <div class="row">
-                                <p>Tu as déja un compte ? <ns-a href="/auth/login">Se connecter</ns-a></p>
+                                <p>Tu as déja un compte ? <ns-a href="/auth/login" class="btn ns-btn-sm ns-tickle-pink-btn">Se connecter</ns-a></p>
                             </div>
                         </div>
                     </div>
@@ -81,6 +81,7 @@ export default class extends Pages {
         _('#ns-re-form').addEventListener('submit', this.sendRegister.bind(this));
         this.captcha = new Captcha(this.app);
         this.captcha.build(_('#ns-fr-captcha'));
+        loadRandomBackGround();
     }
 
     sendRegister(event) {

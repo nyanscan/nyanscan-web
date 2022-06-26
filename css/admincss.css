@@ -180,25 +180,6 @@ body {
     font-weight: bold;
 }
 
-.fpp-modal-btn-container {
-    width: 100%;
-    display: flex;
-    gap: .5rem;
-}
-
-.fpp-modal-btn-container button {
-    padding: .5rem 20px;
-    flex: auto;
-    border: none;
-    cursor: pointer;
-    opacity: 0.9;
-    font-size: 20px;
-}
-
-.fpp-modal-btn-container button:hover {
-    opacity: 1;
-}
-
 .f-toast-container {
     position: fixed;
     bottom: 0.5rem;
@@ -321,17 +302,22 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     margin: 1rem 0;
-    height: 40px;
     align-items: stretch;
+}
+
+.ns-adm-table-settings > * {
+    height: 40px;
 }
 
 .ns-adm-table-settings-search {
     margin: 0;
-    width: 250px
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
 }
 .ns-adm-table-settings-search > * {
     height: 100%;
-    width: 100%;
+    width: 250px;
     border-radius: .5rem;
     border: none;
     background-color: #2C3034;

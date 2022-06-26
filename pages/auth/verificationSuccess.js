@@ -5,7 +5,7 @@ export default class extends Pages {
         <div class="ns-success-css mb-5">
             <div class="ns-center">
                 <div class="ns-scan-success align-items-center">
-                    <p class="ns-font-size-success">Votre compte a bien été vérifié. Vous pouvez vous connecter maintenant en cliquant <ns-a href="/auth/login">ici</ns-a></p>.
+                    <p class="ns-fs-4 text-center m-0">Votre compte a bien été vérifié. Vous pouvez vous connecter maintenant en cliquant <ns-a href="/auth/login" class="btn ns-btn-sm ns-tickle-pink-btn">ici</ns-a></p>
                 </div>
             </div>
         </div>
