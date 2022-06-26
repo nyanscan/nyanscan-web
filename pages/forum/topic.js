@@ -71,12 +71,12 @@ class ForumMessage extends Component {
             </ns-a>
             <div class="nsf-message-date">
                 <span>Le ${this.data['date_inserted']} ${this.isEdit ? '(modifié)' : ''}</span>
-                <div class="btn-group" role="group">
+            </div>
+             <div class="btn-group nsf-message-action" role="group">
                     <button class="btn ns-tickle-pink-btn ns-btn-sm ns-hide-disconnected nsf-message-reply-btn"><i class="bi bi-reply-fill"></i></button>
                     <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-edit-btn"><i class="bi bi-pencil-fill"></i></button>
                     <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-delete-btn"><i class="bi bi-trash-fill"></i></button>
                 </div>
-            </div>
             <p class="nsf-message-content">${formatMessage(this.data.content)}</p>
             <div class="nsf-message-reply nsf-message-reply-hide">
                 <button class="nsf-message-reply-less btn ns-tickle-pink-btn btn-sm">Afficher moins de réponses</button>
@@ -168,11 +168,11 @@ class ForumMessage extends Component {
             </ns-a>
             <div class="nsf-message-date">
                 <span>Le ${data['date_inserted']} ${isEdit ? '(modifié)' : ''}</span>
-                <div class="btn-group" role="group">
+            </div>
+            <div class="btn-group nsf-message-action" role="group">
                     <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-edit-btn"><i class="bi bi-pencil-fill"></i></button>
                     <button class="btn ns-tickle-pink-btn ns-btn-sm nsf-message-delete-btn"><i class="bi bi-trash-fill"></i></button>
                 </div>
-            </div>
             <p class="nsf-message-content">${formatMessage(data.content)}</p>
         `;
         let editBtn = block.querySelector('.nsf-message-edit-btn');

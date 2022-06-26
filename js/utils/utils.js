@@ -102,7 +102,7 @@ function sendApiRequest(method, url, callBack, progressCallBack = undefined, sen
     if (auth !== null) ajax.setRequestHeader('Authorization', auth );
 
     if (progressCallBack !== undefined && progressCallBack !== null) {
-        ajax.addEventListener('progress', progressCallBack);
+        ajax.upload.addEventListener('progress', progressCallBack);
     }
 
     if (callBack !== null && callBack !== undefined) {

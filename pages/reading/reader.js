@@ -258,9 +258,9 @@ export default class extends Pages {
     }
 
     cacheNext() {
-        for (let i = this.page + 1; i < this.page + 4 && this.page < this.maxPage; i++) {
+        for (let i = this.page + 1; i < this.page + 4 && i < this.maxPage; i++) {
             const currentIMG = this.pages[i];
-            this.preloadImage(`volume/${currentIMG.substr(0, 3)}/${currentIMG.substr(3)}.webp`);
+            this.preloadImage(`volume/${currentIMG.substring(0, 3)}/${currentIMG.substring(3)}.webp`);
         }
     }
 

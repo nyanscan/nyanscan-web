@@ -938,13 +938,17 @@ body {
     display: flex;
     flex-direction: column;
     padding: 80px 5%;
-    margin-left: 200px;
-    margin-right: 200px;
 
 }
 
-.ns-background-image {
+.ns-background-image-cgu {
     background-image: url("../res/ImageCGU.jpg");
+    height: 100%;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: min(200px, 10%) 32px;
 
 }
 
@@ -1262,7 +1266,7 @@ body {
 
 .nsf-message {
     display: grid;
-    grid-template-columns: 100px 1fr;
+    grid-template-columns: 100px auto 1fr;
     grid-template-rows: 32px auto auto;
     grid-column-gap: 2rem;
     grid-row-gap: 1rem;
@@ -1289,19 +1293,21 @@ body {
     grid-area: 1 / 2 / 2 / 3;
     font-size: 12px;
     font-style: italic;
+    align-self: center;
+}
 
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+.nsf-message-action {
+    grid-area: 1 / 3 / 2 / 4;
+    justify-self: end;
+    align-self: center;
 }
 
 .nsf-message-content {
-    grid-area: 2 / 2 / 3 / 3;
+    grid-area: 2 / 2 / 3 / 4;
 }
 
 .nsf-message-reply {
-    grid-area: 3 / 2 / 4 / 3;
+    grid-area: 3 / 2 / 4 / 4;
 }
 
 .nsf-message-reply {
@@ -1426,13 +1432,18 @@ body {
 
     .nsf-message {
         grid-template-columns: 100px 1fr;
-        grid-template-rows: 64px auto auto;
+        grid-template-rows: 64px auto auto auto;
         grid-column-gap: .5rem;
-        grid-row-gap: 1.5rem .5rem;
+        grid-row-gap: .5rem;
     }
 
     .nsf-message .nsf-message {
         padding: 1rem;
+    }
+
+    .nsf-message-action {
+        grid-area: 2 / 1 / 3 / 3;
+        justify-self: start;
     }
 
     .nsf-message-user {
@@ -1450,12 +1461,13 @@ body {
     }
 
     .nsf-message-content {
-        grid-area: 2 / 1 / 3 / 3;
+        grid-area: 3 / 1 / 4 / 3;
         margin: 0;
     }
 
     .nsf-message-reply {
-        grid-area: 3 / 1 / 4 / 3;
+        margin-top: 1rem;
+        grid-area: 4 / 1 / 5 / 3;
     }
 
     .ns-md-fs-1 {
