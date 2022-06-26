@@ -547,9 +547,9 @@ const STRUCTURE = [
         }
     },
     {
-        re: /^createEvent$/,
+        re: /^create-event$/,
         rel: "events/addEvent",
-        // loginLevel: LOGIN_LEVEL_CONNECT,
+        //loginLevel: LOGIN_LEVEL_CONNECT,
     },
     {
         re: /^(e|events)(\/.*)?$/,
