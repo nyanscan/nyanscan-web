@@ -15,15 +15,15 @@ export default class extends Pages {
         <section>
             <div id="ns-publish-err" class="alert alert-danger" style="display: none">
             </div>
-            <div class="ns-forum-center ms-3">
-                <div class="p-4 justify-content-start">
+            <div class="ns-forum-center ms-5">
+                <div class="p-4 align-self-start">
                     <h2>Publier un projet</h2>
                 </div>
             </div>
             <div class="ns-center d-flex">
                 <hr class="ns-line">
             </div>
-            <div class="ns-center">
+            <div class="ns-center ns-text-black">
                 <form id="ns-publish-form" class="ns-categ-topic my-5">
                     <div>
                         <div>

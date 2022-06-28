@@ -19,7 +19,10 @@ export default class extends Pages {
                     </div>
                 </div>
                 <div class="ns-pr-vol ns-container">
-                    <h3>Listes des tomes</h3>
+                    <div class="d-flex flex-row align-items-center justify-content-between gap-3 mb-3">
+                        <h3 class="">Listes des tomes</h3>
+                        <ns-a id="ns-pr-add-volume" class="btn ns-tickle-pink-btn">Ajouter un tome</ns-a>
+                    </div>
                     <div id="ns-pr-vol-list">
                     
                     </div>
@@ -84,6 +87,11 @@ export default class extends Pages {
             container.appendChild(clone);
         }
         template.remove();
+        if (this.app.user.permissionLevel < 200 && this.app.user.id !== this.data.rawData['author']) {
+            _('#ns-pr-add-volume').remove();
+        } else {
+            _('#ns-pr-add-volume').href = `/p/${this.project}/edit`;
+        }
     }
 
     constructor(app) {
