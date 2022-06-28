@@ -162,6 +162,12 @@ class Header extends Component {
         this.searchRes = _('#ns-nav-search + .ns-search-result > ul', true);
         this.nav = _('#mainNav');
         this.searchInput.addEventListener('input', this.search.bind(this));
+        this.searchInput.form.addEventListener('submit', (e => {
+            e.preventDefault();
+            if (this.searchInput.value) {
+                this.app.changePage(`/s/${encodeURI(this.searchInput.value)}`);
+            }
+        }).bind(this));
 
         _('#ns-main-burger').addEventListener('click', (e) => {
             const current = _('#horizontal-mobile-nav').style.display === 'none';
@@ -235,6 +241,7 @@ class Index extends Pages {
     fame;
     last;
     love;
+    searchInput;
 
     get raw() {
         return `
@@ -298,7 +305,7 @@ class Index extends Pages {
     <h1 class="ns-text-red fw-bold">NyanScan</h1>
     <p class="text-white ns-fs-5 w-lg-25 w-75 text-center">NyanScan est un site de lecture de scan en ligne. Avec son moteur de recherche complet, trouve le manga qui te plait en quelque clic !</p>
     <form class="form-inline w-lg-40 w-75 ns-fs-4">
-        <input class="ns-search w-100 p-4" id="ns-nav-search" type="search" placeholder="Rechercher...">
+        <input class="ns-search w-100 p-4" id="ns-nav-search-index" type="search" placeholder="Rechercher...">
     </form>
     <span class="text-white ns-fs-3 fw-bold ns-hide-connected">OU</span>
     <a class="btn text-black ns-fs-4 ns-tickle-pink-btn ns-hide-connected" href="auth">Se connecter</a>
@@ -334,6 +341,11 @@ class Index extends Pages {
             this.updateSelection();
         }
         this.data.addEventListener('dataLoad', this.updateSelection.bind(this));
+        this.searchInput = _('#ns-nav-search-index');
+        this.searchInput.form.addEventListener('submit', (e => {
+            e.preventDefault();
+            if (this.searchInput.value) this.app.changePage(`/s/${encodeURI(this.searchInput.value)}`);
+        }).bind(this))
     }
 
     updateSelection() {
@@ -514,6 +526,11 @@ const STRUCTURE = [
                 }
             ]
         }
+    },
+    {
+        re: /^(?:s|serach)\/(.+)$/,
+        var: [{id: 1, name: 'search'}],
+        rel: 'search'
     }
 ];
 

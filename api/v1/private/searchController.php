@@ -33,13 +33,13 @@ function global_search($query) {
 }
 
 function user_search($v, $short): array {
-    $req = getDB()->get_pdo()->prepare('SELECT id, username FROM PAE_USER WHERE username LIKE :username ORDER BY LOCATE(:username_short, username) LIMIT ' . ($short ? '5' : '20'));
+    $req = getDB()->get_pdo()->prepare('SELECT id, username FROM PAE_USER WHERE username LIKE :username ORDER BY LOCATE(:username_short, username) LIMIT ' . ($short ? '5' : '50'));
     $req->execute(["username" => '%' . $v . '%', "username_short" => $v]);
     return $req->fetchAll(PDO::FETCH_ASSOC);
 }
 
 function project_search($v, $short): array {
-    $req = getDB()->get_pdo()->prepare('SELECT id, title FROM PAE_PROJECT WHERE title LIKE :title ORDER BY LOCATE(:title_short, title) LIMIT ' . ($short ? '5' : '20'));
+    $req = getDB()->get_pdo()->prepare('SELECT id, title'. ($short ? '' : ', picture') .' FROM PAE_PROJECT WHERE title LIKE :title ORDER BY LOCATE(:title_short, title) LIMIT ' . ($short ? '5' : '50'));
     $req->execute(["title" => '%' . $v . '%', "title_short" => $v]);
     return $req->fetchAll(PDO::FETCH_ASSOC);
 }
