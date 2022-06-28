@@ -155,7 +155,7 @@ function sendApiFetch(url, body, method) {
         method: method,
         headers: new Headers(header),
         body: body,
-    })).then(r => r.headers.has('Content-Length') ? r.json() : Promise.resolve({code: r.status, message: r.statusText}))
+    })).then(r => r.headers.has('Content-Type') && r.headers.get('Content-Type') === 'application/json' ? r.json() : Promise.resolve({code: r.status, message: r.statusText}))
         .then(response => {
             if (response.code === 401 && response.reason === 'Invalid Authorization') {
                 window.APP.user.logout(true);
@@ -573,7 +573,9 @@ class Application extends EventTarget {
     }
 
     popState(e) {
-        const href = document.location.pathname;
+        let href = document.location.pathname;
+        if (this.prefix.length > 0) href = href.substring(1 + this.prefix.length);
+
         const canceled = !this.dispatchEvent(new CustomEvent('popstate', {
             cancelable: true,
             bubbles: true,

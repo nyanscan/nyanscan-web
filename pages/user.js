@@ -10,7 +10,7 @@ export default class extends Pages {
             <ns-api-data-block id="ns-profile-data" href="user/${this.user}?details=1">
                 <div class="ns-min-vh-100 ns-center py-5 ns-text-black">
                     <div class="ns-scan-preview-profil">
-                        <section class="flex-row d-flex">
+                        <section class="flex-column flex-md-row d-flex">
                             <div class="col-md-8 d-flex justify-content-start align-items-center gap-3">
                                 <div class="p-2">
                                     <img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive">

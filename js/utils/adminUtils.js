@@ -92,6 +92,7 @@ class AdminTable extends Component {
         this.columSettings = _('#' + this.id + '-table-colum');
         this.pagination = _('.' + this.id + '-table-pagination');
         this.selectAmount = _('#' + this.id + '-table-select-amount');
+        this.selectAmount.addEventListener('change', this.updateAmount.bind(this));
         this.search = _('#' + this.id + '-table-search');
         _('#' + this.id + '-table-refresh').addEventListener('click', ((e) => {
             e.preventDefault();
@@ -222,10 +223,10 @@ class AdminTable extends Component {
 
     setupPagination() {
         for (let paginationElement of this.pagination) {
-            for (let prev of paginationElement.getElementsByClassName('device-previous')) {
+            for (let prev of paginationElement.getElementsByClassName('ns-table-previous')) {
                 prev.onclick = this.changePage.bind(this, false);
             }
-            for (let next of paginationElement.getElementsByClassName('device-next')) {
+            for (let next of paginationElement.getElementsByClassName('ns-table-next')) {
                 next.onclick = this.changePage.bind(this, true);
             }
         }
@@ -294,6 +295,7 @@ class AdminTable extends Component {
         path += 'limit=' + this.amountView;
         path += '&offset=' + (this.amountView * this.page);
         for (let se in this.search_v) {
+            if (se.length > 0)
             path += `&${se}=${encodeURI(this.search_v[se])}`;
         }
         if (this.order_v) path += '&order=' + this.order_v;

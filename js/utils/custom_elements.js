@@ -63,6 +63,7 @@ class ApiDataBlock extends HTMLElement {
         }).catch(err => {
             this.error = {code: err?.code||-1, message: err?.reason||'ConnexionError'};
             this.isError = true;
+
         }).finally(() => {
             this.dataLoad = true;
             this.dispatchEvent(new CustomEvent('dataLoad', {
@@ -122,7 +123,7 @@ class ApiData extends HTMLElement {
                 console.warn('A api-data must be in api-data-block !');
             } else  {
                 if (this.block.dataLoad) {
-                    this.innerText =  escapeHtml(this.block.getField(this.field || ''));
+                    this.innerText = this.block.getField(this.field || '');
                 } else {
                     this.block.addEventListener('dataLoad', this.setData.bind(this))
                 }

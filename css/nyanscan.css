@@ -1530,6 +1530,10 @@ ns-project > span > span:empty {
     .ns-carousel .ns-carousel-3 {
         transform: scale(0.8, 0.8) translateX(20vw);
     }
+
+    .ns-section-block {
+        width: 100%;
+    }
 }
 
 @media (max-width: 576px) {

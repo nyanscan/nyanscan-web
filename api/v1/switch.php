@@ -154,6 +154,8 @@ function _get_captcha_settings() {
     ]);
 }
 
-header("HTTP/1.1 404 Not Found");
+
+json_exit(404, 'Not found', 'invalid api request');
+//header("HTTP/1.1 404 Not Found");
 
 exit();

@@ -184,7 +184,7 @@ class ForumMessage extends Component {
         }
         if (deleteBtn) {
             if (isAuthor || this.app.user.permissionLevel >= 200) {
-                deleteBtn.addEventListener('click', this.newDeleteClick.bind(this, this.data['id'], false), true);
+                deleteBtn.addEventListener('click', this.newDeleteClick.bind(this, data['id'], true), true);
             } else deleteBtn.remove();
         }
     }

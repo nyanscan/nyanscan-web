@@ -496,10 +496,7 @@ function _delete_message($id, $isReply)
 	$refData = getDB()->select($table, ['author', 'status'], ['id' => $id], 1);
 	if (!$refData) bad_request('invalid ref');
 	if ($refData['author'] !== $user->getId() && $user->get_permission_level() < PERMISSION_MODERATOR) unauthorized();
-
-	if (!$isReply) getDB()->delete(TABLE_FORUM_REPLY, ['message' => $id]);
-	getDB()->delete($table, ['id' => $id]);
-
+    getDB()->delete($table, ['id' => $id]);
 	success();
 }
 
