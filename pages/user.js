@@ -7,7 +7,7 @@ export default class extends Pages {
     get raw() {
         let html = `
         <section>
-            <ns-api-data-block id="ns-profile-data" href="user/${this.user}">
+            <ns-api-data-block id="ns-profile-data" href="user/${this.user}?details=1">
                 <div class="ns-min-vh-100 ns-center py-5 ns-text-black">
                     <div class="ns-scan-preview-profil">
                         <section class="flex-row d-flex">

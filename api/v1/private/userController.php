@@ -6,7 +6,7 @@ function invokeUser($method, $function, $query) {
             if ($function[0] === 'all') {
                 _admin_fetch_user($query);
             }
-            _get_user($function[0]);
+            _get_user($function[0], $query);
         }
     } elseif ($method === "POST") {
         if (count($function) === 1) {
@@ -40,7 +40,7 @@ function _admin_fetch_user($query) {
  * @param $userid => id OF user or ME for self
  * @author Alice.B
  */
-function _get_user($userid) {
+function _get_user($userid, $query) {
     if (strlen($userid) === 0 || strlen($userid) > 32) {
         bad_request('Invalid user');
     }
@@ -55,7 +55,18 @@ function _get_user($userid) {
     if (!$user->is_connected()) {
         bad_request('Invalid user');
     }
-    success($user->getAPIData($userid === 'me'));
+    $data = $user->getAPIData($userid === 'me');
+
+    if (isset($query['details']) && $query['details'] === '1') {
+        $where_project = ['author' => $user->getId()];
+        if ($userid !== 'me' && get_log_user()->get_permission_level() < PERMISSION_MODERATOR) {
+            $where_project['status'] = PROJECT_STATUS_PUBLISHED;
+        }
+        $data["project"] = getDB()->select(TABLE_PROJECT, ['id', 'author', 'picture', 'title', 'description'],$where_project, 5, 'date_inserted DESC');
+        $data['like'] = getDB()->select_set_settings('SELECT project, volume, picture, author, title, status, like_count, dislike_count, read_count  FROM PAE_VOLUME_READING AS R LEFT JOIN PAE_VOLUME PV on R.fk_project = PV.project and R.fk_volume = PV.volume', ['user_id' => $user->getId()], 5, 'R.date_inserted DESC');
+    }
+
+    success($data);
 }
 
 /**
