@@ -258,36 +258,10 @@ class Index extends Pages {
                         <h3 class="ns-scan-preview-tile">Scan les plus populaires</h3>
                         <div class="overflow-auto w-100 pb-2">
                             <div id="ns-index-fame" class="ns-scan-preview-elements">
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span><span class="placeholder w-75"></span></span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
                             </div>
                         </div>
                     </div>
@@ -297,38 +271,10 @@ class Index extends Pages {
                         <h3 class="ns-scan-preview-tile">Dernière publication</h3>
                         <div class="overflow-auto w-100 pb-2">
                             <div id="ns-index-last" class="ns-scan-preview-elements">
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
                             </div>
                         </div>
                     </div>
@@ -338,38 +284,10 @@ class Index extends Pages {
                         <h3 class="ns-scan-preview-tile">Les coups de cœur de la rédaction</h3>
                         <div class="overflow-auto w-100 pb-2">
                             <div class="ns-scan-preview-elements" id="ns-index-love">
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
-                                <div class="ns-scan-preview-component placeholder-glow">
-                                    <ns-a href="/">
-                                        <span class="ns-scan-preview-component-placeholder placeholder w-100 ns-b-purple-gradient"></span>
-                                    </ns-a>
-                                    <span>
-                                        <span class="placeholder w-75"></span>
-                                    </span>
-                                </div>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
+                                <ns-project></ns-project>
                             </div>
                         </div>
                     </div>
@@ -426,16 +344,11 @@ class Index extends Pages {
         for (const rawDataKey in this.data.rawData) {
             const e = _('#ns-index-' + rawDataKey);
             if (e) {
-                e.innerHTML = '';
+                let inner = '';
                 for (let item of this.data.rawData[rawDataKey]) {
-                    const box = create('div', null, e, 'ns-scan-preview-component');
-                    const ns_a = create('ns-a', null, box);
-                    ns_a.href = '/p/' + item['id'];
-                    const img = create('img', null, ns_a);
-                    img.src = image_id_to_path(item['picture']);
-                    const span = create('span', null, box);
-                    span.innerText = item['title'];
+                    inner += `<ns-project ns-id="${item['id']}" ns-title="${item['title']}" ns-picture="${item['picture']}"></ns-project>`;
                 }
+                e.innerHTML = inner;
             }
         }
     }

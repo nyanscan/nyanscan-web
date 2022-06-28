@@ -61,7 +61,7 @@ class ApiDataBlock extends HTMLElement {
         promise.then(data => {
             this.rawData = data;
         }).catch(err => {
-            this.error = {code: err?.status||-1, message: err?.statusText||'ConnexionError'};
+            this.error = {code: err?.code||-1, message: err?.reason||'ConnexionError'};
             this.isError = true;
         }).finally(() => {
             this.dataLoad = true;
@@ -101,8 +101,6 @@ class ApiDataBlock extends HTMLElement {
     }
 }
 
-window.customElements.define('ns-api-data-block', ApiDataBlock);
-
 class ApiData extends HTMLElement {
     isInit = false;
     dataLoad = false;
@@ -138,8 +136,6 @@ class ApiData extends HTMLElement {
     }
 }
 
-window.customElements.define('ns-api-data', ApiData);
-
 class NSAnchor extends HTMLElement {
 
     get href() {
@@ -160,7 +156,6 @@ class NSAnchor extends HTMLElement {
         }).bind(this))
     }
 }
-window.customElements.define('ns-a', NSAnchor);
 
 class NSPagination extends HTMLElement {
 
@@ -400,4 +395,71 @@ class NSPagination extends HTMLElement {
 
 }
 
+class NSProject extends HTMLElement {
+
+    static get observedAttributes() {
+        return ['ns-title', 'ns-id', 'ns-picture'];
+    }
+
+    get title() {
+        this.getAttribute('ns-title');
+    }
+
+    set title(v) {
+        this.setAttribute('ns-title', v);
+    }
+
+    get cid() {
+        this.getAttribute('ns-id');
+    }
+
+    set cid(v) {
+        this.setAttribute('ns-id', v);
+    }
+
+    get picture() {
+        this.getAttribute('ns-picture');
+    }
+
+    set picture(v) {
+        this.setAttribute('ns-picture', v);
+    }
+
+    link;
+    image;
+    name;
+
+    constructor() {
+        super();
+        this.link = create('ns-a', null, this);
+        this.image = create('img', null, this.link, "ns-empty-img-placeholder");
+        const box = create('span', null, this);
+        this.name = create('span', null, box, 'ns-empty-placeholder');
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        switch (name) {
+            case 'ns-title':
+                this.name.innerText = newValue;
+                break;
+            case 'ns-id':
+                this.link.href = `/p/${newValue}`;
+                break;
+            case 'ns-picture':
+                this.image.src = image_id_to_path(newValue);
+                break;
+        }
+    }
+
+    setData(title, img, id) {
+        this.link.href = `/p/${id}`;
+        this.image.src = image_id_to_path(img);
+        this.name = escapeHtml(title);
+    }
+}
+
+window.customElements.define('ns-api-data-block', ApiDataBlock);
+window.customElements.define('ns-api-data', ApiData);
+window.customElements.define('ns-a', NSAnchor);
 window.customElements.define('ns-pagination', NSPagination);
+window.customElements.define('ns-project', NSProject);

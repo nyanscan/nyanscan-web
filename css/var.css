@@ -136,7 +136,7 @@ body[ns-log-status=false] .ns-hide-disconnected {display: none !important;}
     .ns-d-none-mlg { display: none !important; }
 }
 
-.ns-empty-placeholder:empty, .ns-placeholder {
+.ns-empty-placeholder:empty, .ns-placeholder, .ns-empty-img-placeholder:not([src]) {
     /*display: inline-block;*/
     min-height: 1em;
     vertical-align: middle;
@@ -144,10 +144,11 @@ body[ns-log-status=false] .ns-hide-disconnected {display: none !important;}
     background-color: currentColor;
     background-clip: content-box;
     opacity: 0.5;
-    min-width: 20em;
+    width: 50%;
     -webkit-animation: placeholder-glow 2s ease-in-out infinite;
     animation: placeholder-glow 2s ease-in-out infinite;
 }
+
 
 ns-pagination ul {
     list-style: none;

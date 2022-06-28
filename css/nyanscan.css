@@ -156,7 +156,7 @@ body {
     width: max-content;
 }
 
-.ns-scan-preview-component {
+.ns-scan-preview-component, ns-project {
     display: inline-flex;
     width: 296px;
     justify-content: center;
@@ -166,15 +166,23 @@ body {
     margin: 0 16px;
 }
 
-.ns-scan-preview-component img, .ns-scan-preview-component-placeholder {
+.ns-scan-preview-component img, .ns-scan-preview-component-placeholder, ns-project img {
     height: 420px;
     width: 296px;
     object-fit: cover;
 }
 
-.ns-scan-preview-component > span {
+.ns-scan-preview-component > span, ns-project > span {
     font-size: 24px;
     text-align: center;
+}
+
+ns-project > span > span {
+    display: inline-block;
+}
+
+ns-project > span > span:empty {
+    width: 75%;
 }
 
 .ns-b-azalea {

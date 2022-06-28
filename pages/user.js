@@ -35,62 +35,22 @@ export default class extends Pages {
                         <div class="ns-center py-5 ns-text-white">
                             <div class="ns-section-block ns-b-purple-gradient">
                                 <h4 class="ns-scan-preview-tile">Scans aimés</h4>
-                                <div class="ns-scan-preview-elements">
-                                    <div class="ns-scan-preview-component">
-                                        <a href="/">
-                                            <img src="../../res/book/love-is-war.jpg" alt="">
-                                        </a>
-                                        <span>Love Is War</span>
-                                    </div>
-                                    <div class="ns-scan-preview-component">
-                                        <a href="/">
-                                            <img src="../../res/book/love-is-war.jpg" alt="">
-                                        </a>
-                                        <span>Love Is War</span>
-                                    </div>
-                                    <div class="ns-scan-preview-component">
-                                        <a href="/">
-                                            <img src="../../res/book/love-is-war.jpg" alt="">
-                                        </a>
-                                        <span>Love Is War</span>
-                                    </div>
-                                    <div class="ns-scan-preview-component">
-                                        <a href="/">
-                                            <img src="../../res/book/love-is-war.jpg" alt="">
-                                        </a>
-                                        <span>Love Is War</span>
-                                    </div>
+                                <div id="ns-user-like" class="ns-scan-preview-elements">
+                                    <ns-project></ns-project>
+                                    <ns-project></ns-project>
+                                    <ns-project></ns-project>
+                                    <ns-project></ns-project>
                                 </div>
                             </div>
                         </div>
                         <div class="ns-center py-5 ns-text-white">
                             <div class="ns-section-block ns-b-purple-gradient">
                                 <h4>Scans uploadés</h4>
-                                <div class="ns-scan-preview-elements">
-                                    <div class="ns-scan-preview-component">
-                                        <a href="/">
-                                            <img src="../../res/book/love-is-war.jpg" alt="">
-                                        </a>
-                                        <span>Love Is War</span>
-                                    </div>
-                                    <div class="ns-scan-preview-component">
-                                        <a href="/">
-                                            <img src="../../res/book/love-is-war.jpg" alt="">
-                                        </a>
-                                        <span>Love Is War</span>
-                                    </div>
-                                    <div class="ns-scan-preview-component">
-                                        <a href="/">
-                                            <img src="../../res/book/love-is-war.jpg" alt="">
-                                        </a>
-                                        <span>Love Is War</span>
-                                    </div>
-                                    <div class="ns-scan-preview-component">
-                                        <a href="/">
-                                            <img src="../../res/book/love-is-war.jpg" alt="">
-                                        </a>
-                                        <span>Love Is War</span>
-                                    </div>
+                                <div id="ns-user-upload" class="ns-scan-preview-elements">
+                                    <ns-project></ns-project>
+                                    <ns-project></ns-project>
+                                    <ns-project></ns-project>
+                                    <ns-project></ns-project>
                                 </div>
                             </div>
                         </div>
@@ -193,6 +153,31 @@ export default class extends Pages {
                 this.app.fatalError();
             }
         } else {
+            console.log(this.dataBlock.rawData);
+            const project =  _('#ns-user-upload');
+            project.innerHTML = '';
+            if (this.dataBlock.rawData.project.length > 0) {
+                let inner = '';
+                for (let v of this.dataBlock.rawData.project) {
+                    inner += `<ns-project ns-id="${v.id}" ns-title="${v.title}" ns-picture="${v.picture}"></ns-project>`;
+                }
+                project.innerHTML = inner;
+            } else {
+                project.innerHTML = `Oh non c'est vide`;
+            }
+
+            const like =  _('#ns-user-like');
+            like.innerHTML = '';
+            if (this.dataBlock.rawData.like.length > 0) {
+                let inner = '';
+                for (let v of this.dataBlock.rawData.like) {
+                    inner += `<ns-project ns-id="${v.project}/${v.id}" ns-title="${v.title}" ns-picture="${v.picture}"></ns-project>`;
+                }
+                like.innerHTML = inner;
+            } else {
+                like.innerHTML = `Oh non c'est vide`;
+            }
+            //
             //console.log(this.dataBlock.rawData);
         }
     }

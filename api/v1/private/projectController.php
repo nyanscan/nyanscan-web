@@ -214,7 +214,7 @@ function _fetch_project_with_volumes($id) {
 
     $user = get_log_user();
 
-    $sqlVolumeREQ = "SELECT " . join(', ', ['volume', 'picture', 'author', 'title', 'page_count', 'status', 'like_count', 'dislike_count', 'read_count', 'page']) . ' FROM ' . DB_PREFIX.TABLE_VOLUME . ' AS V LEFT JOIN ' . DB_PREFIX.TABLE_VOLUME_READING . ' L ON L.fk_volume = V.volume AND L.fk_project = V.project AND L.user_id = ' . ($user->is_connected() ? $user->getId() : null);
+    $sqlVolumeREQ = "SELECT " . join(', ', ['volume', 'picture', 'author', 'title', 'page_count', 'status', 'like_count', 'dislike_count', 'read_count', 'page']) . ' FROM ' . DB_PREFIX.TABLE_VOLUME . ' AS V LEFT JOIN ' . DB_PREFIX.TABLE_VOLUME_READING . ' L ON L.fk_volume = V.volume AND L.fk_project = V.project AND L.user_id ' . ($user->is_connected() ? ' = ' . $user->getId() : 'IS NULL');
     $volumes = getDB()->select_set_settings($sqlVolumeREQ, $where);
     $project["volumes"] = [];
     foreach ($volumes as $v) {
