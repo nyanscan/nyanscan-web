@@ -3,11 +3,17 @@ const COMPONENT_TYPE_FOOTER = 1;
 const COMPONENT_TYPE_PAGE = 2;
 const COMPONENT_TYPE_FLOAT = 3;
 const COMPONENT_TYPE_MODAL = 4;
+const COMPONENT_TYPE_TOAST = 5;
 const API_REP_OK = 1;
 const API_REP_BAD = 0;
 const API_REP_CONNECTION_ERROR = -1;
 const LOGIN_LEVEL_DISCONNECT = -1;
 const LOGIN_LEVEL_CONNECT = 1;
+
+const TYPE_SUCCESS = 0;
+const TYPE_INFO = 1;
+const TYPE_WARN = 2;
+const TYPE_ERROR = 3;
 
 const VERSION = 'BETA-2.1.1';
 
@@ -68,7 +74,7 @@ function createPromise(type, id = null, parent = null, ...cla) {
  * @param formData
  * @param callBack
  * @param progressCallBack
- * @deprecated
+ * not deprecated for progressCallBack
  */
 function sendApiPostRequest(url, formData, callBack = null, progressCallBack = null) {
     sendApiRequest("POST", url, callBack, progressCallBack, formData);
@@ -104,7 +110,6 @@ function sendApiDeleteRequest(url, callBack = null, progressCallBack = null) {
  * @param callBack
  * @param progressCallBack
  * @param sendItem
- * @deprecated
  */
 function sendApiRequest(method, url, callBack, progressCallBack = undefined, sendItem = undefined) {
     const ajax = new XMLHttpRequest()
@@ -469,6 +474,122 @@ class Error404 extends Pages {
 
 }
 
+class InfoModal extends Component {
+
+    m_type;
+    title;
+    message;
+    isHTMLMessage;
+
+    get raw() {
+        return `
+        <h3>${this.title}</h3>
+        <div class="ns-form-group d-flex flex-column gap-2">
+            ${this.isHTMLMessage ?  this.message : `<p>${this.message}</p>`}
+        </div>
+        <div class="mt-3 ns-modal-btn-container">
+            <button type="button" class="ns-modal-cancel-btn">Ok</button>
+        </div>
+        `;
+    }
+
+    constructor(app, type, title, message, isHTMLMessage=false) {
+        super(app, COMPONENT_TYPE_MODAL);
+        this.m_type = type;
+        this.title = title;
+        this.message = message;
+        this.isHTMLMessage = isHTMLMessage;
+    }
+    build(parent) {
+        super.build(parent);
+        let btn = parent.querySelector('.ns-modal-cancel-btn');
+        switch (this.m_type) {
+            case TYPE_ERROR:
+                btn.style.backgroundColor = '#dc3545';
+                break;
+            case TYPE_INFO:
+                btn.style.backgroundColor = '#0dcaf0';
+                break;
+            case TYPE_WARN:
+                btn.style.backgroundColor = '#ffc107';
+                break;
+            case TYPE_SUCCESS:
+            default:
+                btn.style.backgroundColor = '#198754';
+                break;
+        }
+    }
+
+}
+
+class Toast extends Component {
+
+    m_type;
+    title;
+    message;
+    isHTMLMessage;
+    autoClose;
+    toast;
+    timeoutID = null;
+
+    constructor(app, title, type, message, isHTMLMessage = false, autoClose=600) {
+        super(app, COMPONENT_TYPE_TOAST);
+        this.m_type = type;
+        this.title = title;
+        this.message = message;
+        this.isHTMLMessage = isHTMLMessage;
+        this.autoClose = autoClose;
+    }
+
+
+    build(parent) {
+        this.toast = create('div', null, parent, 'ns-toast', "ns-text-black");
+        const header = create('div', null, this.toast, 'ns-toast-header');
+        const status = create('div', null, header, 'ns-toast-status');
+        switch (this.m_type) {
+            case TYPE_ERROR:
+                status.style.backgroundColor = '#dc3545';
+                break;
+            case TYPE_INFO:
+                status.style.backgroundColor = '#0dcaf0';
+                break;
+            case TYPE_WARN:
+                status.style.backgroundColor = '#ffc107';
+                break;
+            case TYPE_SUCCESS:
+            default:
+                status.style.backgroundColor = '#198754';
+                break;
+        }
+
+        create('strong', null, header).innerText = this.title;
+        const close = create('button', null, header, 'btn-close');
+        close.addEventListener("click", ((ev) => {
+            if (this.timeoutID !== null) clearTimeout(this.timeoutID);
+            this.destroy();
+        }).bind(this));
+
+        if (this.autoClose >= 0) {
+            this.timeoutID = setTimeout((toast) => {
+                toast.timeoutID = null;
+                toast.destroy();
+            }, this.autoClose * 1000, this)
+        }
+
+        const footer = create('div', null, this.toast, 'ns-toast-footer');
+        if (this.isHTMLMessage)
+            footer.innerHTML = this.message;
+        else
+            footer.innerText = this.message;
+    }
+
+    destroy() {
+        super.destroy();
+        if (this.timeoutID !== null) clearTimeout(this.timeoutID);
+        this.toast.remove();
+    }
+}
+
 class LoadingScreen extends Component {
 
     screen;
@@ -498,12 +619,19 @@ class LoadingScreen extends Component {
 
     switchState(enable) {
         this.screen.style.display = enable ? '' : 'none';
+        if (enable) {
+            this.progress = null;
+            this.text = '';
+        }
     }
 
     set progress(value) {
-        if (this.progressDiv.style.display === 'none')
-            this.progressDiv.style.display = '';
-        this.progressBar.style.width = value + '%';
+        if (value === null) this.progressDiv.style.display = 'none';
+        else  {
+            if (this.progressDiv.style.display === 'none')
+                this.progressDiv.style.display = '';
+            this.progressBar.style.width = value + '%';
+        }
     }
 
     set text(value) {
@@ -616,6 +744,15 @@ class Application extends EventTarget {
             }).bind(this))
         }
         this.modal.style.display = 'flex';
+    }
+
+    openInfoModal(type, title, message, isHtmlMessage=false) {
+        this.openModal(new InfoModal(this, type, title, message, isHtmlMessage));
+    }
+
+    createToast(type, title, message, isHtmlMessage=false, autoClose=600) {
+        let toast = new Toast(this, title, type, message, isHtmlMessage, autoClose);
+        toast.build(_('#ns-toast-container'));
     }
 
     closeModal() {
@@ -940,84 +1077,6 @@ class Captcha extends Component {
         return split.join(':');
     }
 }
-
-// const TOAST_SUCCESS = 0;
-// const TOAST_INFO = 1;
-// const TOAST_WARN = 2;
-// const TOAST_ERROR = 3;
-//
-//
-// // todo : redo
-// function loadToastSession() {
-//     const session = sessionStorage.getItem('ns-toast');
-//     if (session) {
-//         const toasts = JSON.parse(session);
-//         for (let key of Object.keys(toasts)) {
-//             createToastOPT(toasts[key], key);
-//         }
-//     }
-// }
-//
-// function createToastOPT(opt, uuid=null) {
-//     createToast(opt.title, opt.type, opt.message, opt.html || false, uuid);
-// }
-//
-// function createToast(title, type, message, html = false, uuid=null) {
-//     if (!uuid) {
-//         uuid = uuidv4();
-//         const opt = {
-//             "title": title,
-//             "type": type,
-//             "message": message
-//         }
-//         if (html) opt["html"] = true;
-//
-//         const session = JSON.parse(sessionStorage.getItem('ns-toast') || "{}");
-//         session[uuid] = opt;
-//         sessionStorage.setItem('ns-toast', JSON.stringify(session));
-//     }
-//
-//     let container = _('#ns-toast-container');
-//     if (!container) {
-//         container = create('div', 'ns-toast-container', document.body, 'ns-toast-container-style')
-//     }
-//
-//     const toast = create('div', null, container, 'ns-toast', "ns-text-black");
-//     const header = create('div', null, toast, 'ns-toast-header');
-//     const status = create('div', null, header, 'ns-toast-status');
-//     switch (type) {
-//         case TOAST_ERROR:
-//             status.style.backgroundColor = '#dc3545';
-//             break;
-//         case TOAST_INFO:
-//             status.style.backgroundColor = '#0dcaf0';
-//             break;
-//         case TOAST_WARN:
-//             status.style.backgroundColor = '#ffc107';
-//             break;
-//         case TOAST_SUCCESS:
-//         default:
-//             status.style.backgroundColor = '#198754';
-//             break;
-//     }
-//     create('strong', null, header).innerText = title;
-//     const close = create('button', null, header, 'btn-close');
-//     close.ariaLabel = 'closeLabel';
-//     close.id = uuid;
-//     close.addEventListener("click", (ev) => {
-//         ev.target.closest('.ns-toast').remove();
-//         const session = JSON.parse(sessionStorage.getItem('ns-toast') || "{}");
-//         if (session) {
-//             delete session[ev.target.id];
-//             sessionStorage.setItem('ns-toast', JSON.stringify(session));
-//         }
-//     });
-//     const footer = create('div', null, toast, 'ns-toast-footer');
-//     if (html)
-//         footer.innerHTML = message;
-//     else
-//         footer.innerText = message;
-// }
 
 //This function get the path of an image with its ID
 //String.prototype.substr() is deprecated and is not in web standard anymore

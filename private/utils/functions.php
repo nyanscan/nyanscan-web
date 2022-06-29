@@ -84,7 +84,7 @@ function concatenate_array_by_prefix($array, $prefix): array {
 }
 
 function download_file_from_post($from_name, $dest_path, $max_size=5e5)  {
-    if (empty($_FILES[$from_name])) {
+    if (empty($_FILES[$from_name]) || empty($_FILES[$from_name]["name"])) {
         return -1;
     }
     if ($_FILES[$from_name]["size"] > $max_size) {

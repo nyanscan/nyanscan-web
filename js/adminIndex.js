@@ -32,7 +32,7 @@ class Header extends Component {
     }
 
     constructor(app) {
-        super(app, COMPONENT_TYPE_FOOTER);
+        super(app, COMPONENT_TYPE_HEADER);
     }
 
 }

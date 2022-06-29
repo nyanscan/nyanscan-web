@@ -6,10 +6,13 @@ function invokeProject($method, $function, $query) {
             if ($function[0] === 'create') {
                 _new_project();
             }
-            if ($function[0] === 'validation') {
+	        if ($function[0] === 'edit') {
+		        _edit_project();
+	        }
+            else if ($function[0] === 'validation') {
                 _change_status_project();
             }
-            if ($function[0] === 'volume') {
+            else if ($function[0] === 'volume') {
                 _new_volume();
             }
         } elseif (count($function) === 2) {
@@ -94,6 +97,31 @@ function fetch_index() {
     success($data);
 }
 
+function __get_project_image(&$error, $title) {
+	$img = download_image_from_post("picture", [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 1e6);
+	if (is_numeric($img)) {
+		switch ($img) {
+			case -1:
+				$error[] = "Pas de vignette";
+				break;
+			case -2:
+				$error[] = "Vignette trop lourde max 500Ko";
+				break;
+			default:
+				json_exit(500, "Uploading error", "unknow");
+				break;
+		}
+		return null;
+	} else {
+		$img->resize(444, 630);
+		$img->set_author(get_log_user()->getId());
+		$img->set_title("Image pour le projet " . substr($title, 0, 24) . '...');
+		$img->add_logo();
+		$img->save();
+		return $img;
+	}
+}
+
 /**
  * @throws Exception
  */
@@ -114,7 +142,7 @@ function _new_project() {
 
     $error = [];
 
-    if ($title === null || strlen($title) < 1 || strlen($title) > 100) {
+    if ($title === null || strlen($title) < 2 || strlen($title) > 100) {
         $error[] = "Titre invalide.";
     }
     if ($format === null || ($format != '1' && $format != '2')) {
@@ -128,40 +156,73 @@ function _new_project() {
     }
 
     if (empty($error)) {
-        $img = download_image_from_post("picture", [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 1e6);
-        if (is_numeric($img)) {
-            switch ($img) {
-                case -1:
-                    $error[] = "Pas de vignette";
-                    break;
-                case -2:
-                    $error[] = "Vignette trop lourde max 500Ko";
-                    break;
-                default:
-                    json_exit(500, "Uploading error", "unknow");
-                    break;
-            }
-        } else {
-            $img->resize(444, 630);
-            $img->set_author($user->getId());
-            $img->set_title("Image pour le projet " . substr($title, 0, 24) . '...');
-            $img->add_logo();
-            $img->save();
-            getDB()->insert(TABLE_PROJECT, [
-                "author" => $user->getId(),
-                "picture" => $img->get_id(),
-                "title" => $title,
-                "description" => $description,
-                "reading_direction" => $direction,
-                "format" => $format,
-                "status" => PROJECT_STATUS_WAIT_VERIFICATION
-            ]);
-        }
+		$img = __get_project_image($error, $title);
+		if ($img !== null) {
+			getDB()->insert(TABLE_PROJECT, [
+				"author" => $user->getId(),
+				"picture" => $img->get_id(),
+				"title" => $title,
+				"description" => $description,
+				"reading_direction" => $direction,
+				"format" => $format,
+				"status" => PROJECT_STATUS_WAIT_VERIFICATION
+			]);
+		}
     }
     if (count($error) > 0) {
         bad_request($error);
     }
     success();
+}
+
+function _edit_project() {
+	$user = get_log_user();
+	$title = $_POST["title"] ?? null;
+	$direction = $_POST["direction"] ?? null;
+	$description = $_POST["description"] ?? null;
+	$project = $_POST["project"] ?? null;
+
+	$error = [];
+
+	if ($title === null || strlen($title) < 2 || strlen($title) > 100) {
+		$error[] = "Titre invalide.";
+	}
+	if ($direction === null || ($direction != '1' && $direction != '2')) {
+		$error[] = "Sens de lecture invalide.";
+	}
+	if ($description === null || strlen($title) < 1 || strlen($title) > 2000) {
+		$error[] = "Description trop longue (2000 max.) ou inexistante.";
+	}
+
+	if ($project === null) $error[] = 'Projet invalide';
+	else {
+		$projectDB = getDB()->select(TABLE_PROJECT, ['author'], ['id' => $project], 1);
+		if (!$projectDB) $error[] = 'Projet invalide';
+		if ($user->getId() !== $projectDB['author'] && $user->get_permission_level() < PERMISSION_MODERATOR) unauthorized();
+	}
+
+	if (empty($error)) {
+		if (!empty($_FILES['picture']) && !empty($_FILES['picture']['name'])) {
+			$img = __get_project_image($error, $title);
+			if ($img !== null) {
+				getDB()->update(TABLE_PROJECT, [
+					"picture" => $img->get_id(),
+					"title" => $title,
+					"description" => $description,
+					"reading_direction" => $direction
+				], ['id' => $project]);
+			}
+		} else {
+			getDB()->update(TABLE_PROJECT, [
+				"title" => $title,
+				"description" => $description,
+				"reading_direction" => $direction,
+			], ['id' => $project]);
+		}
+	}
+
+	if (!empty($error)) bad_request($error);
+	success();
 }
 
 function _fetch_user_projects($userId) {
@@ -410,15 +471,12 @@ function _new_volume() {
 
     $error = [];
 
-    if ($title === null || strlen($title) < 1 || strlen($title) > 100) {
+    if ($title === null || strlen($title) < 2 || strlen($title) > 100) {
         $error[] = "Titre invalide.";
     }
     if (!is_numeric($volume) || $volume < 0) {
         $error[] = "Le volume n'est pas valide.";
     }
-    /*if (!is_numeric($page_count) || $page_count < 0) {
-        $error[] = "Le nombre de page n'est pas valide";
-    }*/
     if (!isset($_FILES["picture"])) {
         $error[] = "Une vignette est requise.";
     }

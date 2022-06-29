@@ -187,7 +187,7 @@ class Header extends Component {
     }
 
     constructor(app) {
-        super(app, COMPONENT_TYPE_FOOTER);
+        super(app, COMPONENT_TYPE_HEADER);
         app.addEventListener('log', this.updateLogStatus.bind(this));
         app.addEventListener('logout', this.updateLogStatus.bind(this));
     }
