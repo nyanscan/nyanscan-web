@@ -14,6 +14,13 @@ function invokeUser($method, $function, $query) {
                 case 'permission': _admin_change_permission(); break;
                 default: break;
             }
+        } elseif (count($function) === 2 && $function[0] === "edit") {
+			switch ($function[1]) {
+				case 'email': _change_user_email(); break;
+				case 'pseudo': _change_user_pseudo(); break;
+				case 'birthday': _change_user_birthday(); break;
+				case 'password': _change_user_password(); break;
+			}
         }
     } else {
         bad_method();
@@ -67,6 +74,76 @@ function _get_user($userid, $query) {
     }
 
     success($data);
+}
+
+function __check_password_for_edit() {
+	$user = get_log_user();
+	if (!$user->is_connected()) unauthorized();
+	$current_password = $_POST['password-c']??null;
+	if ($current_password === null || !$user->is_valid_password($current_password)) bad_request('Mot de passe actuelle invalide');
+}
+
+function _change_user_email() {
+
+	__check_password_for_edit();
+
+	$email = $_POST['email']??null;
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) bad_request("Format d'e-mail invalide.");
+
+	$verification_token = createMD5Token();
+	$token_2 = createMD5Token();
+	// delete old verification
+	getDB()->delete(TABLE_VERIFICATION, ["user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_EMAIL_CHANGE]);
+	getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_EMAIL_CHANGE, "token" => $token_2, "value" => $email]);
+	send_password_change_verification($token_2, $user->getId(), $user->getEmail(), $user->getUsername());
+	success();
+}
+
+function _change_user_pseudo() {
+	__check_password_for_edit();
+	$pseudo = $_POST['pseudo']??null;
+	if ($pseudo === null || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $pseudo))
+		bad_request("Le pseudo ne peut contenir que des minuscules, majuscules, chiffres ou un \"_\" avec une longueur maximale de 20 caractères.");
+
+	getDB()->update(TABLE_USER, ['username' => $pseudo], ['id' => get_log_user()->getId()]);
+	success();
+}
+
+function _change_user_birthday() {
+	__check_password_for_edit();
+	$birthday = $_POST['birthday']??null;
+
+	$birthdayExploded = explode("-", $birthday);
+	if( count($birthdayExploded)!=3 || !checkdate($birthdayExploded[1], $birthdayExploded[2], $birthdayExploded[0]) ){
+		bad_request("Date de naissance incorrecte.");
+	}else{
+		$age = (time() - strtotime($birthday))/60/60/24/365.25;
+		if($age<13 || $age>100){
+			bad_request("Date de naissance hors borne.");
+		}
+	}
+
+	getDB()->update(TABLE_USER, ['birthday' => $birthday], ['id' => get_log_user()->getId()]);
+	success();
+}
+
+function _change_user_password() {
+	__check_password_for_edit();
+	$user = get_log_user();
+	$new_password = $_POST['password']??null;
+	$new_password_verification = $_POST['password-v']??null;
+
+	if ($new_password === null || $new_password_verification === null) bad_request('Formulaire incomplet');
+	if ($new_password !== $new_password_verification) bad_request('Les mots de passes ne coresponde pas');
+	if (strlen($new_password) < 8 || strlen($new_password) > 60) bad_request("Le mots de passe doit contenir au minimum 8 caractères et au maximum 60 caractères");
+
+	$verification_token = createMD5Token();
+	$token_2 = createMD5Token();
+	// delete old verification
+	getDB()->delete(TABLE_VERIFICATION, ["user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_PASSWORD_CHANGE]);
+	getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_PASSWORD_CHANGE, "token" => $token_2, "value" => password_hash($new_password, PASSWORD_DEFAULT)]);
+	send_password_change_verification($token_2, $user->getId(), $user->getEmail(), $user->getUsername());
+	success();
 }
 
 /**

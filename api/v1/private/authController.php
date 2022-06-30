@@ -101,8 +101,8 @@ function _register() {
         if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $username)) {
             $errors[] = "Le pseudo ne peut contenir que des minuscules, majuscules, chiffres ou un \"_\" avec une longueur maximale de 20 caractères.";
         }
-        if (strlen($password) < 8) {
-            $errors[] = "Le mots de passe doit contenir au minimum 8 caractères";
+        if (strlen($password) < 8 || strlen($password) > 60) {
+            $errors[] = "Le mots de passe doit contenir au minimum 8 caractères et au maximum 60 caractères";
         }
         if ($password !== $password_v) {
             $errors[] = "Les mots de passes ne correspondent pas !";

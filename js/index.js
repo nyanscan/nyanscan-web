@@ -248,10 +248,7 @@ class Index extends Pages {
         <section class="ns-theme-bg py-5">
             <div class="ns-carousel">
                 <div class="ns-carousel-images">
-                    <img src="/res/banner/b1.jpg" alt="">
-                    <img src="/res/banner/b2.jpg" alt="">
-                    <img src="/res/banner/b3.jpeg" alt="">
-                    <img src="/res/banner/b1.jpg" alt="">
+                  
                 </div>
                 <div class="ns-carousel-points">
                 
@@ -326,7 +323,18 @@ class Index extends Pages {
 
     build(parent, vars) {
         super.build(parent, vars);
-        setupCarousel(_('.ns-carousel', true));
+        const carousel = _('.ns-carousel', true);
+        const carousel_img = carousel.querySelector('.ns-carousel-images');
+        sendApiGetFetch('carousel').then(d => {
+            d.forEach(v => {
+                const img = create('img', null, carousel_img);
+                img.src = image_id_to_path(v.picture);
+                if (v.title !== null) img.ariaLabel = v.title;
+                if (v.href !== null) img.c_href = v.href;
+            })
+            setupCarousel(carousel);
+        })
+
 
         this.data = _('#ns-index-data');
         const join = _('#ns-index-join');

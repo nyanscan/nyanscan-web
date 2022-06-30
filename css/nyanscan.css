@@ -41,6 +41,7 @@ body {
 
 .ns-carousel .ns-carousel-2 {
     z-index: 5;
+    transform: none !important;
 }
 
 .ns-carousel .ns-carousel-3 {
