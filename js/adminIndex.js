@@ -14,7 +14,8 @@ class Header extends Component {
                     <ns-a class="c-nav-link" aria-current="page" href="/" aria-label="home" title="Home"><i class="bi bi-house"></i></ns-a>
                     <ns-a class="c-nav-link" href="/event" aria-label="switch" title="Switch"><i class="bi bi-book"></i></ns-a>
                     <ns-a class="c-nav-link" href="/volume" aria-label="device" title="Device"><i class="bi bi-file-earmark-break"></i></ns-a>
-                    <ns-a class="c-nav-link" href="/image" aria-label="user" title="User"><i class="bi bi-image"></i></ns-a>
+                    <ns-a class="c-nav-link" href="/picture" aria-label="picture" title="Image"><i class="bi bi-image"></i></ns-a>
+                    <ns-a class="c-nav-link" href="/carousel" aria-label="carousel" title="Caroussel"><i class="bi bi-window-stack"></i></ns-a>
                     <ns-a class="c-nav-link" href="/users" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
                     <ns-a class="c-nav-link" href="/log-root" aria-label="log" title="Log"><i class="bi bi-journal"></i></ns-a>
                 </div>
@@ -47,7 +48,7 @@ class Index extends Pages {
                     <span>
                     
                     </span>
-                    <ns-a class="content" href="project">
+                    <ns-a class="content" href="/project">
                         <i class="bi bi-book"></i>
                         <ns-api-data field="project">0</ns-api-data>
                         <h3>Projet</h3>
@@ -57,7 +58,7 @@ class Index extends Pages {
                     <span>
                     
                     </span>
-                    <ns-a class="content" href="volume">
+                    <ns-a class="content" href="/volume">
                         <i class="bi bi-file-earmark-break"></i>
                         <ns-api-data field="volume">0</ns-api-data>
                         <h3>Volumes</h3>
@@ -67,10 +68,18 @@ class Index extends Pages {
                     <span>
                     
                     </span>
-                    <ns-a class="content" href="device">
+                    <ns-a class="content" href="/picture">
                         <i class="bi bi-image"></i>
                         <ns-api-data field="picture">0</ns-api-data>
                         <h3>Image</h3>
+                    </ns-a>
+                </div>
+                 <div class="box" style="--color-one: #ad4c4c; --color-two: #d11d1d">
+                    <span></span>
+                    <ns-a class="content" href="/carousel">
+                        <i class="bi bi-window-stack"></i>
+                        <ns-api-data field="carousel">0</ns-api-data>
+                        <h3>Caroussel</h3>
                     </ns-a>
                 </div>
                 <div class="box" style="--color-one: #4C6CAD; --color-two: #1D59D1">
@@ -132,6 +141,14 @@ const STRUCTURE = [
     {
         re: /^users$/,
         rel: "admin/users"
+    },
+    {
+        re: /^picture$/,
+        rel: "admin/picture"
+    },
+    {
+        re: /^carousel$/,
+        rel: "admin/carousel"
     }
 ]
 

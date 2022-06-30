@@ -28,6 +28,8 @@ class AdminTable extends Component {
     colCallback;
     createLink;
 
+    createBTN;
+
     get raw() {
         return `
         <div class="ns-adm-table">
@@ -50,7 +52,7 @@ class AdminTable extends Component {
                     </div>
                     <button type="button" class="ns-table-next"">Suivant</button>
                 </nav>
-                ${this.createLink ? `<a href="${this.createLink}" class="device-view-settings-add"><i class="bi bi-plus-circle"></i> Create</a>` : '' }
+                ${this.getCreateHtml()}
                 <div class="ns-adm-table-total-amount">
                     <span id="${this.id}-table-total-amount"></span>
                 </div>
@@ -68,6 +70,15 @@ class AdminTable extends Component {
             </ns-api-data-block>
         </div>
         `;
+    }
+
+    getCreateHtml() {
+        if (this.createLink === null) return '';
+        if (typeof this.createLink === 'object') {
+            if (this.createLink.href !== undefined) return `<ns-a href="${this.createLink.href}" class="ns-adm-table-settings-add"><i class="bi bi-plus-circle"></i> Nouveu </ns-a>`;
+            else if (this.createLink.isBtn === true) return `<button id="${this.id}-add-btn" class="ns-adm-table-settings-add"><i class="bi bi-plus-circle"></i> Nouveu </button>`
+            else return '';
+        } else return `<ns-a href="${this.createLink}" class="ns-adm-table-settings-add"><i class="bi bi-plus-circle"></i> Nouveu </ns-a>`;
     }
 
     constructor(app, id, colum, baseURL, colCallback, createLink=null) {
@@ -94,6 +105,7 @@ class AdminTable extends Component {
         this.selectAmount = _('#' + this.id + '-table-select-amount');
         this.selectAmount.addEventListener('change', this.updateAmount.bind(this));
         this.search = _('#' + this.id + '-table-search');
+        this.createBTN = _('#' + this.id + '-add-btn');
         _('#' + this.id + '-table-refresh').addEventListener('click', ((e) => {
             e.preventDefault();
             this.refresh();
