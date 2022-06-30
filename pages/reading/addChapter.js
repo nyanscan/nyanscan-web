@@ -22,7 +22,7 @@ export default class extends Pages {
             
             </div>
             <ns-api-data-block id="ns-p-edit-block" href="project/${this.id}">
-            <h1 class="ns-text-red ns-fs-1 my-3 ns-container bg-none">Edtition de <ns-api-data field="title"></ns-api-data></h1>
+            <h1 class="ns-text-red ns-fs-1 my-3 ns-container bg-none" style="filter: none !important;">Edtition de <ns-api-data field="title"></ns-api-data></h1>
             <form id="ns-p-edit-form">
                 <input type="hidden" hidden="hidden" name="project" value="${this.id}">
                 <div class="ns-container">
@@ -42,9 +42,9 @@ export default class extends Pages {
                             <textarea class="ns-fs-5" id="ns-pr-desc-edit" rows="5" name="description"></textarea>
                             <div class="ns-form-group mt-3">
                                 <select id="ns-publish-direction" name="direction" class="form-select">
-                                <option value="1" selected>De droite à gauche (japonais)</option>
-                                <option value="2">De gauche à droite (Classique)</option>
-                            </select>
+                                    <option value="1">De droite à gauche (japonais)</option>
+                                    <option value="2">De gauche à droite (Classique)</option>
+                                </select>
                             <div class="form-text">Dans quel sens les pages vont être tournées</div>
                             </div>
                             <button type="submit" class="btn ns-tickle-pink-btn ns-form-pink"> Enregistrer la modification</button>
@@ -141,6 +141,9 @@ export default class extends Pages {
         console.log(this.block.rawData.description);
         this.projectPreviewImage.src = image_id_to_path(this.block.rawData.picture);
         _('#ns-pr-desc-edit').value = this.block.rawData.description;
+        if (this.block.rawData.reading_direction === '1')
+            _('#ns-publish-direction').firstElementChild.selected = true;
+        else _('#ns-publish-direction').lastElementChild.selected = true;
     }
 
     checkAPIErr() {
@@ -209,12 +212,10 @@ export default class extends Pages {
             this.app.changePage('/p/' + this.id);
         } else if ($repStatus === API_REP_BAD) {
             const err = getAPIErrorReason(event);
-
             this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', err.map(e => `<p>${e}</p>`), true);
 
         } else {
-            //todo warn
-            console.warn('error upload');
+            this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', 'Erreur d\'upload verifier votre connexion');
         }
     }
 

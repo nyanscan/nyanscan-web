@@ -25,25 +25,24 @@ export default class extends Pages {
             </div>
             <div class="ns-center ns-text-black">
                 <form id="ns-publish-form" class="ns-categ-topic my-5">
-                    <div>
+                    <div class="d-flex flex-row flex-wrap justify-content-center gap-5 align-items-center">
+                        <div class="ns-project-picture-edit">
+                               <canvas id="ns-publish-preview" width="296" height="420"></canvas>
+                               <label>
+                                    <i class="b bi-plus-circle"></i>
+                                    <input id="ns-publish-picture" type="file" name="picture" accept="image/png,image/jpeg">
+                                </label>
+                        </div>  
                         <div>
-                            <u>Vignette du manga</u>
+                            <u>Vignette de la page du tome</u>
                             <div>
-                                Ratio: 8/6 <br>
+                                Ration: 8/6 <br>
                                 Format : JPG ou GIF<br>
                                 Poids : 500Ko max.
                             </div>
-                            <p>
-                                Celle-ci représentera votre projet sur Nyanscan. C'est ce que les lecteurs verront en premier avant de le découvrir !
+                            <p style="max-width: 550px">
+                                Celle-ci représentera le manga sur Nyanscan, c'est ce que les lecteurs verront en premier avant de le lire !
                             </p>
-                        </div>
-                        <div>
-                            <div  style="width: 180px;height: 240px;overflow: hidden" class="ns-picture-preview">
-                                <canvas id="ns-publish-preview" width="180" height="240"></canvas>
-                            </div>
-                        </div>
-                        <div class="my-3">
-                            <input id="ns-publish-picture" type="file" name="picture" accept="image/png,image/jpeg">
                         </div>
                     </div>
                     <div>
@@ -98,7 +97,7 @@ export default class extends Pages {
         this.previewImage = new Image();
 
         this.previewImage.onload = (function () {
-            this.previewCTX.drawImage(this.previewImage, 0, 0, 180, 240);
+            this.previewCTX.drawImage(this.previewImage, 0, 0, 296, 420);
         }).bind(this);
 
         this.publishForm.addEventListener('submit', this.send.bind(this));
@@ -109,20 +108,15 @@ export default class extends Pages {
         if(this.pictureInput.files) {
             const file = this.pictureInput.files[0];
             if (file.type === 'image/png' || file.type === 'image/jpeg') {
-                console.log(file.size);
                 if (file.size <= 1e6) {
-                    window.URL = window.URL || window.webkitURL;
-                    this.pictureURL = window.URL.createObjectURL(file);
-                    this.previewImage.src = this.pictureURL;
+                    this.previewImage.src = window.URL.createObjectURL(file);
                 } else {
-                    // todo warn
                     this.pictureInput.value = '';
-                    console.warn('too heavy');
+                    this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image à un poid limite de 1Mo !');
                 }
             } else {
-                //todo warn
                 this.pictureInput.value = '';
-                console.warn('invalid format');
+                this.app.openInfoModal(TYPE_ERROR, 'Upload image invalide', 'L\'image dois être en png ou jpg !');
             }
         } else {
             this.previewImage.src = '';
@@ -138,19 +132,13 @@ export default class extends Pages {
     sendCallback(event) {
         const $repStatus = checkApiResStatus(event);
         if ($repStatus === API_REP_OK) {
-            // todo: toast
-            // todo: change to list
+            this.app.createToast(TYPE_SUCCESS, 'Project', 'Le projet à bien était créé')
             this.app.changePage('/');
         } else if ($repStatus === API_REP_BAD) {
             const err = getAPIErrorReason(event);
-            this.errorBlock.innerHTML = '';
-            this.errorBlock.style.display = 'block';
-            for (let errElement of err) {
-                createPromise('p', null, this.errorBlock).then(e => e.innerText = errElement);
-            }
+            this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', err.map(e => `<p>${e}</p>`), true);
         } else {
-            //todo warn
-            console.warn('error upload');
+            this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', 'Erreur d\'upload verifier votre connexion');
         }
     }
 

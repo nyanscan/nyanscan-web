@@ -88,6 +88,7 @@ function fetch_index() {
     $data = [];
     // todo: change
     $data["last"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
+
     $data["fame"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
     $data["love"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'title'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
 
@@ -243,7 +244,7 @@ function _fetch_user_projects($userId) {
 }
 
 function _fetch_project($id) {
-    $project = getDB()->select(TABLE_PROJECT, ["id", "author", "picture", "title", "description", "format", "status", "date_inserted"],
+    $project = getDB()->select(TABLE_PROJECT, ["id", "author", "picture", "title", "description", "format", "status", 'reading_direction', "date_inserted"],
         ["id" => $id], 1);
     if (!$project) {
         bad_method();
