@@ -113,7 +113,7 @@ function sendApiDeleteRequest(url, callBack = null, progressCallBack = null) {
  */
 function sendApiRequest(method, url, callBack, progressCallBack = undefined, sendItem = undefined) {
     const ajax = new XMLHttpRequest()
-    ajax.open(method, '/api/v1/' + url, true);
+    ajax.open(method, `${window.location.protocol}//api.${window.domaine}/v1/${url}`, true);
     let auth = window.APP.user.authorization;
     if (auth !== null) ajax.setRequestHeader('Authorization', auth );
 
@@ -156,7 +156,7 @@ function sendApiFetch(url, body, method) {
 
     if (auth === null) delete header.Authorization;
     // if (body !== null) header['Content-Type'] = 'application/x-www-form-urlencoded'
-    return fetch(new Request('/api/v1/' + url, {
+    return fetch(new Request(`${window.location.protocol}//api.${window.domaine}/v1/${url}`, {
         method: method,
         headers: new Headers(header),
         body: body,
@@ -668,6 +668,9 @@ class Application extends EventTarget {
 
     constructor(header, footer, index, err404, structure, prefix = '') {
         super()
+        let host = window.location.hostname;
+        if (host.endsWith('localhost')) window.domaine = 'localhost';
+        else window.domaine = host.split(/\./g).slice(-2).join('.');
         this.prefix = prefix;
         this.structure = structure;
         this.header = new header(this);
@@ -1084,7 +1087,7 @@ class Captcha extends Component {
 function image_id_to_path(id) {
     const format = id.substring(0, 1);
     const ext = '.' + ({'w': 'webp', 'p': 'png', 'j': 'jpg', 'g': 'gif', 'n': ''}[format]);
-    return `/picture/${id.substring(0, 5)}/${id.substring(5)}${ext}`
+    return `${window.location.protocol}//res.${window.domaine}/picture/${id.substring(0, 5)}/${id.substring(5)}${ext}`
 }
 
 //Return a html span with message from the status of a project

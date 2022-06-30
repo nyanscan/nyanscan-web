@@ -1,5 +1,5 @@
 <?php
-require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/functions.php');
+require('functions.php');
 
 function delete_category($id) : bool {
     return getDB()->delete(TABLE_FORUM_CATEGORY, ["id" => $id]);

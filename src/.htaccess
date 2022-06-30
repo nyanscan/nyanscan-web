@@ -1,22 +1,12 @@
 ErrorDocument 404 /index.html/404
 ErrorDocument 403 /index.html/404
 
-<FilesMatch "^composer\.">
-Order allow,deny
-Deny from all
-</FilesMatch>
+Options All -Indexes
 
 <FilesMatch "^\.">
 Order allow,deny
 Deny from all
 </FilesMatch>
-
-<FilesMatch ".http$">
-Order allow,deny
-Deny from all
-</FilesMatch>
-
-Options All -Indexes
 
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f

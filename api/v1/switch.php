@@ -4,9 +4,19 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/forum.php');
-require($_SERVER['DOCUMENT_ROOT'] . '/private/utils/mailer.php');
-require($_SERVER['DOCUMENT_ROOT'] . '/private/captchaUtils.php');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, PUT, OPTIONS');
+header('Access-Control-Allow-Headers: *');
+header('Access-Control-Max-Age: 300');
+
+$method = strtoupper($_SERVER["REQUEST_METHOD"]);
+if ($method === "OPTIONS") exit(200);
+
+require(__DIR__ . '/../../private/utils/forum.php');
+require(__DIR__ . '/../../private/utils/mailer.php');
+require(__DIR__ . '/../../private/captchaUtils.php');
+
+
 
 include __DIR__ . '/private/forumController.php';
 include __DIR__ . '/private/authController.php';
@@ -104,10 +114,10 @@ function admin_fetch($table, $col, $query, $primary, $search_col=[]) {
 register_shutdown_function('my_error_handler');
 
 $uri = explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-$controller = $uri[3] ?? null;
-$function = array_slice($uri, 4);
+$controller = $uri[2] ?? null;
+$function = array_slice($uri, 3);
 parse_str($_SERVER['QUERY_STRING'], $query);
-$method = strtoupper($_SERVER["REQUEST_METHOD"]);
+
 
 
 if ($controller === 'analytic') {

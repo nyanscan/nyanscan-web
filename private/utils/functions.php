@@ -1,6 +1,6 @@
 <?php
 
-include $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+include __DIR__ . '/../../vendor/autoload.php';
 use Jcupitt\Vips;
 
 require 'config.php';
