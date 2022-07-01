@@ -113,7 +113,7 @@ function sendApiDeleteRequest(url, callBack = null, progressCallBack = null) {
  */
 function sendApiRequest(method, url, callBack, progressCallBack = undefined, sendItem = undefined) {
     const ajax = new XMLHttpRequest()
-    ajax.open(method, `${window.location.protocol}//api.${window.domaine}/v1/${url}`, true);
+    ajax.open(method, `/api/v1/${url}`, true);
     let auth = window.APP.user.authorization;
     if (auth !== null) ajax.setRequestHeader('Authorization', auth );
 
@@ -156,7 +156,7 @@ function sendApiFetch(url, body, method) {
 
     if (auth === null) delete header.Authorization;
     // if (body !== null) header['Content-Type'] = 'application/x-www-form-urlencoded'
-    return fetch(new Request(`${window.location.protocol}//api.${window.domaine}/v1/${url}`, {
+    return fetch(new Request(`/api/v1/${url}`, {
         method: method,
         headers: new Headers(header),
         body: body,

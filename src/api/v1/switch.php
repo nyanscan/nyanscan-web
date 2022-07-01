@@ -13,19 +13,19 @@ header('Access-Control-Max-Age: 300');
 $method = strtoupper($_SERVER["REQUEST_METHOD"]);
 if ($method === "OPTIONS") exit(200);
 
-require(__DIR__ . '/../../private/utils/forum.php');
-require(__DIR__ . '/../../private/utils/mailer.php');
-require(__DIR__ . '/../../private/captchaUtils.php');
+require(__DIR__ . '/../../../private/utils/forum.php');
+require(__DIR__ . '/../../../private/utils/mailer.php');
+require(__DIR__ . '/../../../private/captchaUtils.php');
 
 
 
-include __DIR__ . '/private/forumController.php';
-include __DIR__ . '/private/authController.php';
-include __DIR__ . '/private/userController.php';
-include __DIR__ . '/private/projectController.php';
-include __DIR__ . '/private/adminController.php';
-include __DIR__ . '/private/searchController.php';
-include __DIR__ . '/private/otherController.php';
+include __DIR__ . '/../../../private/api/forumController.php';
+include __DIR__ . '/../../../private/api/authController.php';
+include __DIR__ . '/../../../private/api/userController.php';
+include __DIR__ . '/../../../private/api/projectController.php';
+include __DIR__ . '/../../../private/api/adminController.php';
+include __DIR__ . '/../../../private/api/searchController.php';
+include __DIR__ . '/../../../private/api/otherController.php';
 
 function my_error_handler() {
     $last_error = error_get_last();
@@ -116,8 +116,8 @@ function admin_fetch($table, $col, $query, $primary, $search_col=[]) {
 register_shutdown_function('my_error_handler');
 
 $uri = explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-$controller = $uri[2] ?? null;
-$function = array_slice($uri, 3);
+$controller = $uri[3] ?? null;
+$function = array_slice($uri, 4);
 parse_str($_SERVER['QUERY_STRING'], $query);
 
 
