@@ -270,7 +270,7 @@ export default class extends Pages {
 
         const currentIMG = this.pages[this.page];
 
-        this.view.src = `${document.location.protocol}://res.${window.domaine}/volume/${currentIMG.substring(0, 3)}/${currentIMG.substring(3)}.webp`;
+        this.view.src = `${document.location.protocol}//res.${window.domaine}/volume/${currentIMG.substring(0, 3)}/${currentIMG.substring(3)}.webp`;
         this.cacheNext();
         if (!no_history)
             window.history.pushState("", "",  `${(this.app.prefix ? `/${this.app.prefix}/` : '/')}p/${this.project}/${this.volume}/${this.page}`);
@@ -283,7 +283,7 @@ export default class extends Pages {
     cacheNext() {
         for (let i = this.page + 1; i < this.page + 4 && i < this.maxPage; i++) {
             const currentIMG = this.pages[i];
-            this.preloadImage(`${document.location.protocol}://res.${window.domaine}/volume/${currentIMG.substring(0, 3)}/${currentIMG.substring(3)}.webp`);
+            this.preloadImage(`${document.location.protocol}//res.${window.domaine}/volume/${currentIMG.substring(0, 3)}/${currentIMG.substring(3)}.webp`);
         }
     }
 
