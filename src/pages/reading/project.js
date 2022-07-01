@@ -83,7 +83,7 @@ export default class extends Pages {
             clone.querySelector('.ns-pr-volume-img').src = image_id_to_path(volumes[volID]["picture"]);
             const user_page = this.data.rawData['volumes'][volID]['page'];
             if (user_page !== null)
-                clone.querySelector('.ns-pr-progress > div').style.width = `${Math.max(0, Math.min(100, (user_page / this.data.rawData['volumes'][volID]['page_count'])*100))}%`;
+                clone.querySelector('.ns-pr-progress > div').style.width = `${((n) => n > 95 ? 100 : n < 0 ? 0 : n) ((user_page / this.data.rawData['volumes'][volID]['page_count'])*100)}%`;
             container.appendChild(clone);
         }
         template.remove();

@@ -101,6 +101,7 @@ function _change_user_email() {
 
 function _change_user_pseudo() {
 	__check_password_for_edit();
+    // todo: check duplicate
 	$pseudo = $_POST['username']??null;
 	if ($pseudo === null || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $pseudo))
 		bad_request("Le pseudo ne peut contenir que des minuscules, majuscules, chiffres ou un \"_\" avec une longueur maximale de 20 caractères.");
