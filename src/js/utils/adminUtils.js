@@ -150,10 +150,14 @@ class AdminTable extends Component {
                     }
                 }
                 input.setAttribute('table_search_col', col.name);
-                if (col.hide) input.hidden = true;
+                if (col.hide) {
+                    input.hidden = true;
+                }
             }
         }
-        if (count === 0) this.search.style.display = 'none';
+        if (count === 0) {
+            this.search.style.display = 'none';
+        }
         else {
             this.search.addEventListener('submit', this.apply_filter.bind(this));
         }
@@ -207,8 +211,12 @@ class AdminTable extends Component {
             this.setup_row(raw_row, value, cpt);
             cpt++;
         }
-        if (this.pagination) this.updatePagination(this.block.rawData["total_count"]);
-        if (this.totalAmountSpan) this.totalAmountSpan.innerText = `Total: ${this.block.rawData["total_count"]}`;
+        if (this.pagination) {
+            this.updatePagination(this.block.rawData["total_count"]);
+        }
+        if (this.totalAmountSpan) {
+            this.totalAmountSpan.innerText = `Total: ${this.block.rawData["total_count"]}`;
+        }
     }
 
     setup_row(data, row, cpt) {
@@ -225,7 +233,9 @@ class AdminTable extends Component {
                     } else {
                         const anchor = create('a', null, e);
                         anchor.innerHTML = data[col.name]||col.default;
-                        if (data[col.name] !== undefined) anchor.href = col.href + data[col.name];
+                        if (data[col.name] !== undefined) {
+                            anchor.href = col.href + data[col.name];
+                        }
                     }
                 });
             }
@@ -286,8 +296,11 @@ class AdminTable extends Component {
 
     order(row) {
         if (this.order_v === row) {
-            if (this.reverse) this.order_v = '';
-            else this.reverse = true;
+            if (this.reverse) {
+                this.order_v = '';
+            } else {
+                this.reverse = true;
+            }
         }
         else {
             this.reverse = false;
@@ -303,18 +316,23 @@ class AdminTable extends Component {
     update() {
         let path = this.baseURL + '?';
         // const limit = 50;
-        if (this.vars) path += this.vars + '&';
+        if (this.vars) {
+            path += this.vars + '&';
+        }
         path += 'limit=' + this.amountView;
         path += '&offset=' + (this.amountView * this.page);
         for (let se in this.search_v) {
             if (se.length > 0)
             path += `&${se}=${encodeURI(this.search_v[se])}`;
         }
-        if (this.order_v) path += '&order=' + this.order_v;
-        if (this.reverse) path += '&reverse=1';
+        if (this.order_v) {
+            path += '&order=' + this.order_v;
+        }
+        if (this.reverse) {
+            path += '&reverse=1';
+        }
         this.block.href = path;
     }
-
 }
 
 class SimpleTablePages extends Pages {

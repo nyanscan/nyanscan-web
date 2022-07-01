@@ -102,7 +102,7 @@ body[ns-log-status=false] .ns-hide-disconnected {display: none !important;}
 .ns-burger {
     --ns-color-burger: var(--ns-color-paradise-pink);
     --ns-color-burger2: #d9647b;
-    --ns-size-burger: 40px;
+    --ns-size-burger: 32px;
     position: relative;
     width: var(--ns-size-burger);
     height: calc(var(--ns-size-burger) / 5);

@@ -93,6 +93,7 @@ export default class extends Pages {
 
             _("#pasword").value = '';
             _("#password-v").value = '';
+            //deprecated
             sendApiPostRequest('auth/register', fd, this.registerResult.bind(this));
         }
     }

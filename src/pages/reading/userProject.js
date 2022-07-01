@@ -13,7 +13,7 @@ export default class extends Pages {
             if (this.isSelf) {
                 html += `
                     <div>
-                        <span>Status: ${event_status_to_html(project.status)}</span>
+                        <span>Status: ${project_status_to_html(project.status)}</span>
                         <ns-a href="/p/${project["id"]}/edit">Edit</ns-a>
                     </div>
                 `;

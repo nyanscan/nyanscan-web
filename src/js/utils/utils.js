@@ -15,7 +15,7 @@ const TYPE_INFO = 1;
 const TYPE_WARN = 2;
 const TYPE_ERROR = 3;
 
-const VERSION = 'BETA-2.1.1';
+const VERSION = 'BETA-2.1.2';
 
 //Kind of a selector function :
 //to select html tag
@@ -135,19 +135,22 @@ function sendApiRequest(method, url, callBack, progressCallBack = undefined, sen
     }
 }
 
-
+//see deprecated one
 function sendApiPostFetch(url, fd) {
     return sendApiFetch(url, fd, "POST");
 }
 
+//see deprecated one
 function sendApiGetFetch(url) {
     return sendApiFetch( url, null, 'GET');
 }
 
+//see deprecated one
 function sendApiDeleteFetch(url) {
     return sendApiFetch( url, null, 'DELETE');
 }
 
+//see deprecated one
 function sendApiFetch(url, body, method) {
     let auth = window.APP.user.authorization;
     let header = {
@@ -210,7 +213,7 @@ function uuidv4() {
     );
 }
 
-  //Function that import fragment of a document into a document
+//Function that import fragment of a document into a document
 //with template that is a html element
 //return document fragment
 function importTemplate(template, vars, isString = false) {
@@ -246,10 +249,12 @@ class User {
     id = null;
     token = null;
 
+    //getting authorization with token and id here
     get authorization() {
         return (this.token !== null && this.id !== null) ? `${this.id} ${this.token}` : null;
     }
 
+    //TODO avatar
     get profile_picture() {
         return '/res/profile.webp';
     }
@@ -272,13 +277,14 @@ class User {
         if (needResetToken) localStorage.removeItem('token');
     }
 
+    //Storing token and id locally in client side
     setAuthorization(id, token) {
         this.id = id;
         this.token = token;
         localStorage.setItem('token', JSON.stringify({'id': id, 'token': token}));
     }
 
-    //to get log of the user
+    //to log user
     log() {
         if (this.token === null || this.id === null) {
             this.switchBodyLogValue(false);
@@ -307,7 +313,7 @@ class User {
         return this.isLog ? LOGIN_LEVEL_CONNECT : LOGIN_LEVEL_DISCONNECT;
     }
 
-    //Redirect on logout
+    //Redirect on logging out
     logout(redirectLogin) {
         localStorage.removeItem('token');
         this.switchBodyLogValue(false);
@@ -362,7 +368,7 @@ class Component {
 
 }
 
-//Creating base class pages from component
+//Creating base class pages from component that construct pages
 class Pages extends Component {
 
     app;
@@ -454,7 +460,7 @@ class Error404 extends Pages {
                             <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
                             <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>
                             <div class="w-100 ns-center py-2">
-                                <p>Retourner à la <ns-aa href="/" class="btn ns-btn-sm ns-tickle-pink-btn">page d'accueil</ns-aa></p>
+                                <p>Retourner à la <ns-a href="/" class="btn ns-btn-sm ns-tickle-pink-btn">page d'accueil</ns-a></p>
                             </div>
                         </div>
                     </div>
@@ -608,7 +614,6 @@ class LoadingScreen extends Component {
     }
 
     build(parent) {
-
         this.screen = create('div', 'ns-loading-screen', parent, 'ns-loading-screen-style');
         this.screen.style.display = 'none';
         this.screen.innerHTML = this.raw;
@@ -873,8 +878,9 @@ class Application extends EventTarget {
         const C = this.currentPages.constructor;
         console.log(this.currentPages);
         console.log(C);
-        if (C) this.loadPage(new C(this), this.currentVars);
-
+        if (C) {
+            this.loadPage(new C(this), this.currentVars);
+        }
     }
 
     setHeaderSticky(value) {
@@ -896,7 +902,6 @@ class Application extends EventTarget {
     fatalError() {
 
     }
-
 }
 
 //Creating the captcha
@@ -912,7 +917,7 @@ class Captcha extends Component {
                 <input id="captcha-id" type="hidden" name="captcha-id"">
                 <input class="captcha-input" type="hidden" name="captcha">
                 <div class="captcha-view">
-                    <img id="captcha-img" alt="captcha">
+                    <img id="captcha-img" alt="captcha" src="">
                 </div>
                 <div class="captcha-piece-storage">
                 
@@ -1096,16 +1101,32 @@ function image_id_to_path(id) {
 }
 
 //Return a html span with message from the status of a project
-function event_status_to_html($status) {
+function project_status_to_html($status) {
     switch ($status) {
         case '0':
-            return '<span class="project-status-wait">Attente de vérification</span>';
+            return '<span class="project-status-wait">En attente de vérification</span>';
         case '1':
             return '<span class="project-status-denied">Rejeté</span>';
         case '2':
-            return '<span class="project-status-accept">Accepté en attente de contenu</span>';
+            return '<span class="project-status-accept">Accepté, en attente de contenu</span>';
         case '3':
             return '<span class="project-status-publish">Publié</span>';
+        default:
+            return '';
+    }
+}
+
+//same as above but for event
+function event_status_to_html($status) {
+    switch ($status) {
+        case '0':
+            return '<span class="event-status-wait">En attente de vérification</span>';
+        case '1':
+            return '<span class="event-status-denied">Rejeté</span>';
+        case '2':
+            return '<span class="event-status-accept">Accepté, en attente de contenu</span>';
+        case '3':
+            return '<span class="event-status-publish">Publié</span>';
         default:
             return '';
     }
