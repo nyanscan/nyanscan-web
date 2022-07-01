@@ -129,7 +129,6 @@ export default class extends Pages {
 		}).bind(this);
 		
 		this.eventForm.addEventListener('submit', this.send.bind(this));
-		
 	}
 	
 	imagePreviewChange(event) {

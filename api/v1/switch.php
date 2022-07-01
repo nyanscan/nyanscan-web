@@ -135,7 +135,20 @@ switch ($controller) {
         if ($method === 'GET' && count($function) === 0) _get_captcha_settings();
         break;
     case 'project':
-        invokeProject($method, $function, $query); break;
+        try {
+            invokeProject($method, $function, $query);
+        } catch (Exception $e) {
+            //to handle ?
+            //can cause unhandled exception
+        }
+        break;
+    case 'event':
+        try {
+            invokeEvent($method, $function, $query);
+        } catch (Exception $e) {
+            //to handle too
+        }
+        break;
     case 'admin':
         invokeAdmin($method, $function, $query); break;
     case 'search':

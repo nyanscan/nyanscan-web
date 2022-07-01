@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @throws Exception
+ */
 function invokeProject($method, $function, $query) {
     if ($method === "POST") {
         if (count($function) === 1) {
@@ -490,7 +493,7 @@ function _new_volume() {
         bad_request($error);
     }
 
-    $data_uuid = uniqidReal(24);
+    $data_uuid = uniqIdReal(24);
 
     $json = json_encode($doc);
 
