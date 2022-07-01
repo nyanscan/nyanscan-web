@@ -1,5 +1,5 @@
 <?php
-require 'private/utils/functions.php';
+require __DIR__ . '/../private/utils/functions.php';
 
 if (!$method = strtoupper($_SERVER["REQUEST_METHOD"]) === "GET") {
     http_response_code(405);

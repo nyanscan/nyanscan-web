@@ -1,6 +1,6 @@
 <?php
 
-require 'private/captchaUtils.php';
+require __DIR__ . '/../private/captchaUtils.php';
 
 $id = $_GET["id"] ?? null;
 
@@ -14,7 +14,7 @@ session_start();
 sleep(.5);
 
 function get_piece() {
-    $files = glob(__DIR__ . '/private/res/piece/*.png');
+    $files = glob(__DIR__ . '/../private/res/piece/*.png');
     $i = imagecreatefrompng($files[array_rand($files)]);
     imagesavealpha($i, true);
     return $i;

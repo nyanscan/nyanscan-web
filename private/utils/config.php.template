@@ -1,4 +1,6 @@
 <?php
+const ALLOW_ORIGIN = 'https://nyanscan.fr';
+
 const DB_HOST = '127.0.0.1';
 const DB_NAME = 'nyanscan';
 const DB_PORT = '3306';
