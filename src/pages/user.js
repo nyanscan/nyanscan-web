@@ -1,3 +1,91 @@
+class EditInfoModal extends Component {
+
+    static TYPE_EMAIL = 0;
+    static TYPE_PASSWORD = 1;
+    static TYPE_USERNAME = 2;
+    static TYPE_BIRTHDAY = 3;
+
+    static STRUCT = {
+        [EditInfoModal.TYPE_EMAIL]: {name: 'email', api: 'user/edit/email', needConfirmation: true,  fields: [{name: 'email', display: 'E-mail', type: 'email'}]},
+        [EditInfoModal.TYPE_PASSWORD]: {name: 'mot de passe', api: 'user/edit/password', needConfirmation: true,  fields: [
+            {name: 'password', display: 'Mot de passe', type: 'password'},
+            {name: 'password-v', display: 'Confirmation', type: 'password'}
+            ]},
+        [EditInfoModal.TYPE_USERNAME]: {name: 'nom d\'utilisateur', api: 'user/edit/username', needConfirmation: false,  fields: [{name: 'username', display: 'Nom d\'utilisateur', type: 'text'}]},
+        [EditInfoModal.TYPE_BIRTHDAY]: {name: 'date de naissance', api: 'user/edit/birthday', needConfirmation: false,  fields: [{name: 'birthday', display: 'Date de naissance', type: 'date'}]}
+    }
+
+    c_type;
+    error;
+
+    get raw() {
+        return `
+         <form id="ns-modal-profile-form">
+            <h3>Modifier votre  ${EditInfoModal.STRUCT[this.c_type].name}</h3>
+            <div class="alert alert-danger" id="ns-modal-profile-error">
+            
+            </div>
+            <div class="d-flex flex-column my-3 gap-3" id="ns-modal-profile-fields">
+               
+            </div>
+            <div class="ns-modal-btn-container">
+                <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
+                <button type="submit" class="ns-tickle-pink-bg">Modifier</button>
+            </div>
+        </form>
+        `;
+    }
+
+    constructor(app, c_type) {
+        super(app, COMPONENT_TYPE_MODAL);
+        this.c_type = c_type;
+        if (EditInfoModal.STRUCT[c_type] === undefined) throw Error('Invalid USER MODAL TYPE');
+    }
+
+    createField(parent, data) {
+        const div = create('div', null, parent);
+        const id = `ns-modal-profile-field-${data.name}`;
+        const label = create('label', null, div, 'form-label');
+        label.setAttribute('for', id);
+        label.innerText = data.display;
+        const input = create('input', id, div, 'form-control');
+        input.type = data.type;
+        input.name = data.name;
+    }
+
+    build(parent) {
+        console.log('build')
+        super.build(parent);
+        const fields = _('#ns-modal-profile-fields');
+        EditInfoModal.STRUCT[this.c_type].fields.forEach(value => this.createField(fields, value));
+        this.createField(fields, {name: 'password-c', display: 'Mot de passe actuelle', type: 'password'});
+        this.error = _('#ns-modal-profile-error');
+        this.error.style.display = 'none';
+        _('#ns-modal-profile-form').addEventListener('submit', this.submit.bind(this));
+    }
+
+    submit(e) {
+        e.preventDefault();
+        loadingScreen(true);
+        sendApiPostFetch(EditInfoModal.STRUCT[this.c_type].api, new FormData(e.target)).then(() => {
+            if ( EditInfoModal.STRUCT[this.c_type].needConfirmation) {
+                this.app.openInfoModal(TYPE_SUCCESS, `Modification de votre ${EditInfoModal.STRUCT[this.c_type].name}`, `Un mail de vérification vous as était envoyé, une fois verifier votre ${EditInfoModal.STRUCT[this.c_type].name} seras modifier.`);
+            } else {
+                this.app.closeModal();
+                this.app.createToast(TYPE_SUCCESS, `Modification de votre ${EditInfoModal.STRUCT[this.c_type].name}`, `Votre  ${EditInfoModal.STRUCT[this.c_type].name} à bien était modifié.`);
+            }
+        }).catch(r => {
+                e.target.reset();
+                this.error.style = '';
+                if (r.code > 0) {
+                    this.error.innerText = r.reason;
+                } else this.error.innerText = 'Une erreur est survenue verifier votre connexion.'
+            }
+        ).finally(() => loadingScreen(false));
+    }
+
+}
+
 export default class extends Pages {
 
     user;
@@ -57,65 +145,46 @@ export default class extends Pages {
         `
         if (this.isSelf) {
             html += `
-                        <div class="ns-center py-5 ns-text-white ">
-                            <div class="ns-section-block ns-b-purple-gradient">
-                                <section>
-                                    <h3>Modifier le profil</h3>
-        <!--<?php
-                if (!empty($errors_edit)) {
-                    echo "<div class='row rounded mt-2 ns-b-azalea ns-text-red'>";
-                    foreach ($errors_edit as $err) {
-                        echo "<p class='my-1 justify-content-center'>" . $err . "</p><br>";
-                    }
-                    echo "</div>";
-                                }
-        ?>-->
-                                    <form method="post" id="ns-profile-edit" class="my-3">
-                                        <input class="d-none" name="type" value="edit" type="hidden">
-                                        <input class="d-none" name="id" value="<?php echo $id ?>" type="hidden">
-                                        <div class="ns-f-w-group">
-                                            <label for="email">Adresse E-mail :</label>
-                                            <input id="email" class="ns-data-field-var form-control ns-form-deep-mauve" type="email" name="email" required="required" value="$email$">
-                                        </div>
-                                        <div class="ns-f-w-group">
-                                            <label for="username">Pseudo :</label>
-                                            <input id="username" class="ns-data-field-var form-control ns-form-deep-mauve" type="text" name="username" required="required" value="$username$">
-                                        </div>
-                                        <div class="ns-f-w-group">
-                                            <label for="birth">Date de naissance :</label>
-                                            <input id="birth" class="ns-data-field-var form-control ns-form-deep-mauve" type="date" name="birth" required="required" value="$birthday$">
-                                        </div>
-                                        <h5>Modifier le mot de passe</h5>
-                                        <p>Si vous ne souhaitez pas modifier votre mot de passe, merci de ne pas remplir les champs ci-dessous.</p>
-                                        <div class="ns-f-w-group">
-                                            <label for="password">Mot de passe :</label>
-                                            <input id="password" class="form-control ns-form-deep-mauve" type="password" name="password">
-                                        </div>
-                                        <div class="ns-f-w-group">
-                                            <label for="password-v">Confirmation :</label>
-                                            <input id="password-v" class="form-control ns-form-deep-mauve" type="password" name="password-v">
-                                        </div>
-                                        <p>Pour des raisons de sécurité, veuillez renseigner à nouveau votre mot de passe pour toute modification !</p>
-                                        <div class="ns-f-w-group">
-                                            <label for="password-c">Mot de Passe actuelle :</label>
-                                            <input id="password-c" class="form-control ns-form-deep-mauve" type="password" name="password-c">
-                                        </div>
-                                        <button class="form-control ns-form-deep-mauve w-100 w-md-50 mx-auto mt-4" type="submit">Modifier</button>
-                                    </form>
-                                </section>
+                <div class="ns-center py-5 ns-text-white ">
+                    <div class="ns-section-block ns-b-purple-gradient">
+                        <section>
+                            <h3>Modifier le profil</h3>
+                            <div class="d-flex flex-column gap-3 align-content-stretch">
+                            <div class="ns-user-edit-field">
+                                <span>Adresse E-mail :</span>
+                                <ns-api-data field="email" class="ns-fs-6"></ns-api-data>
+                                <button class="btn ns-btn-sm ns-tickle-pink-btn rounded-0" ns-profile-edit-type="${EditInfoModal.TYPE_EMAIL}">Modifier</button>
                             </div>
-                        </div>
-                        <div class="ns-center pb-5 ns-text-white">
-                            <div class="ns-section-block ns-b-purple-gradient">
-                                <section>
-                                    <h3>Zone dangereuse</h3>
-                                    <p>Suppression du compte : Une fois ton compte supprimé, tu ne peux pas revenir en arrière !</p>
-                                    <div class ="ns-center">
-                                        <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
-                                    </div>
-                                </section>
+                            <div class="ns-user-edit-field">
+                                <span>Nom d'utilisateur</span>
+                                <ns-api-data field="username" class="ns-fs-6"></ns-api-data>
+                                <button class="btn ns-btn-sm ns-tickle-pink-btn rounded-0" ns-profile-edit-type="${EditInfoModal.TYPE_USERNAME}">Modifier</button>
                             </div>
-                        </div>`
+                            <div class="ns-user-edit-field">
+                                <span>Date de naissance</span>
+                                <ns-api-data field="birthday" class="ns-fs-6"></ns-api-data>
+                                <button class="btn ns-btn-sm ns-tickle-pink-btn rounded-0" ns-profile-edit-type="${EditInfoModal.TYPE_BIRTHDAY}">Modifier</button>
+                            </div>
+                            <div class="ns-user-edit-field">
+                                <span>Mot de passe</span>
+                                <span class="ns-fs-6">*******</span>
+                                <button class="btn ns-btn-sm ns-tickle-pink-btn rounded-0" ns-profile-edit-type="${EditInfoModal.TYPE_PASSWORD}">Modifier</button>
+                            </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="ns-center pb-5 ns-text-white">
+                    <div class="ns-section-block ns-b-purple-gradient">
+                        <section>
+                            <h3>Zone dangereuse</h3>
+                            <p>Suppression du compte : Une fois ton compte supprimé, tu ne peux pas revenir en arrière !</p>
+                            <div class ="ns-center">
+                                <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
+                            </div>
+                        </section>
+                    </div>
+                </div>`
         }
                 html += `
                     </div>
@@ -143,6 +212,12 @@ export default class extends Pages {
             this.fetchData();
         }
         this.dataBlock.addEventListener('dataLoad', this.fetchData.bind(this));
+        _('button[ns-profile-edit-type]').forEach(node => {
+            node.addEventListener('click', evt => {
+                evt.preventDefault();
+                window.APP.openModal(new EditInfoModal(window.APP, parseInt(evt.target.getAttribute('ns-profile-edit-type'))));
+            })
+        })
     }
 
     fetchData() {
@@ -153,7 +228,6 @@ export default class extends Pages {
                 this.app.fatalError();
             }
         } else {
-            console.log(this.dataBlock.rawData);
             const project =  _('#ns-user-upload');
             project.innerHTML = '';
             if (this.dataBlock.rawData.project.length > 0) {
@@ -177,8 +251,6 @@ export default class extends Pages {
             } else {
                 like.innerHTML = `Oh non c'est vide`;
             }
-            //
-            //console.log(this.dataBlock.rawData);
         }
     }
 }

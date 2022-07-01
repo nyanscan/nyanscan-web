@@ -677,6 +677,12 @@ class Application extends EventTarget {
         this.footer = new footer(this);
         this.caches["index"] = index;
         this.caches["404"] = err404;
+        window.addEventListener('load', () => {
+            console.log('load')
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js');
+            }
+        })
     }
 
     start() {

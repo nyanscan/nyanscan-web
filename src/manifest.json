@@ -1,6 +1,6 @@
 {
   "name": "NyanScan",
-  "short_name": "NS",
+  "short_name": "NyanScan",
   "scope": "/",
   "orientation": "portrait",
   "icons": [
@@ -18,5 +18,6 @@
   "start_url": "/",
   "display": "standalone",
   "lang": "fr",
-  "theme_color": "#9241AF"
+  "theme_color": "#9241AF",
+  "background_color": "#404141"
 }

@@ -7,5 +7,5 @@ function invokeDefault($method, $function, $query) {
 }
 
 function _default_carousel() {
-	success(getDB()->select(TABLE_INDEX_CAROUSEL, ['picture', 'href', 'title'], ['disable' => '0'], 0, 'priority'));
+	success(getDB()->select(TABLE_INDEX_CAROUSEL, ['picture', 'href', 'title'], ['disable' => '0'], 0, 'priority DESC'));
 }

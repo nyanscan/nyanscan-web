@@ -17,7 +17,7 @@ function invokeUser($method, $function, $query) {
         } elseif (count($function) === 2 && $function[0] === "edit") {
 			switch ($function[1]) {
 				case 'email': _change_user_email(); break;
-				case 'pseudo': _change_user_pseudo(); break;
+				case 'username': _change_user_pseudo(); break;
 				case 'birthday': _change_user_birthday(); break;
 				case 'password': _change_user_password(); break;
 			}
@@ -86,7 +86,7 @@ function __check_password_for_edit() {
 function _change_user_email() {
 
 	__check_password_for_edit();
-
+	$user = get_log_user();
 	$email = $_POST['email']??null;
 	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) bad_request("Format d'e-mail invalide.");
 
@@ -101,7 +101,7 @@ function _change_user_email() {
 
 function _change_user_pseudo() {
 	__check_password_for_edit();
-	$pseudo = $_POST['pseudo']??null;
+	$pseudo = $_POST['username']??null;
 	if ($pseudo === null || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $pseudo))
 		bad_request("Le pseudo ne peut contenir que des minuscules, majuscules, chiffres ou un \"_\" avec une longueur maximale de 20 caractères.");
 

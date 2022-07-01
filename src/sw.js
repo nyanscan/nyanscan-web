@@ -1,7 +1,6 @@
 const PREFIX = 'BETA-2.1.1';
 
-
-self.addEventListener('install', () => {
+self.addEventListener('install', evt => {
     self.skipWaiting();
     console.log(`${PREFIX} Install`);
 })

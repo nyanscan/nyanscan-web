@@ -16,8 +16,8 @@ class Footer extends Component {
                     </ns-a>
                 </div>
                 <div id="ns-footer-link">
-                    <ns-a href="/u/me">Mon compte</ns-a>
-                    <ns-a href="/catalogue">Catalogue</ns-a>
+                    <ns-a href="/u/me" class="ns-hide-disconnected">Mon compte</ns-a>
+                    <ns-a href="/forum"> Forum </ns-a>
                     <a href="/">A propos</a>
                     <a href="/">Contact</a>
                     <a href="/">FAQ</a>
@@ -75,6 +75,7 @@ class Header extends Component {
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/catalogue">Catalogue</ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/events">Évènements</ns-a>
                 <ns-a  class="ns-a-1 ns-hide-disconnected ns-d-none-mlg" href="/publish">Publier</ns-a>
+                <a  class="ns-a-1 ns-hide-disconnected ns-d-none-mlg" ns-perm-level="200" href="/admin">Admin</a>
             </div>
             <div>
                 <form id="ns-search" class="justify-content-center form-inline ns-form-search">
@@ -108,6 +109,9 @@ class Header extends Component {
                     </li>
                     <li class="ns-hide-disconnected">
                         <ns-a  class="ns-a-1" href="/publish">Publier</ns-a>
+                    </li>
+                    <li class="ns-hide-disconnected" ns-perm-level="200" >
+                        <a  class="ns-a-1" href="/admin">Admin</a>
                     </li>
                     <li class="ns-hide-connected">
                         <ns-a class='ns-a-1' href='/auth'>Se Connecter</ns-a>

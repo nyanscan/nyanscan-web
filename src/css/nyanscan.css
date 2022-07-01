@@ -353,7 +353,6 @@ ns-project > span > span:empty {
 
 #horizontal-mobile-nav-container {
     max-height: 100vh;
-    overflow: scroll;
     width: 300px;
     background-color: var(--ns-color-deep-mauve);
     padding: 1rem;
@@ -1516,6 +1515,27 @@ ns-project > span > span:empty {
 .ns-project-picture-edit label:hover {
     display: block;
     cursor: pointer;
+}
+
+.ns-user-edit-field {
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: 1fr auto;
+    row-gap: .1rem;
+}
+
+.ns-user-edit-field > *:nth-child(1) {
+    grid-area: 1 / 1 / 2 / 2;
+    color: #ddd;
+    text-transform: uppercase;
+}
+
+.ns-user-edit-field > *:nth-child(2) {
+    grid-area: 2 / 1 / 3 / 2;
+}
+
+.ns-user-edit-field > *:nth-child(3) {
+    grid-area: 1 / 2 / 3 / 3;
 }
 
 @media not (pointer: fine) {
