@@ -5,6 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 header('Access-Control-Allow-Origin: *');
+header('strict-origin-when-cross-origin: *');
 header('Access-Control-Allow-Methods: POST, PUT, OPTIONS');
 header('Access-Control-Allow-Headers: *');
 header('Access-Control-Max-Age: 300');

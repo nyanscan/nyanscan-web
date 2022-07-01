@@ -1,0 +1,22 @@
+{
+  "name": "NyanScan",
+  "short_name": "NS",
+  "scope": "/",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/res/icons/512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/res/icons/192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "lang": "fr",
+  "theme_color": "#9241AF"
+}
