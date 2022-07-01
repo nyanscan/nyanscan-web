@@ -723,19 +723,19 @@ body {
 /*FONT SIZE */
 
 .ns-fs-1 {
-    font-size: 64px;
+    font-size: 45px;
 }
 
 .ns-fs-2 {
-    font-size: 48px;
-}
-
-.ns-fs-3 {
     font-size: 32px;
 }
 
+.ns-fs-3 {
+    font-size: 26px;
+}
+
 .ns-fs-4 {
-    font-size: 24px;
+    font-size: 22px;
 }
 
 .ns-fs-5 {
@@ -939,7 +939,7 @@ body {
     border-radius: 0.5rem;
     display: flex;
     flex-direction: column;
-    padding: 80px 5%;
+    padding: 80px 9%;
 
 }
 
@@ -950,7 +950,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    padding: min(200px, 10%) 32px;
+    padding: min(200px, 10%) 40px;
 
 }
 
@@ -1407,7 +1407,7 @@ body {
     }
 
     .ns-fs-1 {
-        font-size: 56px;
+        font-size: 32px;
     }
 }
 
@@ -1531,11 +1531,11 @@ body {
     }
 
     .ns-fs-1 {
-        font-size: 48px;
+        font-size: 35px;
     }
 
     .ns-fs-2 {
-        font-size: 40px;
+        font-size: 28px;
     }
 
     .ns-md-fs-1 {

@@ -78,7 +78,7 @@ export default class extends SimpleTablePages {
                 e.innerText = value === '1' ? 'Série' : 'One-shot';
                 break;
             case 'status':
-                e.innerHTML = event_status_to_html(value);
+                e.innerHTML = project_status_to_html(value);
                 break;
             case 'action':
                 const group = create('div', null, e, 'btn-group');

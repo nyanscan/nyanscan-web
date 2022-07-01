@@ -69,7 +69,7 @@ class Picture {
         if ($this->isLoad) {
             return false;
         }
-        $this->id = $format . uniqidReal(23);
+        $this->id = $format . uniqIdReal(23);
         $this->author = $author;
         $this->title =  $title;
         $this->format =  $format;

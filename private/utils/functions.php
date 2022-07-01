@@ -54,6 +54,7 @@ function redirectIfNotConnected() {
     }
 }
 
+//file does not exist anymore ??
 function redirect404() {
     http_response_code(404);
     include $_SERVER['DOCUMENT_ROOT'] . '/error/404.php';
@@ -150,7 +151,7 @@ function download_volume_from_post($from_name, $max_size=5e8) {
         unset($image);
         for ($n = 0; $n < $n_pages; $n++) {
 
-            $uuid = uniqidReal(24);
+            $uuid = uniqIdReal(24);
             $data["pages"][] = $uuid;
 
             $page = Vips\Image::newFromFile($d_path, [
@@ -172,7 +173,7 @@ function download_volume_from_post($from_name, $max_size=5e8) {
             $data["error"] = true;
         }
     } catch (Exception $e) {
-        //for uniqidReal function
+        //for uniqIdReal function
     } finally {
         unlink($d_path);
     }
@@ -186,7 +187,7 @@ function download_volume_from_post($from_name, $max_size=5e8) {
  * for random_bytes function
  * @throws Exception
  */
-function uniqidReal($length = 13) {
+function uniqIdReal($length = 13) {
     // uniqid gives 13 characters, but we could adjust it to your needs.
     if (function_exists("random_bytes")) {
         $bytes = random_bytes(ceil($length / 2));

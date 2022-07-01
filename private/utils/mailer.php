@@ -47,3 +47,26 @@ EOT;
         $headers
     );
 }
+
+function send_event_status_change_mail($status, $name, $email, $username) {
+    $headers = "From : NyanScan " . '<no-reply@nyanscan.fr>';
+    $subject = 'Status de votre project actualisé';
+    $content = <<<EOT
+Salut $username !
+
+Un de tes évènements a subit un changement de statut :
+
+Évènement : $name
+Status : $status
+
+Rends-toi sur NyanScan pour avoir plus d'information.
+
+À très vite !
+EOT;
+    mail(
+        $email,
+        $subject,
+        $content,
+        $headers
+    );
+}
