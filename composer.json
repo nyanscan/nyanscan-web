@@ -3,6 +3,6 @@
     "description": "nyanscan web site",
     "type": "project",
     "require": {
-        "jcupitt/vips": "^2.0"
+        "jcupitt/vips": "^2.0",
     }
 }
