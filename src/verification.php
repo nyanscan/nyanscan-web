@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/../private/utils/functions.php';
 
-if (!$method = strtoupper($_SERVER["REQUEST_METHOD"]) === "GET") {
+if (strtoupper($_SERVER["REQUEST_METHOD"]) !== "GET") {
     http_response_code(405);
     exit();
 }
@@ -31,7 +31,7 @@ if ($raw) {
 		case VERIFICATION_TYPE_PASSWORD_CHANGE:
 			if ($deny !== '1') {
 				$token = createMD5Token();
-				getDB()->update(TABLE_USER, ['password' => $raw['value'], "token" => $this->token], ['id' => $user]);
+				getDB()->update(TABLE_USER, ['password' => $raw['value'], "token" => $token], ['id' => $user]);
 			}
 			header('Location: /auth/verification-success');
 			exit();
@@ -39,7 +39,7 @@ if ($raw) {
 		case VERIFICATION_TYPE_EMAIL_CHANGE:
 			if ($deny !== '1') {
 				$token = createMD5Token();
-				getDB()->update(TABLE_USER, ['email' => $raw['value'], "token" => $this->token], ['id' => $user]);
+				getDB()->update(TABLE_USER, ['email' => $raw['value'], "token" => $token], ['id' => $user]);
 			}
 			header('Location: /auth/verification-success');
 			exit();
