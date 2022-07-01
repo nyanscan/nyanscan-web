@@ -58,8 +58,14 @@ class User {
         }
     }
 
+	public function is_valid_password($password) : bool {
+		$pass = $this->db_adapter->select(TABLE_USER, ['password'], ['id' => $this->id], 1);
+		if (!$pass) return false;
+		return password_verify($password, $pass["password"]);
+	}
+
     private function fetch_data($where) {
-        $raw = $this->db_adapter->select('USER', ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'permission'], $where, 1);
+        $raw = $this->db_adapter->select(TABLE_USER, ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'permission'], $where, 1);
 
         if ($raw) {
             $this->is_log = true;
@@ -122,17 +128,17 @@ class User {
 			if ($this->token === null)
 			{
 				$this->token = createMD5Token();
-				$this->db_adapter->update("USER", ["token" => $this->token], ["id" => $this->id]);
+				$this->db_adapter->update(TABLE_USER, ["token" => $this->token], ["id" => $this->id]);
 			}
         } else {
-            $r = $this->db_adapter->select(TABLE_VERIFICATION, ["id"], ["user_id" => $this->id], 1);
+            $r = $this->db_adapter->select(TABLE_VERIFICATION, ["id"], ["user_id" => $this->id, 'type' => VERIFICATION_TYPE_EMAIL_CREATE], 1);
             if ($r) {
                 $this->verification_token = $r["id"];
             } else {
                 // create token and send email
                 $this->verification_token = createMD5Token();
                 $token_2 = createMD5Token();
-                $this->db_adapter->insert(TABLE_VERIFICATION, ["id" => $this->verification_token, "user_id" => $this->id, "token" => $token_2]);
+                $this->db_adapter->insert(TABLE_VERIFICATION, ["id" => $this->verification_token, "user_id" => $this->id, 'type' => VERIFICATION_TYPE_EMAIL_CREATE, "token" => $token_2]);
                 send_verification_mail($token_2, $this->id, $this->email, $this->username);
             }
         }
@@ -154,7 +160,15 @@ class User {
         return $this->username;
     }
 
-    /**
+	/**
+	 * @return string
+	 */
+	public function getEmail(): string {
+		return $this->email;
+	}
+
+
+	/**
      * @return string
      */
     public function getId(): string {

@@ -11,8 +11,33 @@ function invokeAdmin($method, $function, $query) {
         elseif ($function[0] === "picture") _admin_picture($query);
         elseif ($function[0] === "carousel") _admin_carousel($query);
     } elseif ($method === "POST") {
-	    if ($function[0] === "carousel") _admin_create_carousel();
+	    if (count($function) === 1 && $function[0] === "carousel") _admin_create_carousel();
+	    elseif (count($function) === 3 && $function[0] === "edit" && $function[1] === "carousel") __admin_edit_carousel($function[2], $query);
     }
+}
+
+function __admin_edit_carousel($id, $query) {
+	if (!$id) bad_request('invalid id');
+	if (isset($query['enable']) && $query['enable'] === '1') {
+		getDB()->update(TABLE_INDEX_CAROUSEL, ['disable' => 0], ['picture' => $id]);
+	} elseif (isset($query['disable']) && $query['disable'] === '1') {
+		getDB()->update(TABLE_INDEX_CAROUSEL, ['disable' => 1], ['picture' => $id]);
+	}
+	if (isset($query['priority'])) {
+		$priority = max(-127, min(127, intval($query['priority']?? '0')));
+		getDB()->update(TABLE_INDEX_CAROUSEL, ['priority' => $priority], ['picture' => $id]);
+	}
+	if (isset($query['href'])) {
+		$href = urldecode($query['href']);
+		if ($href === "") $href = null;
+		getDB()->update(TABLE_INDEX_CAROUSEL, ['href' => $href], ['picture' => $id]);
+	}
+	if (isset($query['title'])) {
+		$title = urldecode($query['title']);
+		if ($title === "") $href = null;
+		getDB()->update(TABLE_INDEX_CAROUSEL, ['title' => $title], ['picture' => $id]);
+	}
+	success();
 }
 
 function _admin_create_carousel() {
@@ -20,8 +45,11 @@ function _admin_create_carousel() {
 	$priority = max(-127, min(127, intval($_POST['priority']?? '0')));
 	$href = $_POST['href']??null;
 	if ($href === "") $href = null;
+	$title = $_POST['title']??null;
+	if ($title === "") $title = null;
 	$errors = [];
-	if ($href === null && strlen($href) > 255) $errors[] = 'Href trop long max 255';
+	if ($href !== null && strlen($href) > 255) $errors[] = 'Href trop long max 255';
+	if ($title !== null && strlen($title) > 255) $errors[] = 'Titre trop long max 255';
 	$img = download_image_from_post('picture', [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 1e7);
 	if (empty($errors)) {
 		if (is_numeric($img)) {
@@ -42,7 +70,7 @@ function _admin_create_carousel() {
 			$img->add_logo(80);
 			$img->set_title('Carousel image');
 			$img->save();
-			getDB()->insert(TABLE_INDEX_CAROUSEL, ['picture' => $img->get_id(), 'href' => $href, 'priority' => $priority, 'disable' => true]);
+			getDB()->insert(TABLE_INDEX_CAROUSEL, ['picture' => $img->get_id(), 'title' => $title, 'href' => $href, 'priority' => $priority, 'disable' => true]);
 		}
 	}
 
@@ -62,7 +90,7 @@ function _admin_picture($query) {
 }
 
 function _admin_carousel($query) {
-	admin_fetch(TABLE_INDEX_CAROUSEL, ['picture', 'href', 'priority', 'disable', 'date_inserted'], $query, 'picture', ['picture', 'href']);
+	admin_fetch(TABLE_INDEX_CAROUSEL, ['picture', 'href', 'title', 'priority', 'disable', 'date_inserted'], $query, 'picture', ['picture', 'title', 'href']);
 }
 
 function _admin_stats() {

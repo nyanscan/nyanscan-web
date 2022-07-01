@@ -25,6 +25,7 @@ include __DIR__ . '/private/userController.php';
 include __DIR__ . '/private/projectController.php';
 include __DIR__ . '/private/adminController.php';
 include __DIR__ . '/private/searchController.php';
+include __DIR__ . '/private/otherController.php';
 
 function my_error_handler() {
     $last_error = error_get_last();
@@ -152,7 +153,7 @@ switch ($controller) {
     case 'search':
         invokeSearch($method, $function, $query); break;
     default:
-        break;
+	    invokeDefault($method, [$controller, ...$function], $query); break;
 }
 
 function _get_captcha_settings() {

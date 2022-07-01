@@ -1190,18 +1190,23 @@ function setupCarousel(carousel) {
         images[i].topCarousel = carousel;
         images[i].nsCarouselIndex = i;
         images[i].addEventListener("click", (evt) => {
-            setCarouselActiveElements(evt.currentTarget.topCarousel, evt.currentTarget.nsCarouselIndex)
+            setCarouselActiveElements(evt.currentTarget.topCarousel, evt.currentTarget.nsCarouselIndex, true);
         }, false);
     }
     setCarouselActiveElements(carousel, 0);
 }
 
 //Make it functional and in loop
-function setCarouselActiveElements(carousel, index) {
+function setCarouselActiveElements(carousel, index, checkUrl = false) {
     if (carousel.nsCarouselCount <= index) return;
 
     const imagesDiv =  carousel.getElementsByClassName("ns-carousel-images")[0];
     const images = imagesDiv.getElementsByTagName("img");
+    const current = images[index];
+    if (current.c_href !== undefined && current.classList.contains("ns-carousel-2")) {
+        window.APP.loadURL(current.c_href);
+        return;
+    }
     for (let image of images) {
         image.classList.remove("ns-carousel-1");
         image.classList.remove("ns-carousel-2");
