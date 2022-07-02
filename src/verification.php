@@ -28,14 +28,16 @@ if ($raw) {
 				exit();
 			}
 			break;
+        case VERIFICATION_TYPE_PASSWORD_FORGET:
 		case VERIFICATION_TYPE_PASSWORD_CHANGE:
-			if ($deny !== '1') {
+			if ($deny !== '1' && $raw['value']) {
 				$token = createMD5Token();
 				getDB()->update(TABLE_USER, ['password' => $raw['value'], "token" => $token], ['id' => $user]);
 			}
 			header('Location: /auth/verification-success');
 			exit();
 			break;
+            break;
 		case VERIFICATION_TYPE_EMAIL_CHANGE:
 			if ($deny !== '1') {
 				$token = createMD5Token();
@@ -55,7 +57,6 @@ if ($raw) {
             header('Location: /');
             exit();
             break;
-
 	}
 }
 

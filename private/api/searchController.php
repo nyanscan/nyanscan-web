@@ -12,7 +12,7 @@ function invokeSearch($method, $function, $query) {
 
 function global_search($query) {
 
-    $data = ["user" => [], "project" => []];
+    $data = ["user" => [], "project" => [], "volume" => []];
 
     $search = $query["v"]??null;
     $short = isset($query["short"]) && $query["short"] === '1';

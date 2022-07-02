@@ -57,10 +57,10 @@ class EditInfoModal extends Component {
         const input = create('input', id, div, 'form-control');
         input.type = data.type;
         input.name = data.name;
+        input.required = true;
     }
 
     build(parent) {
-        console.log('build')
         super.build(parent);
         const fields = _('#ns-modal-profile-fields');
         if (this.c_type === EditInfoModal.TYPE_DELETE) {

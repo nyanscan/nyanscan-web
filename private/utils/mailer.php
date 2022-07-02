@@ -127,6 +127,32 @@ EOT;
     );
 }
 
+function send_email_forget_password($token, $id, $mail, $username) {
+    $headers = "From : NyanScan " . '<no-reply@nyanscan.fr>';
+    $subject = 'Mot de passe oubliée ' . $username;
+    $content = <<<EOT
+Salut $username,
+
+Mot de passe oublié ?
+
+Pour valider cette action click sur ce lien
+
+https://nyanscan.fr/verification.php?t=$token&user=$id
+
+Si tu n'est pas à l'origine de cette action click ici et nous te conseillions de changer toi même ton mot de passe
+
+https://nyanscan.fr/verification.php?t=$token&user=$id&deny=1
+
+Et à bientôt sur NyanScan !;
+EOT;
+    mail(
+        $mail,
+        $subject,
+        $content,
+        $headers
+    );
+}
+
 function send_event_status_change_mail($status, $name, $email, $username) {
     $headers = "From : NyanScan " . '<no-reply@nyanscan.fr>';
     $subject = 'Status de votre project actualisé';

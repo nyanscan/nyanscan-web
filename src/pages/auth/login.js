@@ -1,3 +1,63 @@
+class ForgetPassword extends Component {
+
+    get raw() {
+        return `
+         <form id="ns-forget-password-form">
+            <h3>Mot de passe oublié</h3>
+            <div class="alert alert-danger" id="ns-modal-profile-error">
+            
+            </div>
+            <div class="d-flex flex-column my-3 gap-3" id="ns-modal-profile-fields">
+               <div>
+                    <label for="ns-forget-password-email" class="form-label">E-MAIL</label> 
+                    <input id="ns-forget-password-email" type="email" name="email" class="form-control" required>
+               </div>
+               <div>
+                    <label for="ns-forget-password-password" class="form-label">Mot de passe</label> 
+                    <input id="ns-forget-password-password" type="password" name="password" class="form-control" required>
+               </div>
+               <div>
+                    <label for="ns-forget-password-password-v" class="form-label">Confirmaion</label> 
+                    <input id="ns-forget-password-password-v" type="password" name="password-v" class="form-control" required>
+               </div>
+            </div>
+            <div class="ns-modal-btn-container">
+                <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>   
+                <button type="submit" class="ns-tickle-pink-bg">Valider</button> 
+            </div>
+        </form>
+        `;
+    }
+
+    constructor(app) {
+        super(app, COMPONENT_TYPE_MODAL);
+    }
+
+    build(parent) {
+        super.build(parent);
+
+        this.error = _('#ns-modal-profile-error');
+        this.error.style.display = 'none';
+        _('#ns-forget-password-form').addEventListener('submit', this.submit.bind(this));
+    }
+
+    submit(e) {
+        e.preventDefault();
+        loadingScreen(true);
+        sendApiPostFetch('user/forget-password', new FormData(e.target)).then(() => {
+            this.app.openInfoModal(TYPE_SUCCESS, `Mot de passe oublié`, `Un mail de vérification vous a été envoyé;`);
+        }).catch(r => {
+                e.target.reset();
+                this.error.style = '';
+                if (r.code > 0) {
+                    this.error.innerText = r.reason;
+                } else this.error.innerText = 'Une erreur est survenue verifier votre connexion.'
+            }
+        ).finally(() => loadingScreen(false));
+    }
+
+}
+
 export default class extends Pages {
 
     isSending;
@@ -21,12 +81,13 @@ export default class extends Pages {
                             <div id="ns-log-error" class='row rounded mt-2 ns-b-azalea ns-text-red' style="display: none">
                             
                             </div>
-                            <div class="<?php echo  $d_class ?>">
+                            <div>
                                 <form id="ns-log-form" method="post">
                                     <label for="email">Adresse E-mail :</label>
                                     <input id="email" class="form-control ns-form-pink" type="email" required="required">
                                     <label for="mdp">Mot de passe :</label>
                                     <input id="mdp" class="form-control ns-form-pink" type="password" required="required">
+                                    <button id="ns-forget-password" type="button" class="btn ns-btn-sm ns-tickle-pink-btn">Mot de pasee oublié</button>
                                     <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">Se connecter</button>
                                 </form>
                             </div>
@@ -48,6 +109,10 @@ export default class extends Pages {
         super.build(parent, vars);
         _('#ns-log-form').addEventListener('submit', this.sendLogin.bind(this));
         loadRandomBackGround();
+        _('#ns-forget-password').addEventListener('click', evt => {
+            evt.preventDefault();
+            window.APP.openModal(new ForgetPassword(window.APP));
+        })
     }
 
     sendLogin(ev) {

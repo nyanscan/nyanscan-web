@@ -12,7 +12,8 @@ function invokeUser($method, $function, $query) {
         if (count($function) === 1) {
             switch ($function[0]) {
                 case 'permission': _admin_change_permission(); break;
-                case 'delete': _user_delete_self();
+                case 'delete': _user_delete_self(); break;
+                case 'forget-password': _forget_password(); break;
                 default: break;
             }
         } elseif (count($function) === 2 && $function[0] === "edit") {
@@ -236,6 +237,32 @@ function _user_delete_self() {
     getDB()->delete(TABLE_VERIFICATION, ["user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_DELETE]);
     getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_DELETE, "token" => $token_2]);
     send_email_delete_account($token_2, $user->getId(), $user->getEmail(), $user->getUsername());
+    success();
+}
+
+function _forget_password()
+{
+    $email = $_POST['email']??null;
+
+    if ($email !== null) {
+
+        $new_password = $_POST['password']??null;
+        $new_password_verification = $_POST['password-v']??null;
+
+        if ($new_password === null || $new_password_verification === null) bad_request('Formulaire incomplet');
+        if ($new_password !== $new_password_verification) bad_request('Les mots de passes ne coresponde pas');
+        if (strlen($new_password) < 8 || strlen($new_password) > 60) bad_request("Le mots de passe doit contenir au minimum 8 caractères et au maximum 60 caractères");
+
+        // always success to prevent email discovery
+        $user = getDB()->select(TABLE_USER, ['id', 'status', 'username', 'email'], ['email' => $email], 1);
+        if ($user && (intval($user['status']) & STATUS_DELETE) === 0) {
+            $verification_token = createMD5Token();
+            $token_2 = createMD5Token();
+            getDB()->delete(TABLE_VERIFICATION, ["user_id" => $user['id'], 'type' => VERIFICATION_TYPE_PASSWORD_FORGET]);
+            getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user['id'], 'type' => VERIFICATION_TYPE_PASSWORD_FORGET, "token" => $token_2, "value" => password_hash($new_password, PASSWORD_DEFAULT)]);
+            send_email_forget_password($token_2, $user['id'], $user['email'], $user['username']);
+        }
+    } else bad_request('empty email');
     success();
 }
 
