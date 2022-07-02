@@ -4,5 +4,6 @@
     "type": "project",
     "require": {
         "jcupitt/vips": "^2.0",
+        "mpdf/mpdf": "^8.1"
     }
 }

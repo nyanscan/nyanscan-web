@@ -124,7 +124,7 @@ export default class extends Pages {
                             </div>
                             <div class="d-flex flex-column justify-content-end">
                                 <div class="p-2">
-                                    <ns-a  href="user/${this.user}/projet">Voir mes projets</ns-a>
+                                    <button id="ns-profile-download" class="btn ns-btn-sm ns-tickle-pink-btn">Télécharger</button>
                                 </div>
                                 <div class="p-2">
                                     <span> Rejoint le <ns-api-data field="join"></ns-api-data></span>
@@ -232,6 +232,28 @@ export default class extends Pages {
                 window.APP.openModal(new EditInfoModal(window.APP, parseInt(evt.target.getAttribute('ns-profile-edit-type'))));
             })
         })
+        let  download =_('#ns-profile-download');
+        console.log(this.app.user.permissionLevel);
+        if (this.isSelf || this.app.user.permissionLevel >= 200 ) {
+            download.addEventListener('click', evt => {
+
+                let auth = window.APP.user.authorization;
+                let header = {
+                    'Authorization': auth
+                };
+
+                if (auth === null) delete header.Authorization;
+                fetch(new Request(`/api/v1/user/${this.user}?pdf=1`, {
+                    method: "GET",
+                    headers: new Headers(header)
+                })).then(r => r.arrayBuffer()).then(data => {
+                    let file = new Blob([data], {type: 'application/pdf'});
+                    let fileURL = URL.createObjectURL(file);
+                    window.open(fileURL);
+                }).catch(() => window.APP.createToast(TYPE_ERROR, 'Téléchargement pdf', 'Erreur serveur'))
+            })
+        } else download.parentElement.remove();
+
     }
 
     fetchData() {
@@ -249,6 +271,7 @@ export default class extends Pages {
                 for (let v of this.dataBlock.rawData.project) {
                     inner += `<ns-project ns-id="${v.id}" ns-title="${v.title}" ns-picture="${v.picture}"></ns-project>`;
                 }
+                inner += `<ns-a class="btn ns-tickle-pink-btn" href="/s/author:${this.user}" >Voir plus</ns-a>`
                 project.innerHTML = inner;
             } else {
                 project.innerHTML = `Oh non c'est vide`;
@@ -259,8 +282,9 @@ export default class extends Pages {
             if (this.dataBlock.rawData.like.length > 0) {
                 let inner = '';
                 for (let v of this.dataBlock.rawData.like) {
-                    inner += `<ns-project ns-id="${v.project}/${v.id}" ns-title="${v.title}" ns-picture="${v.picture}"></ns-project>`;
+                    inner += `<ns-project ns-id="${v.project}/${v.volume}" ns-title="${v.title}" ns-picture="${v.picture}"></ns-project>`;
                 }
+                inner += `<ns-a class="btn ns-tickle-pink-btn" href="/s/likeby:${this.user}" >Voir plus</ns-a>`
                 like.innerHTML = inner;
             } else {
                 like.innerHTML = `Oh non c'est vide`;

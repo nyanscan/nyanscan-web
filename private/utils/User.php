@@ -175,6 +175,10 @@ class User {
         return $this->id;
     }
 
+    public function getBirthday() {
+        return $this->birthday;
+    }
+
     public function getAge(): int {
         return floor((time() - strtotime($this->birthday)) / 60 / 60 / 24 / 365.25);
     }
@@ -231,6 +235,22 @@ class User {
 
     public function is_delete() : bool {
         return (intval($this->status) & STATUS_DELETE) > 0;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastSean()
+    {
+        return $this->last_sean;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJoin()
+    {
+        return $this->join;
     }
 
 }

@@ -24,6 +24,11 @@ export default class extends Pages {
                     <ns-project></ns-project><ns-project></ns-project><ns-project></ns-project><ns-project></ns-project><ns-project></ns-project>
                 </div>
             </div>
+            <div id="ns-search-res-volumes" class="ns-search-res-category">
+                <h2 class="ns-fs-2">Tomes</h2>
+                <div class="ns-search-res-container">
+                </div>
+            </div>
             <div id="ns-search-res-empty" style="display: none">
                 <div class="ns-success-css mb-5">
                     <div class="ns-center">
@@ -66,12 +71,11 @@ export default class extends Pages {
     searchResult(data) {
         const memberDiv = _('#ns-search-res-members');
         const projectDiv = _('#ns-search-res-project');
+        const volumeDiv = _('#ns-search-res-volumes');
         if (data.user.length > 0) {
             let container = memberDiv.getElementsByClassName('ns-search-res-container')[0];
             container.innerHTML = '';
             data.user.forEach(user => this.createUser(user, container));
-
-
         } else memberDiv.style.display = 'none';
 
         if (data.project.length > 0) {
@@ -79,7 +83,13 @@ export default class extends Pages {
             container.innerHTML = data.project.map(project => `<ns-project ns-title="${project.title}" ns-id="${project.id}" ns-picture="${project.picture}"></ns-project>`).join('');
         } else projectDiv.style.display = 'none';
 
-        if (data.project.length === 0 && 0 === data.user.length) {
+        if (data.volume.length > 0) {
+            let container = volumeDiv.getElementsByClassName('ns-search-res-container')[0];
+            container.innerHTML = data.volume.map(project => `<ns-project ns-title="${project.title}" ns-id="${project.project}/${project.volume}" ns-picture="${project.picture}"></ns-project>`).join('');
+        } else volumeDiv.style.display = 'none';
+
+
+        if (data.project.length + data.user.length + data.volume.length === 0) {
             _('#ns-search-res-empty').style.display = '';
         }
     }

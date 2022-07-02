@@ -63,6 +63,84 @@ function _get_user($userid, $query) {
     if (!$user->is_connected() || $user->is_delete()) {
         bad_request('Invalid user');
     }
+
+    if (isset($query['pdf']) && $query['pdf'] === '1') {
+        if (!$user->is_current_connected() && !is_moderator()) unauthorized();
+        require __DIR__ . '/../../vendor/autoload.php';
+        $mpdf = new Mpdf\Mpdf();
+
+        $forumHTML = "";
+        $readingHTML = "";
+
+        $messages = getDB()->select(TABLE_FORUM_MESSAGE, ['content', 'date_inserted'], ['author' => $user->getId()]);
+        $reply = getDB()->select(TABLE_FORUM_REPLY, ['content', 'date_inserted'], ['author' => $user->getId()]);
+        foreach ([...$messages, ...$reply] as $m) {
+            $forumHTML .= "<tr><td>{$m['date_inserted']}</td><td>{$m['content']}</td></tr>";
+        }
+
+        $reading = getDB()->select_set_settings("SELECT * FROM PAE_VOLUME_READING LEFT JOIN PAE_VOLUME PV on PAE_VOLUME_READING.fk_project = PV.project and PAE_VOLUME_READING.fk_volume = PV.volume", ['user_id' => $user->getId()]);
+        foreach ($reading as $r) {
+            $like  = $r['is_negative'] === '1' ? 'dislike' : ($r['is_negative'] === '0' ? 'like' : '');
+            $readingHTML .= "<tr><td>{$r['title']}</td><td>{$r['page']}</td><td>{$like}</td></tr>";
+        }
+
+        $html = <<<EOT
+            <div>
+                <h1>Profil de {$user->getUsername()}</h1>;
+                <h2>Données perssonelle</h2>
+                <table class="b-table">
+                        <tr><td>E-MAIL</td> <td>{$user->getEmail()}</td></tr>
+                        <tr><td>Pseudo</td> <td>{$user->getUsername()}</td></tr>
+                        <tr><td>Date de naissance</td> <td>{$user->getBirthday()}</td></tr>
+                        <tr><td>Date de création</td> <td>{$user->getJoin()}</td></tr>
+                        <tr><td>Dérniére connection</td> <td>{$user->getLastSean()}</td></tr>
+                </table>
+                <h2>Messages</h2>
+                <table class="b-table">
+                    <tr><th>Date</th><th>Message</th></tr>
+                    $forumHTML
+                </table>
+                <h2>Lecture</h2>
+                
+                <table class="b-table">
+                    <tr><th>Tome</th><th>Page</th><th>Like</th></tr>
+                    
+                    $readingHTML
+                </table>
+            </div>
+        EOT;
+
+        $mpdf->WriteHTML(
+            <<<EOT
+            .b-table, .b-table th, .b-table td {
+              border: 1px solid;
+              padding: 5px;
+            }
+            .b-table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            EOT, \Mpdf\HTMLParserMode::HEADER_CSS);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->SetHTMLFooter(
+            <<<EOT
+            <table style="width: 100%; vertical-align: bottom; font-family: serif; font-size: 8pt; color: #000000; font-weight: bold; font-style: italic;">
+                <tr>
+                    <td width="33%">{DATE j-m-Y}</td>
+                    <td width="33%" align="center">{PAGENO}/{nbpg}</td>
+                    <td width="33%" style="text-align: right;">NyanScan - {$user->getUsername()}</td>
+                </tr>
+            </table>
+            EOT
+        );
+
+        $mpdf->SetTitle("NyanScan_profil_de_{$user->getUsername()}.pdf");
+
+        $mpdf->Output();
+        exit();
+    }
+
     $data = $user->getAPIData($userid === 'me');
 
     if (isset($query['details']) && $query['details'] === '1') {
