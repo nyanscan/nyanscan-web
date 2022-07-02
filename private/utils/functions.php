@@ -171,9 +171,16 @@ function download_volume_from_post($from_name, $max_size=5e8) {
     } catch (Vips\Exception $e) {
         if ($e->getCode() !== 1) {
             $data["error"] = true;
+            foreach ($data["pages"] as $toDelete) {
+                try {
+                    $dir = substr($toDelete,  0,3);
+                    unlink(VOLUME_PATH . $dir .  '/' . substr($toDelete, 3) . '.webp');
+                } catch (Exception $e2) {}
+            }
         }
+
     } catch (Exception $e) {
-        //for uniqIdReal function
+        $data["error"] = true;
     } finally {
         unlink($d_path);
     }

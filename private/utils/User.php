@@ -93,7 +93,7 @@ class User {
             return false;
         }
 
-        $success = password_verify($password, $raw["password"]);
+        $success = ((intval($raw['status']) & STATUS_DELETE) === 0) && password_verify($password, $raw["password"]);
 
         $log = [
             "user" => $raw['id'],
@@ -228,5 +228,9 @@ class User {
 	public function get_token(): string {
 		return $this->token;
 	}
+
+    public function is_delete() : bool {
+        return (intval($this->status) & STATUS_DELETE) > 0;
+    }
 
 }

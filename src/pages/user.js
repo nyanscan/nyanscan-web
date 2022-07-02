@@ -4,6 +4,7 @@ class EditInfoModal extends Component {
     static TYPE_PASSWORD = 1;
     static TYPE_USERNAME = 2;
     static TYPE_BIRTHDAY = 3;
+    static TYPE_DELETE = 4;
 
     static STRUCT = {
         [EditInfoModal.TYPE_EMAIL]: {name: 'email', api: 'user/edit/email', needConfirmation: true,  fields: [{name: 'email', display: 'E-mail', type: 'email'}]},
@@ -12,7 +13,8 @@ class EditInfoModal extends Component {
             {name: 'password-v', display: 'Confirmation', type: 'password'}
             ]},
         [EditInfoModal.TYPE_USERNAME]: {name: 'nom d\'utilisateur', api: 'user/edit/username', needConfirmation: false,  fields: [{name: 'username', display: 'Nom d\'utilisateur', type: 'text'}]},
-        [EditInfoModal.TYPE_BIRTHDAY]: {name: 'date de naissance', api: 'user/edit/birthday', needConfirmation: false,  fields: [{name: 'birthday', display: 'Date de naissance', type: 'date'}]}
+        [EditInfoModal.TYPE_BIRTHDAY]: {name: 'date de naissance', api: 'user/edit/birthday', needConfirmation: false,  fields: [{name: 'birthday', display: 'Date de naissance', type: 'date'}]},
+        [EditInfoModal.TYPE_DELETE]: {name: 'Suppressions de votre compte', api: 'user/delete', needConfirmation: true,  fields: []},
     }
 
     c_type;
@@ -21,7 +23,7 @@ class EditInfoModal extends Component {
     get raw() {
         return `
          <form id="ns-modal-profile-form">
-            <h3>Modifier votre  ${EditInfoModal.STRUCT[this.c_type].name}</h3>
+            <h3>${this.c_type === EditInfoModal.TYPE_DELETE ? '' : 'Modifier votre'} ${EditInfoModal.STRUCT[this.c_type].name}</h3>
             <div class="alert alert-danger" id="ns-modal-profile-error">
             
             </div>
@@ -30,7 +32,11 @@ class EditInfoModal extends Component {
             </div>
             <div class="ns-modal-btn-container">
                 <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
-                <button type="submit" class="ns-tickle-pink-bg">Modifier</button>
+                ${ this.c_type === EditInfoModal.TYPE_DELETE ?
+                    '<button type="submit" class="bg-danger">Supprimer</button>' : 
+                    '<button type="submit" class="ns-tickle-pink-bg">Modifier</button>'
+                }
+                
             </div>
         </form>
         `;
@@ -57,6 +63,12 @@ class EditInfoModal extends Component {
         console.log('build')
         super.build(parent);
         const fields = _('#ns-modal-profile-fields');
+        if (this.c_type === EditInfoModal.TYPE_DELETE) {
+            let warn = create('p', null, fields, 'alert', 'alert-danger');
+            warn.innerHTML = `Une fois ton compte supprimé, tu ne peux pas revenir en arrière !<br>
+                                Nous supprimerons tes données perosnelle (email, date de naissance pseudo) <br> 
+                                tous vos postes ne seront pas supprimés mais seront affiché comme publié par un utilisateur supprimé`
+        }
         EditInfoModal.STRUCT[this.c_type].fields.forEach(value => this.createField(fields, value));
         this.createField(fields, {name: 'password-c', display: 'Mot de passe actuelle', type: 'password'});
         this.error = _('#ns-modal-profile-error');
@@ -69,7 +81,9 @@ class EditInfoModal extends Component {
         loadingScreen(true);
         sendApiPostFetch(EditInfoModal.STRUCT[this.c_type].api, new FormData(e.target)).then(() => {
             if ( EditInfoModal.STRUCT[this.c_type].needConfirmation) {
-                this.app.openInfoModal(TYPE_SUCCESS, `Modification de votre ${EditInfoModal.STRUCT[this.c_type].name}`, `Un mail de vérification vous as était envoyé, une fois verifier votre ${EditInfoModal.STRUCT[this.c_type].name} seras modifier.`);
+                if(this.c_type === EditInfoModal.TYPE_DELETE)
+                    this.app.openInfoModal(TYPE_WARN, EditInfoModal.STRUCT[this.c_type].name, `Un mail de vérification vous a été envoyé, une fois que vous vérifiez votre compte sera supprimé.`);
+                else this.app.openInfoModal(TYPE_SUCCESS, `Modification de votre ${EditInfoModal.STRUCT[this.c_type].name}`, `Un mail de vérification vous a été envoyé, une fois verifier votre ${EditInfoModal.STRUCT[this.c_type].name} seras modifier.`);
             } else {
                 this.app.closeModal();
                 this.app.createToast(TYPE_SUCCESS, `Modification de votre ${EditInfoModal.STRUCT[this.c_type].name}`, `Votre  ${EditInfoModal.STRUCT[this.c_type].name} à bien était modifié.`);
@@ -180,7 +194,7 @@ export default class extends Pages {
                             <h3>Zone dangereuse</h3>
                             <p>Suppression du compte : Une fois ton compte supprimé, tu ne peux pas revenir en arrière !</p>
                             <div class ="ns-center">
-                                <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" type="submit">Supprimer le compte</button>
+                                <button class="ns-form-danger py-2 w-100 w-md-50 mx-auto mt-4" ns-profile-edit-type="${EditInfoModal.TYPE_DELETE}">Supprimer le compte</button>
                             </div>
                         </section>
                     </div>

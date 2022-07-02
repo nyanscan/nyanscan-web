@@ -12,6 +12,7 @@ function invokeUser($method, $function, $query) {
         if (count($function) === 1) {
             switch ($function[0]) {
                 case 'permission': _admin_change_permission(); break;
+                case 'delete': _user_delete_self();
                 default: break;
             }
         } elseif (count($function) === 2 && $function[0] === "edit") {
@@ -59,7 +60,7 @@ function _get_user($userid, $query) {
     } else {
         $user = new User($userid);
     }
-    if (!$user->is_connected()) {
+    if (!$user->is_connected() || $user->is_delete()) {
         bad_request('Invalid user');
     }
     $data = $user->getAPIData($userid === 'me');
@@ -101,10 +102,11 @@ function _change_user_email() {
 
 function _change_user_pseudo() {
 	__check_password_for_edit();
-    // todo: check duplicate
 	$pseudo = $_POST['username']??null;
 	if ($pseudo === null || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $pseudo))
 		bad_request("Le pseudo ne peut contenir que des minuscules, majuscules, chiffres ou un \"_\" avec une longueur maximale de 20 caractères.");
+
+    if (getDB()->select(TABLE_USER, ['id'], ['username' => $pseudo], 1)) bad_request("Ce nom d'utilisateur est deja reliée à un compte.");
 
 	getDB()->update(TABLE_USER, ['username' => $pseudo], ['id' => get_log_user()->getId()]);
 	success();
@@ -145,6 +147,18 @@ function _change_user_password() {
 	getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_PASSWORD_CHANGE, "token" => $token_2, "value" => password_hash($new_password, PASSWORD_DEFAULT)]);
 	send_password_change_verification($token_2, $user->getId(), $user->getEmail(), $user->getUsername());
 	success();
+}
+
+function _user_delete_self() {
+    __check_password_for_edit();
+    $user = get_log_user();
+    $verification_token = createMD5Token();
+    $token_2 = createMD5Token();
+    // delete old verification
+    getDB()->delete(TABLE_VERIFICATION, ["user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_DELETE]);
+    getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_DELETE, "token" => $token_2]);
+    send_email_delete_account($token_2, $user->getId(), $user->getEmail(), $user->getUsername());
+    success();
 }
 
 /**

@@ -44,6 +44,18 @@ if ($raw) {
 			header('Location: /auth/verification-success');
 			exit();
 			break;
+        case VERIFICATION_TYPE_DELETE:
+            if ($deny !== '1') {
+                $token = createMD5Token();
+                $status = getDB()->select(TABLE_USER, ['status'], ['id' => $user], 1);
+                if ($status) {
+                    getDB()->update(TABLE_USER, ['email' => createMD5Token(), 'username' => 'utilisateur_supprime', "token" => $token, 'status' => intval($status["status"]) | STATUS_DELETE], ['id' => $user]);
+                }
+            }
+            header('Location: /');
+            exit();
+            break;
+
 	}
 }
 

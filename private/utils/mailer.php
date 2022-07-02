@@ -26,8 +26,8 @@ EOT;
 }
 
 function send_password_change_verification($token, $id, $mail, $username) {
-	$headers = "From : NyanScan " . '<register-no-reply@nyanscan.fr>';
-	$subject = 'Vérifie ton mail '.$username.' pour NyanScan !';
+	$headers = "From : NyanScan " . '<no-reply@nyanscan.fr>';
+	$subject = 'Changement de mot passe, verification';
 	$content = <<<EOT
 Salut $username,
 
@@ -52,8 +52,8 @@ EOT;
 }
 
 function send_email_change_verification($token, $id, $mail, $username) {
-	$headers = "From : NyanScan " . '<register-no-reply@nyanscan.fr>';
-	$subject = 'Vérifie ton mail '.$username.' pour NyanScan !';
+	$headers = "From : NyanScan " . '<no-reply@nyanscan.fr>';
+	$subject = 'Changement d\'email, verification';
 	$content = <<<EOT
 Salut $username,
 
@@ -75,6 +75,33 @@ EOT;
 		$content,
 		$headers
 	);
+}
+
+function send_email_delete_account($token, $id, $mail, $username) {
+    $headers = "From : NyanScan " . '<no-reply@nyanscan.fr>';
+    $subject = 'Au-revoir ' . $username;
+    $content = <<<EOT
+Salut $username,
+
+Tu souhaite nous quitter ?
+Une fois ton compte supprimé, tu ne peux pas revenir en arrière !
+
+Pour valider cette action click sur ce lien
+
+https://nyanscan.fr/verification.php?t=$token&user=$id
+
+Si tu n'est pas à l'origine de cette action click ici et nous te conseillions de changer toi même ton mot de passe
+
+https://nyanscan.fr/verification.php?t=$token&user=$id&deny=1
+
+Et à bientôt sur NyanScan !;
+EOT;
+    mail(
+        $mail,
+        $subject,
+        $content,
+        $headers
+    );
 }
 
 function send_project_status_change_mail($status, $title, $email, $username) {
