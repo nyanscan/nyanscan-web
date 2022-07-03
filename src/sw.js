@@ -4,7 +4,9 @@ const PREFIX = 'BETA-2.1.2';
 const CACHE_FILES = [
     'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css',
-    `${BASE}/res/logo-ns-icon.ico`,
+    `${BASE}/res/icons/ico.ico`,
+    `${BASE}/res/icons/192.png`,
+    `${BASE}/res/icons/512.png`,
     `${BASE}/css/var.css`,
     `${BASE}/css/nyanscan.css`,
     `${BASE}/js/utils/custom_elements.js`,

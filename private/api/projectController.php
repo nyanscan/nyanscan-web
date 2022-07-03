@@ -32,6 +32,8 @@ function invokeProject($method, $function, $query) {
             _admin_fetch_volume($query);
         } elseif ($function[0] === 'index') {
             fetch_index();
+        } elseif ($function[0] === 'check') {
+            __check_useless($query);
         } elseif (count($function) === 2 && $function[1] === 'volumes') {
             _fetch_project_with_volumes($function[0]);
         }  elseif (count($function) === 1) {
@@ -574,4 +576,38 @@ function _new_volume() {
     getDB()->insert(TABLE_VOLUME, $v_data);
 
     success();
+}
+
+function __check_useless($query) {
+    if (!is_moderator()) {
+        forbidden();
+    }
+
+    $delete = isset($query['delete']);
+    if ($delete) {
+        if (!file_exists(VOLUME_PATH . 'to_delete')) {
+            mkdir(VOLUME_PATH . 'to_delete', 0775);
+        }
+    }
+
+    $files = [];
+    foreach(glob(VOLUME_PATH . 'header_data/*.json', GLOB_NOSORT) as $file) {
+        $files = [...$files,  ...(json_decode(file_get_contents($file), true)['pages'])];
+    }
+    $notBound = [];
+
+    foreach (glob(VOLUME_PATH . '*', GLOB_ONLYDIR | GLOB_MARK | GLOB_NOSORT) as $dir) {
+        foreach (glob($dir . '*.webp', GLOB_NOSORT) as $img) {
+            $matches = [];
+            if(preg_match('/^.*\/([0-9a-f]{3})\/([0-9a-f]+)\.webp$/', $img, $matches)) {
+                if (!in_array($matches[1] . $matches[2], $files)) {
+                    $notBound[] = $img;
+                    if ($delete) {
+                        rename($img, VOLUME_PATH . 'to_delete/' . $matches[1] . $matches[2] . '.webp');
+                    }
+                }
+            }
+        }
+    }
+    success($notBound);
 }

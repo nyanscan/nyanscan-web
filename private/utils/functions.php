@@ -1,8 +1,5 @@
 <?php
 
-include __DIR__ . '/../../vendor/autoload.php';
-use Jcupitt\Vips;
-
 require 'config.php';
 require 'DBAdapter.php';
 require 'User.php';
@@ -130,9 +127,9 @@ function download_image_from_post($from_name, $type=[], $max_size=1e6)  {
 }
 
 function download_volume_from_post($from_name, $max_size=5e8) {
-    Vips\Config::CacheSetMax(0);
-    Vips\Config::cacheSetMaxMem(1.2e9);
-
+    require __DIR__ . '/../../vendor/autoload.php';
+    Jcupitt\Vips\Config::CacheSetMax(0);
+    Jcupitt\Vips\Config::cacheSetMaxMem(1.2e9);
 
 
     set_time_limit(0);
@@ -146,7 +143,7 @@ function download_volume_from_post($from_name, $max_size=5e8) {
     ];
     $pager_count = 0;
     try {
-        $image = Vips\Image::newFromFile($d_path);
+        $image = Jcupitt\Vips\Image::newFromFile($d_path);
         $n_pages = $image->get("n-pages");
         unset($image);
         for ($n = 0; $n < $n_pages; $n++) {
@@ -154,7 +151,7 @@ function download_volume_from_post($from_name, $max_size=5e8) {
             $uuid = uniqIdReal(24);
             $data["pages"][] = $uuid;
 
-            $page = Vips\Image::newFromFile($d_path, [
+            $page = Jcupitt\Vips\Image::newFromFile($d_path, [
                 "dpi" => 30,
                 "page" => $n,
                 # this enables image streaming
@@ -168,12 +165,19 @@ function download_volume_from_post($from_name, $max_size=5e8) {
             $pager_count++;
             unset($page);
         }
-    } catch (Vips\Exception $e) {
+    } catch (Jcupitt\Vips\Exception $e) {
         if ($e->getCode() !== 1) {
             $data["error"] = true;
+            foreach ($data["pages"] as $toDelete) {
+                try {
+                    $dir = substr($toDelete,  0,3);
+                    unlink(VOLUME_PATH . $dir .  '/' . substr($toDelete, 3) . '.webp');
+                } catch (Exception $e2) {}
+            }
         }
+
     } catch (Exception $e) {
-        //for uniqIdReal function
+        $data["error"] = true;
     } finally {
         unlink($d_path);
     }

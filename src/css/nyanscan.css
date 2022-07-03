@@ -1491,7 +1491,7 @@ ns-project > span > span:empty {
     display: block;
 }
 
-.ns-project-picture-edit label {
+.ns-project-picture-edit label{
     display: none;
     background-color: rgba(50, 50, 50, .3);
     position: absolute;
@@ -1538,6 +1538,104 @@ ns-project > span > span:empty {
     grid-area: 1 / 2 / 3 / 3;
 }
 
+.ns-profile-avatar-edit {
+    position: relative;
+}
+
+.ns-profile-avatar-edit .bi {
+    display: none;
+    background-color: rgba(50, 50, 50, .3);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    font-size: 64px;
+    text-align: center;
+    line-height: 166px;
+    border-radius: 50%;
+    color: var(--ns-color-paradise-pink);
+}
+
+.ns-profile-avatar-edit:hover .bi {
+    display: block;
+}
+
+.ns-modal-profile-avatar-inside {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr;
+    justify-content: stretch;
+    align-items: stretch;
+    gap: .5rem;
+    margin-bottom: 24px;
+    margin-top: 16px;
+}
+
+#ns-modal-profile-avatar-preview {
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ns-modal-profile-avatar-images {
+    position: relative;
+    width: 102px;
+    height: 102px;
+}
+
+.ns-modal-profile-avatar-images img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#ns-modal-profile-avatar-settings {
+    min-height: 150px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.ns-modal-profile-avatar-btn-group {
+
+}
+
+.ns-modal-profile-avatar-btn-group > div {
+    display: flex;
+    flex-direction: row;
+}
+
+.ns-modal-profile-avatar-btn-group > div > button {
+    background-color: var(--ns-color-tickle-me-pink);
+    border: none;
+    outline: none;
+    padding: .5rem;
+    border-radius: 50% 0 0 50%;
+}
+
+.ns-modal-profile-avatar-btn-group > div > button:hover {
+    opacity: .8;
+}
+
+.ns-modal-profile-avatar-btn-group > div > button:last-child {
+    border-radius: 0 50% 50% 0;
+}
+
+.ns-modal-profile-avatar-btn-group > div > span {
+    background-color: var(--ns-color-tickle-me-pink);
+    border-right: 1px white solid;
+    border-left: 1px white solid;
+    flex-grow: 1;
+    text-align: center;
+    padding: .5rem;
+}
+
 @media not (pointer: fine) {
     .ns-project-picture-edit label {
         display: block;
@@ -1563,6 +1661,11 @@ ns-project > span > span:empty {
 
     .ns-reading-head ns-api-data {
         text-align: center;
+    }
+
+    .ns-modal-profile-avatar-inside {
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr;
     }
 
     .ns-reading-nav, .ns-reading-progress {

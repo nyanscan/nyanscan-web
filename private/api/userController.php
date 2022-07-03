@@ -12,6 +12,8 @@ function invokeUser($method, $function, $query) {
         if (count($function) === 1) {
             switch ($function[0]) {
                 case 'permission': _admin_change_permission(); break;
+                case 'delete': _user_delete_self(); break;
+                case 'forget-password': _forget_password(); break;
                 default: break;
             }
         } elseif (count($function) === 2 && $function[0] === "edit") {
@@ -20,6 +22,7 @@ function invokeUser($method, $function, $query) {
 				case 'username': _change_user_pseudo(); break;
 				case 'birthday': _change_user_birthday(); break;
 				case 'password': _change_user_password(); break;
+                case 'avatar': _change_user_avatar(); break;
 			}
         }
     } else {
@@ -59,9 +62,87 @@ function _get_user($userid, $query) {
     } else {
         $user = new User($userid);
     }
-    if (!$user->is_connected()) {
+    if (!$user->is_connected() || $user->is_delete()) {
         bad_request('Invalid user');
     }
+
+    if (isset($query['pdf']) && $query['pdf'] === '1') {
+        if (!$user->is_current_connected() && !is_moderator()) unauthorized();
+        require __DIR__ . '/../../vendor/autoload.php';
+        $mpdf = new Mpdf\Mpdf();
+
+        $forumHTML = "";
+        $readingHTML = "";
+
+        $messages = getDB()->select(TABLE_FORUM_MESSAGE, ['content', 'date_inserted'], ['author' => $user->getId()]);
+        $reply = getDB()->select(TABLE_FORUM_REPLY, ['content', 'date_inserted'], ['author' => $user->getId()]);
+        foreach ([...$messages, ...$reply] as $m) {
+            $forumHTML .= "<tr><td>{$m['date_inserted']}</td><td>{$m['content']}</td></tr>";
+        }
+
+        $reading = getDB()->select_set_settings("SELECT * FROM PAE_VOLUME_READING LEFT JOIN PAE_VOLUME PV on PAE_VOLUME_READING.fk_project = PV.project and PAE_VOLUME_READING.fk_volume = PV.volume", ['user_id' => $user->getId()]);
+        foreach ($reading as $r) {
+            $like  = $r['is_negative'] === '1' ? 'dislike' : ($r['is_negative'] === '0' ? 'like' : '');
+            $readingHTML .= "<tr><td>{$r['title']}</td><td>{$r['page']}</td><td>{$like}</td></tr>";
+        }
+
+        $html = <<<EOT
+            <div>
+                <h1>Profil de {$user->getUsername()}</h1>;
+                <h2>Données perssonelle</h2>
+                <table class="b-table">
+                        <tr><td>E-MAIL</td> <td>{$user->getEmail()}</td></tr>
+                        <tr><td>Pseudo</td> <td>{$user->getUsername()}</td></tr>
+                        <tr><td>Date de naissance</td> <td>{$user->getBirthday()}</td></tr>
+                        <tr><td>Date de création</td> <td>{$user->getJoin()}</td></tr>
+                        <tr><td>Dérniére connection</td> <td>{$user->getLastSean()}</td></tr>
+                </table>
+                <h2>Messages</h2>
+                <table class="b-table">
+                    <tr><th>Date</th><th>Message</th></tr>
+                    $forumHTML
+                </table>
+                <h2>Lecture</h2>
+                
+                <table class="b-table">
+                    <tr><th>Tome</th><th>Page</th><th>Like</th></tr>
+                    
+                    $readingHTML
+                </table>
+            </div>
+        EOT;
+
+        $mpdf->WriteHTML(
+            <<<EOT
+            .b-table, .b-table th, .b-table td {
+              border: 1px solid;
+              padding: 5px;
+            }
+            .b-table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            EOT, \Mpdf\HTMLParserMode::HEADER_CSS);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->SetHTMLFooter(
+            <<<EOT
+            <table style="width: 100%; vertical-align: bottom; font-family: serif; font-size: 8pt; color: #000000; font-weight: bold; font-style: italic;">
+                <tr>
+                    <td width="33%">{DATE j-m-Y}</td>
+                    <td width="33%" align="center">{PAGENO}/{nbpg}</td>
+                    <td width="33%" style="text-align: right;">NyanScan - {$user->getUsername()}</td>
+                </tr>
+            </table>
+            EOT
+        );
+
+        $mpdf->SetTitle("NyanScan_profil_de_{$user->getUsername()}.pdf");
+
+        $mpdf->Output();
+        exit();
+    }
+
     $data = $user->getAPIData($userid === 'me');
 
     if (isset($query['details']) && $query['details'] === '1') {
@@ -101,10 +182,11 @@ function _change_user_email() {
 
 function _change_user_pseudo() {
 	__check_password_for_edit();
-    // todo: check duplicate
 	$pseudo = $_POST['username']??null;
 	if ($pseudo === null || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', $pseudo))
 		bad_request("Le pseudo ne peut contenir que des minuscules, majuscules, chiffres ou un \"_\" avec une longueur maximale de 20 caractères.");
+
+    if (getDB()->select(TABLE_USER, ['id'], ['username' => $pseudo], 1)) bad_request("Ce nom d'utilisateur est deja reliée à un compte.");
 
 	getDB()->update(TABLE_USER, ['username' => $pseudo], ['id' => get_log_user()->getId()]);
 	success();
@@ -145,6 +227,80 @@ function _change_user_password() {
 	getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_PASSWORD_CHANGE, "token" => $token_2, "value" => password_hash($new_password, PASSWORD_DEFAULT)]);
 	send_password_change_verification($token_2, $user->getId(), $user->getEmail(), $user->getUsername());
 	success();
+}
+
+function _user_delete_self() {
+    __check_password_for_edit();
+    $user = get_log_user();
+    $verification_token = createMD5Token();
+    $token_2 = createMD5Token();
+    // delete old verification
+    getDB()->delete(TABLE_VERIFICATION, ["user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_DELETE]);
+    getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user->getId(), 'type' => VERIFICATION_TYPE_DELETE, "token" => $token_2]);
+    send_email_delete_account($token_2, $user->getId(), $user->getEmail(), $user->getUsername());
+    success();
+}
+
+function _forget_password()
+{
+    $email = $_POST['email']??null;
+
+    if ($email !== null) {
+
+        $new_password = $_POST['password']??null;
+        $new_password_verification = $_POST['password-v']??null;
+
+        if ($new_password === null || $new_password_verification === null) bad_request('Formulaire incomplet');
+        if ($new_password !== $new_password_verification) bad_request('Les mots de passes ne coresponde pas');
+        if (strlen($new_password) < 8 || strlen($new_password) > 60) bad_request("Le mots de passe doit contenir au minimum 8 caractères et au maximum 60 caractères");
+
+        // always success to prevent email discovery
+        $user = getDB()->select(TABLE_USER, ['id', 'status', 'username', 'email'], ['email' => $email], 1);
+        if ($user && (intval($user['status']) & STATUS_DELETE) === 0) {
+            $verification_token = createMD5Token();
+            $token_2 = createMD5Token();
+            getDB()->delete(TABLE_VERIFICATION, ["user_id" => $user['id'], 'type' => VERIFICATION_TYPE_PASSWORD_FORGET]);
+            getDB()->insert(TABLE_VERIFICATION, ["id" => $verification_token, "user_id" => $user['id'], 'type' => VERIFICATION_TYPE_PASSWORD_FORGET, "token" => $token_2, "value" => password_hash($new_password, PASSWORD_DEFAULT)]);
+            send_email_forget_password($token_2, $user['id'], $user['email'], $user['username']);
+        }
+    } else bad_request('empty email');
+    success();
+}
+
+function _change_user_avatar()
+{
+    $user = get_log_user();
+    if (!$user->is_connected()) unauthorized();
+
+    // verification
+    foreach (AVATAR_SETTINGS as $key => $value) {
+        $userValue = $_POST[$key]??null;
+        if (!is_numeric($userValue) || $userValue >= $value['count'] || ($userValue < 0 && !$value["nullable"])) bad_request("Invalid request");
+    }
+
+
+    $background = imagecreatetruecolor(102, 102);
+    $full_alpha = imagecolorallocatealpha($background, 0, 0, 0, 127);
+    imagefill($background, 0, 0, $full_alpha);
+    imagesavealpha($background, true);
+    ImageAlphaBlending($background, true);
+
+
+    foreach (AVATAR_SETTINGS as $key => $value) {
+        $userValue = $_POST[$key]??null;
+        if ($userValue !== null && $userValue >= 0) {
+            $i = imagecreatefrompng(__DIR__ . "/../../src/res/avatar/$key/$userValue.png");
+            ImageCopy($background, $i, 0, 0, 0, 0, 102, 102);
+        }
+    }
+
+    $img = new Picture();
+    $img->create_from_ressource($background, PICTURE_FORMAT_WEBP, $user->getId(), 'Phto de profil de ' . $user->getUsername());
+    $img->save();
+
+    getDB()->update(TABLE_USER, ['avatar' => $img->get_id()], ['id' => $user->getId()]);
+
+    success();
 }
 
 /**

@@ -8,7 +8,7 @@ class Footer extends Component {
             <div id="ns-footer">
                 <div id="ns-footer-logo">
                     <ns-a href="/" class="ns-center flex-column">
-                        <img class="ns-logo" src="../res/logo-ns.png" alt="nyanscan-logo">
+                        <img class="ns-logo" src="../res/icons/512.png" alt="nyanscan-logo">
                         <div>
                             <h3 class="ns-fs-4 text-center">NyanScan</h3>
                             <p class="ns-fs-4 text-center">Ton site de scan préféré</p>
@@ -70,7 +70,7 @@ class Header extends Component {
                 </div>
             </div>
             <div class="d-flex gap-3 justify-content-center align-items-center">
-                <ns-a href="/" class="ms-2"><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a>
+                <ns-a href="/" class="ms-2"><img src="../res/icons/512.png" alt="nyanscan-logo" width="38"></ns-a>
                 <ns-a class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/catalogue">Catalogue</ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/events">Évènements</ns-a>
@@ -93,7 +93,7 @@ class Header extends Component {
             <div class="ns-d-none-mlg">
                <ns-a class='ns-a-1 nav-link ns-hide-connected' href='/auth'>Se Connecter</ns-a>
                <span class='ns-a-1 nav-link ns-hide-disconnected d-inline' href='/auth' onclick="window.APP.user.logout(true)">Se Déconnecter</span>
-               <ns-a class="ns-hide-disconnected d-inline" href='/u/me'><img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive ns-avatar-sm"></ns-a>
+               <ns-a class="ns-hide-disconnected d-inline" href='/u/me'><img src="/res/profile.webp" id="ns-header-profile-picture" alt="profilePhoto" class="ns-avatar img-responsive ns-avatar-sm"></ns-a>
             </div>
         </nav>  
         <nav id="horizontal-mobile-nav" style="display: none">
@@ -138,7 +138,7 @@ class Header extends Component {
     }
 
     updateLogStatus() {
-
+        _('#ns-header-profile-picture').src = this.app.user.profile_picture;
         const login = _('#ns-h-log');
         if (!login) {
             return;
@@ -188,6 +188,7 @@ class Header extends Component {
         _('#horizontal-mobile-nav').addEventListener('click', (e) => {
             if (e.target && e.target.id === 'horizontal-mobile-nav') _('#horizontal-mobile-nav').style.display = 'none';
         });
+        _('#ns-header-profile-picture').src = this.app.user.profile_picture;
     }
 
     constructor(app) {
