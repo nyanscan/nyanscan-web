@@ -59,14 +59,14 @@ function _new_event() {
         bad_request("l'utilisateur a deja un évènement en attente de vérification.");
     }
 
-    $name = $_POST["name"] ?? null;
-    $startDate = $_POST["start_date"] ?? null;
-    $endDate = $_POST["end_date"] ?? null;
-    $maxUser = $_POST["max_user"] ?? null;
-    $isDistance = $_POST["is_distance"] ?? null;
+    $name = $_POST["title"] ?? null;
+    $startDate = strtotime($_POST["dateStart"] ?? null);
+    $endDate = strtotime($_POST["dateEnd"] ?? null);
+    $maxUser = $_POST["nbPer"] ?? null;
+    $isDistance = $_POST["format"] ?? null;
     $address = $_POST["address"] ?? null;
-    $contact = $_POST["contact"] ?? null;
-    $contactPhone = $_POST["contact_phone"] ?? null;
+    $contact = $_POST["contactName"] ?? null;
+    $contactPhone = $_POST["contactTel"] ?? null;
     $link = $_POST["link"] ?? null;
     $description = $_POST["description"] ?? null;
 
@@ -75,48 +75,35 @@ function _new_event() {
     if ($name === null || strlen($name) < 1 || strlen($name) > 100) {
         $error[] = "Titre invalide.";
     }
-    //TODO to implement correctly
-    $startDateExploded = explode("-", $startDate);
-    if( count($startDateExploded)!=3 || !checkdate($startDateExploded[1], $startDateExploded[2], $startDateExploded[0]) ){
-        $error[] = "Date de début incorrecte.";
-    }else{
-        $correctStart = (time() - strtotime($startDate))/60/60/24/365.25;
-        if($correctStart<1){
-            $error[] = "Vous ne pouvez pas créer d'évènement commençant aujourd'hui ou avant.";
-        }
-    }
-    //TODO to implement correctly
-    $endDateExploded = explode("-", $endDate);
-    if( count($endDateExploded)!=3 || !checkdate($endDateExploded[1], $endDateExploded[2], $endDateExploded[0]) ){
-        $error[] = "Date de fin incorrecte.";
-    }else{
-        $correctEnd = (time() - strtotime($endDate))/60/60/24/365.25;
-        if($correctEnd<13){
-            $error[] = "Date de naissance hors borne.";
-        }
-    }
-    if ($maxUser === null || ($maxUser === 0)) {
+
+    if ($startDate <= time()) $error[] = "Vous ne pouvez pas créer d'évènement commençant aujourd'hui ou avant.";
+    if ($endDate <= $startDate) $error[] = "La date de fin ne dois pas être inférieur à la date de début";
+
+    if ($maxUser === null || ($maxUser <= 0)) {
         $error[] = "Nombre max. de participants invalide.";
     }
-    //TODO to implement correctly
-    if ($isDistance === null || ($isDistance != '1' && $isDistance != '2')) {
+    if ($maxUser = '' ) $maxUser = -1;
+
+    if ($isDistance != '1' && $isDistance != '2') {
         $error[] = "Préférence de présence invalide.";
     }
-    //TODO to implement correctly
+
     if ($address === null) {
         $error[] = "Adresse invalide.";
-    }
-    if ($contact === null) {
+    } elseif (strlen($address) === 0) $address = null;
+
+    if ($contact === null || strlen($contact) < 1 || strlen($contact) > 100) {
         $error[] = "Nom du contact invalide.";
     }
-    if ($contactPhone === null) {
+    if ($contactPhone === null || strlen($contactPhone) < 1 || strlen($contactPhone) > 20) {
         $error[] = "Numéro du contact invalide.";
     }
-    //TODO to implement correctly
+
     if ($link === null) {
         $error[] = "Lien invalide.";
-    }
-    if ($description === null || strlen($name) < 1 || strlen($name) > 2000) {
+    } elseif (strlen($link) === 0) $link = null;
+
+    if ($description === null || strlen($description) < 1 || strlen($description) > 2000) {
         $error[] = "Description trop longue (2000 max.) ou inexistante.";
     }
 
@@ -137,7 +124,7 @@ function _new_event() {
         } else {
             $img->resize(720, 576);
             $img->set_author($user->getId());
-            $img->set_title("Image pour l'évènement' " . substr($name, 0, 24) . '...');
+            $img->set_title("Image pour l'évènement " . substr($name, 0, 20) . '...');
             $img->add_logo();
             $img->save();
             getDB()->insert(TABLE_EVENT, [

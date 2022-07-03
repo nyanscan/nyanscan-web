@@ -147,7 +147,7 @@ try {
             require __DIR__ . '/../../../private/api/projectController.php';
             invokeProject($method, $function, $query);
             break;
-        case 'event':
+        case 'events':
             require __DIR__ . '/../../../private/api/eventController.php';
             invokeEvent($method, $function, $query);
             break;

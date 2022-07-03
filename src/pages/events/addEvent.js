@@ -25,26 +25,29 @@ export default class extends Pages {
             </div>
             <div class="ns-center">
                 <form id="ns-event-form" class="ns-categ-topic my-5">
-                    <div>
-                        <div>
-                            <u>Miniature de l'évènement</u>
-                            <div>
-                                Ratio: 4/3 <br>
-                                Format : JPG ou GIF<br>
-                                Poids : 500Ko max.
-                            </div>
-                            <p>
-                                Celle-ci représentera votre évènement sur Nyanscan.
-                            </p>
-                        </div>
-                        <div>
-                            <div  style="width: 320px;height: 240px;overflow: hidden" class="ns-picture-preview">
-                                <canvas id="ns-event-preview" width="320" height="240"></canvas>
-                            </div>
-                        </div>
-                        <div class="my-3">
-                            <input id="ns-event-picture" type="file" name="picture" accept="image/png,image/jpeg">
-                        </div>
+                	<div class="d-flex flex-row gap-3 flex-wrap">
+						<div>
+							<div class="ns-project-picture-edit" style="width: 320px; height: 240px">
+							   <canvas id="ns-event-preview" width="320" height="240"></canvas>
+							   <label style="line-height: 240px">
+									<i class="b bi-plus-circle"></i>
+									<input id="ns-event-picture" type="file" name="picture" accept="image/png,image/jpeg">
+								</label>
+							</div>   
+						</div>
+						<div>
+							<div>
+								<u>Miniature de l'évènement</u>
+								<div>
+									Ratio: 4/3 <br>
+									Format : JPG ou GIF<br>
+									Poids : 500Ko max.
+								</div>
+								<p>
+									Celle-ci représentera votre évènement sur Nyanscan.
+								</p>
+							</div>
+						</div>
                     </div>
                     <div>
                         <div class="ns-form-group">
@@ -64,7 +67,7 @@ export default class extends Pages {
                         </div>
                         <div class="ns-form-group">
                             <label for="ns-event-nbPer" class="form-label">Nombre de personnes maximum</label>
-                            <input id="ns-event-nbPer" name="nbPer" type="number" class="form-control">
+                            <input id="ns-event-nbPer" name="nbPer" type="number" min="1" max="1000" class="form-control">
                             <div class="form-text">Nombre de personnes maximum pouvant s'inscrire (laisser vide s'il n'y a pas lieu).</div>
                         </div>
                         <div class="ns-form-group">
@@ -135,20 +138,17 @@ export default class extends Pages {
 		if(this.pictureInput.files) {
 			const file = this.pictureInput.files[0];
 			if (file.type === 'image/png' || file.type === 'image/jpeg') {
-				console.log(file.size);
 				if (file.size <= 1e6) {
 					window.URL = window.URL || window.webkitURL;
 					this.pictureURL = window.URL.createObjectURL(file);
 					this.previewImage.src = this.pictureURL;
 				} else {
-					// todo warn
-					this.pictureInput.value = '';
-					console.warn('too heavy');
+					event.target.value = '';
+					this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image à un poid limite de 1Mo !');
 				}
 			} else {
-				//todo warn
 				this.pictureInput.value = '';
-				console.warn('invalid format');
+				this.app.openInfoModal(TYPE_ERROR, 'Upload image invalide', 'L\'image dois être en png ou jpg !');
 			}
 		} else {
 			this.previewImage.src = '';
@@ -158,17 +158,10 @@ export default class extends Pages {
 	send(event) {
 		event.preventDefault();
 		const fd = new FormData(event.target);
-		sendApiPostRequest('events/create', fd, this.sendCallback.bind(this), this.sendProgressCallback.bind(this));
+		sendApiPostRequest('events/create', fd, this.sendCallback.bind(this));
 	}
 	
-	sendProgressCallback(event) {
-		console.log(event);
-		const percent = Math.round( (event.loaded / event.total) * 100);
-		this.app.loading.progress = percent;
-		if (percent >= 100)
-			this.app.loading.textHtml = `Enregistrement de votre évènement en cours... Vous pouvez aller à la page <ns-a class="ns-tickle-pink-btn ns-btn-sm">d'accueil</ns-a> le temps que le processus se termine ou patientez : Vous serez automatiquement redirigé à la fin.`
-	}
-	
+
 	sendCallback(event) {
 		const $repStatus = checkApiResStatus(event);
 		if ($repStatus === API_REP_OK) {
@@ -180,7 +173,7 @@ export default class extends Pages {
 			this.errorBlock.innerHTML = '';
 			this.errorBlock.style.display = 'block';
 			for (let errElement of err) {
-				createPromise('e', null, this.errorBlock).then(e => e.innerText = errElement);
+				createPromise('p', null, this.errorBlock).then(e => e.innerText = errElement);
 			}
 		} else {
 			//todo warn
