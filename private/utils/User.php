@@ -13,6 +13,7 @@ class User {
     private int $status;
     private $join;
     private $last_sean;
+    private ?string $avatar;
     private ?string $verification_token = null;
     private int $permission = PERMISSION_DISCONNECT;
 
@@ -65,7 +66,7 @@ class User {
 	}
 
     private function fetch_data($where) {
-        $raw = $this->db_adapter->select(TABLE_USER, ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'permission'], $where, 1);
+        $raw = $this->db_adapter->select(TABLE_USER, ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'permission', 'avatar'], $where, 1);
 
         if ($raw) {
             $this->is_log = true;
@@ -78,6 +79,7 @@ class User {
             $this->join = $raw["date_inserted"];
             $this->last_sean = $raw["date_updated"]??$this->join;
             $this->permission = $raw["permission"];
+            $this->avatar = $raw["avatar"];
         } elseif (isset($where["token"])) {
 			unauthorized(true);
         }
@@ -85,7 +87,7 @@ class User {
 
     public function login($email, $password) : bool {
 
-        $raw = $this->db_adapter->select(TABLE_USER, ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'permission', 'password'], [
+        $raw = $this->db_adapter->select(TABLE_USER, ['id', 'token', 'username', 'email', 'birthday', 'status', 'date_inserted', 'date_updated', 'permission', 'password', 'avatar'], [
             "email" => $email
         ], 1);
 
@@ -122,6 +124,7 @@ class User {
         $this->join = $raw["date_inserted"];
         $this->last_sean = $raw["date_updated"]??$this->join;
         $this->permission = $raw["permission"];
+        $this->avatar = $raw["avatar"];
         $this->email = $email;
 
         if ($this->is_verified()) {
@@ -190,6 +193,7 @@ class User {
             "age" => $this->getAge(),
             "join" => $this->join,
             "last_sean" => $this->last_sean,
+            "avatar" => $this->avatar,
         ];
 
         if ($self) {

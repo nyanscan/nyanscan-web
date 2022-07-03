@@ -1,3 +1,115 @@
+class EditAvatarModal extends Component {
+
+    data;
+    previewContainer;
+    settingsContainer;
+
+    settings = {};
+
+    get raw() {
+        return `
+         <form id="ns-modal-profile-avatar-form">
+            <h3>Modifier la photo de profil</h3>
+            <div class="ns-modal-profile-avatar-inside">
+                <div id="ns-modal-profile-avatar-preview" class="ns-empty-placeholder"></div>
+                <div id="ns-modal-profile-avatar-settings" class="ns-empty-placeholder"></div>
+            </div>
+            
+            <div class="ns-modal-btn-container">
+                <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
+                <button type="submit" class="ns-tickle-pink-bg">Modifier</button>
+            </div>
+        </form>
+        `;
+    }
+
+    constructor(app) {
+        super(app, COMPONENT_TYPE_MODAL);
+    }
+
+    build(parent) {
+        super.build(parent);
+        this.previewContainer = _('#ns-modal-profile-avatar-preview');
+        this.settingsContainer = _('#ns-modal-profile-avatar-settings');
+        sendApiGetFetch('avatar-settings').then( data => {
+            this.data = data;
+            this.loadData();
+            _('#ns-modal-profile-avatar-form').addEventListener('submit', this.send.bind(this));
+        }).catch((r) => {
+            window.APP.closeModal();
+            window.APP.openInfoModal(TYPE_ERROR, 'Une erreur est survenue', 'Verifier vottre conexion internet et réssayer');
+        })
+    }
+
+    loadData() {
+        const imageContainer = create('div', null, this.previewContainer, 'ns-modal-profile-avatar-images');
+        for (let key in this.data) {
+            let type = this.data[key];
+            this.settings[key] = {};
+            this.settings[key].img = create('img', null, imageContainer);
+
+            const btnGroup = create('div', null, this.settingsContainer, 'ns-modal-profile-avatar-btn-group');
+            createPromise('span', null, btnGroup).then(e => e.innerText = type.display);
+            const btns = create('div', null, btnGroup);
+            createPromise('button', null, btns).then(e => {
+                e.type = 'button';
+                create('i', null, e, 'bi', 'bi-caret-left-fill');
+                e.addEventListener('click', this.changeSettings.bind(this, key, false));
+            })
+            this.settings[key].label = create('span', null, btns);
+            this.settings[key].value = type.nullable ? -1 : 0;
+            createPromise('button', null, btns).then(e => {
+                e.type = 'button';
+                create('i', null, e, 'bi', 'bi-caret-right-fill');
+                e.addEventListener('click', this.changeSettings.bind(this, key, true));
+            })
+        }
+        this.updateDisplay();
+    }
+
+    changeSettings(name, right, event) {
+        event.preventDefault();
+
+        let current = this.settings[name].value;
+        let max = this.data[name]['count'] - 1;
+        let min = this.data[name]['nullable'] ? -1 : 0;
+
+        let newValue = current + (right ? 1 : -1);
+        if (newValue > max) newValue = min;
+        else if (newValue < min) newValue = max;
+        this.settings[name].value = newValue;
+        console.log(this.settings);
+        this.updateDisplay();
+    }
+
+    updateDisplay() {
+        for (let key in this.settings) {
+            this.settings[key].label.innerText = this.settings[key].value < 0 ? 'Aucun' : this.settings[key].value;
+            const img = this.settings[key].img;
+            const newUrl = this.settings[key].value < 0 ? '' : `/res/avatar/${key}/${this.settings[key].value}.png`;
+            if (img.src !== newUrl) img.src = newUrl;
+        }
+    }
+
+    send(e) {
+        e.preventDefault();
+        const fd = new FormData;
+        for (let key in this.settings) {
+            fd.set(key, this.settings[key].value);
+        }
+        loadingScreen(true);
+        sendApiPostFetch('user/edit/avatar', fd).then(() => {
+            window.APP.closeModal();
+            window.APP.reload();
+        }).catch((r) => {
+            console.log(r);
+            window.APP.closeModal();
+            window.APP.openInfoModal(TYPE_ERROR, 'Une erreur est survenue', 'Verifier vottre conexion internet et réssayer');
+        }).finally(() => loadingScreen(false));
+    }
+
+}
+
 class EditInfoModal extends Component {
 
     static TYPE_EMAIL = 0;
@@ -114,8 +226,9 @@ export default class extends Pages {
                     <div class="ns-scan-preview-profil">
                         <section class="flex-column flex-md-row d-flex">
                             <div class="col-md-8 d-flex justify-content-start align-items-center gap-3">
-                                <div class="p-2">
+                                <div class="p-2${this.isSelf ? ' ns-profile-avatar-edit' : ''}">
                                     <img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive">
+                                    ${this.isSelf ? '<i class="bi bi-pencil"></i>' :''}
                                 </div>
                                 <div class="p-2">
                                     <h3><ns-api-data field="username"></ns-api-data></h3>
@@ -233,7 +346,7 @@ export default class extends Pages {
             })
         })
         let  download =_('#ns-profile-download');
-        console.log(this.app.user.permissionLevel);
+        _('.ns-profile-avatar-edit').forEach(e => e.addEventListener('click', () => window.APP.openModal(new EditAvatarModal(window.APP))));
         if (this.isSelf || this.app.user.permissionLevel >= 200 ) {
             download.addEventListener('click', evt => {
 

@@ -8,7 +8,7 @@ class Footer extends Component {
             <div id="ns-footer">
                 <div id="ns-footer-logo">
                     <ns-a href="/" class="ns-center flex-column">
-                        <img class="ns-logo" src="../res/logo-ns.png" alt="nyanscan-logo">
+                        <img class="ns-logo" src="../res/icons/512.png" alt="nyanscan-logo">
                         <div>
                             <h3 class="ns-fs-4 text-center">NyanScan</h3>
                             <p class="ns-fs-4 text-center">Ton site de scan préféré</p>
@@ -70,7 +70,7 @@ class Header extends Component {
                 </div>
             </div>
             <div class="d-flex gap-3 justify-content-center align-items-center">
-                <ns-a href="/" class="ms-2"><img src="../res/logo-ns.png" alt="nyanscan-logo" width="38"></ns-a>
+                <ns-a href="/" class="ms-2"><img src="../res/icons/512.png" alt="nyanscan-logo" width="38"></ns-a>
                 <ns-a class="ns-a-1 ns-d-none-mlg" href="/forum">Forum</ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/catalogue">Catalogue</ns-a>
                 <ns-a  class="ns-a-1 ns-d-none-mlg" href="/events">Évènements</ns-a>

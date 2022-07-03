@@ -254,9 +254,9 @@ class User {
         return (this.token !== null && this.id !== null) ? `${this.id} ${this.token}` : null;
     }
 
-    //TODO avatar
     get profile_picture() {
-        return '/res/profile.webp';
+        if (this.data['avatar'] !== null) return image_id_to_path(this.data['avatar']);
+        return  '/res/profile.webp';
     }
 
     constructor(app) {
@@ -455,7 +455,7 @@ class Error404 extends Pages {
                     <div id="error" class="ns-theme-bg ns-theme-text rounded-3 my-5 align-self-center col-10 offset-1 col-md-8 offset-md-2">
                         <div class="ns-center w-100 h-100 flex-row flex-wrap">
                             <div class="w-100 ns-center py-2">
-                                <ns-a href="/"><img src="/res/logo-ns.png" alt="nyanscan logo" class="ns-logo-404"></a>
+                                <ns-a href="/"><img src="/res/icons/512.png" alt="nyanscan logo" class="ns-logo-404"></a>
                             </div>
                             <h1 class="w-auto my-5 me-lg-5 w-25 ps-1 ns-404-h1">404</h1>
                             <p class="w-75 w-lg-50 py-2">Oops, on a cherché aux quatre coins du serveur, mais il semble que cette page n'existe plus ou a été déplacé...</p>

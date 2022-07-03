@@ -53,3 +53,9 @@ const VERIFICATION_TYPE_EMAIL_CHANGE = 1;
 const VERIFICATION_TYPE_PASSWORD_CHANGE = 2;
 const VERIFICATION_TYPE_DELETE = 3;
 const VERIFICATION_TYPE_PASSWORD_FORGET = 4;
+
+const AVATAR_SETTINGS = [
+    "background" => ["display"=> "Fond", "count" => 9, "nullable" => false],
+    "body" => ["display" => "Corp", "count" => 22, "nullable" => false],
+    "head" => ["display" => "Tête", "count" => 21, "nullable" => false]
+];

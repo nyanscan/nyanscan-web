@@ -140,6 +140,9 @@ try {
             require(__DIR__ . '/../../../private/captchaUtils.php');
             if ($method === 'GET' && count($function) === 0) _get_captcha_settings();
             break;
+        case 'avatar-settings':
+            if ($method === 'GET' && count($function) === 0) success(AVATAR_SETTINGS);
+            break;
         case 'project':
             require __DIR__ . '/../../../private/api/projectController.php';
             invokeProject($method, $function, $query);

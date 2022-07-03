@@ -22,6 +22,7 @@ function invokeUser($method, $function, $query) {
 				case 'username': _change_user_pseudo(); break;
 				case 'birthday': _change_user_birthday(); break;
 				case 'password': _change_user_password(); break;
+                case 'avatar': _change_user_avatar(); break;
 			}
         }
     } else {
@@ -263,6 +264,42 @@ function _forget_password()
             send_email_forget_password($token_2, $user['id'], $user['email'], $user['username']);
         }
     } else bad_request('empty email');
+    success();
+}
+
+function _change_user_avatar()
+{
+    $user = get_log_user();
+    if (!$user->is_connected()) unauthorized();
+
+    // verification
+    foreach (AVATAR_SETTINGS as $key => $value) {
+        $userValue = $_POST[$key]??null;
+        if (!is_numeric($userValue) || $userValue >= $value['count'] || ($userValue < 0 && !$value["nullable"])) bad_request("Invalid request");
+    }
+
+
+    $background = imagecreatetruecolor(102, 102);
+    $full_alpha = imagecolorallocatealpha($background, 0, 0, 0, 127);
+    imagefill($background, 0, 0, $full_alpha);
+    imagesavealpha($background, true);
+    ImageAlphaBlending($background, true);
+
+
+    foreach (AVATAR_SETTINGS as $key => $value) {
+        $userValue = $_POST[$key]??null;
+        if ($userValue !== null && $userValue >= 0) {
+            $i = imagecreatefrompng(__DIR__ . "/../../src/res/avatar/$key/$userValue.png");
+            ImageCopy($background, $i, 0, 0, 0, 0, 102, 102);
+        }
+    }
+
+    $img = new Picture();
+    $img->create_from_ressource($background, PICTURE_FORMAT_WEBP, $user->getId(), 'Phto de profil de ' . $user->getUsername());
+    $img->save();
+
+    getDB()->update(TABLE_USER, ['avatar' => $img->get_id()], ['id' => $user->getId()]);
+
     success();
 }
 
