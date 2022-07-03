@@ -82,7 +82,7 @@ function _new_event() {
     if ($maxUser === null || ($maxUser <= 0)) {
         $error[] = "Nombre max. de participants invalide.";
     }
-    if ($maxUser = '' ) $maxUser = -1;
+    if ($maxUser === '' ) $maxUser = -1;
 
     if ($isDistance != '1' && $isDistance != '2') {
         $error[] = "Préférence de présence invalide.";
@@ -133,8 +133,8 @@ function _new_event() {
                 "name" => $name,
                 "description" => $description,
                 "max_user" => $maxUser,
-                "start_date" => $startDate,
-                "end_date" => $endDate,
+                "start_date" => $_POST["dateStart"],
+                "end_date" => $_POST["dateEnd"],
                 "is_distance" => $isDistance,
                 "address" => $address,
                 "contact" => $contact,
@@ -184,7 +184,7 @@ function _fetch_event($id) {
 }
 
 function _admin_fetch_events($query) {
-    admin_fetch(TABLE_EVENT, ["id", "author", "picture", "name", "description", "start_date", "end_date", "max_user", "is_distance", "address", "contact", "contact_phone" , "link", "status", "date_inserted"], $query, 'id');
+    admin_fetch(TABLE_EVENT, ["id", "author", "picture", "name", "description", "start_date", "end_date", "max_user", "is_distance", "address", "contact", "contact_phone" , "link", "status", "date_inserted"], $query, 'id', ['name', 'description']);
 }
 
 function _change_status_event() {
@@ -201,14 +201,15 @@ function _change_status_event() {
     if (!is_numeric($status) || intval($status) < 0 || $status > EVENT_STATUS_PUBLISHED) {
         bad_request("wrong status");
     }
+    if (strlen($reason) > 255) {
+        bad_request("La raison ne doit pas dépasser les 255 caractères.");
+    }
 
     $event = getDB()->select(TABLE_EVENT, ['id', 'author', 'name'], ["id" => $eventID], 1);
     if (!$event) {
         bad_request("wrong event");
     }
-    if (strlen($reason) > 255) {
-        bad_request("La raison ne doit pas dépasser les 255 caractères.");
-    }
+
 
     getDB()->update(TABLE_EVENT, ["status" => $status], ["id" => $eventID]);
 

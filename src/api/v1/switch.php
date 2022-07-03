@@ -125,7 +125,7 @@ if ($path) {
     }
 }
 
-try {
+//try {
     switch ($controller) {
         case 'forum':
             require __DIR__ . '/../../../private/api/forumController.php';
@@ -161,9 +161,9 @@ try {
             require __DIR__ . '/../../../private/api/otherController.php';
             invokeDefault($method, [$controller, ...$function], $query); break;
     }
-} catch (Exception $e) {
-    json_exit(500, "Internal Server Error", "Internal Server Error");
-}
+//} catch (Exception $e) {
+//    json_exit(500, "Internal Server Error", "Internal Server Error");
+//}
 
 
 function _get_captcha_settings() {
