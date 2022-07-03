@@ -15,17 +15,6 @@ if ($method === "OPTIONS") exit(200);
 
 require(__DIR__ . '/../../../private/utils/forum.php');
 require(__DIR__ . '/../../../private/utils/mailer.php');
-require(__DIR__ . '/../../../private/captchaUtils.php');
-
-
-
-include __DIR__ . '/../../../private/api/forumController.php';
-include __DIR__ . '/../../../private/api/authController.php';
-include __DIR__ . '/../../../private/api/userController.php';
-include __DIR__ . '/../../../private/api/projectController.php';
-include __DIR__ . '/../../../private/api/adminController.php';
-include __DIR__ . '/../../../private/api/searchController.php';
-include __DIR__ . '/../../../private/api/otherController.php';
 
 function my_error_handler() {
     $last_error = error_get_last();
@@ -136,38 +125,46 @@ if ($path) {
     }
 }
 
-switch ($controller) {
-    case 'forum':
-        invokeForm($method, $function, $query);break;
-    case 'auth':
-        invokeAuth($method, $function, $query); break;
-    case 'user':
-        invokeUser($method, $function, $query); break;
-    case 'captchaSettings':
-        if ($method === 'GET' && count($function) === 0) _get_captcha_settings();
-        break;
-    case 'project':
-        try {
+try {
+    switch ($controller) {
+        case 'forum':
+            require __DIR__ . '/../../../private/api/forumController.php';
+            invokeForm($method, $function, $query);break;
+        case 'auth':
+            require __DIR__ . '/../../../private/api/authController.php';
+            invokeAuth($method, $function, $query); break;
+        case 'user':
+            require __DIR__ . '/../../../private/api/userController.php';
+            invokeUser($method, $function, $query); break;
+        case 'captchaSettings':
+            require(__DIR__ . '/../../../private/captchaUtils.php');
+            if ($method === 'GET' && count($function) === 0) _get_captcha_settings();
+            break;
+        case 'avatar-settings':
+            if ($method === 'GET' && count($function) === 0) success(AVATAR_SETTINGS);
+            break;
+        case 'project':
+            require __DIR__ . '/../../../private/api/projectController.php';
             invokeProject($method, $function, $query);
-        } catch (Exception $e) {
-            //to handle ?
-            //can cause unhandled exception
-        }
-        break;
-    case 'event':
-        try {
+            break;
+        case 'event':
+            require __DIR__ . '/../../../private/api/eventController.php';
             invokeEvent($method, $function, $query);
-        } catch (Exception $e) {
-            //to handle too
-        }
-        break;
-    case 'admin':
-        invokeAdmin($method, $function, $query); break;
-    case 'search':
-        invokeSearch($method, $function, $query); break;
-    default:
-	    invokeDefault($method, [$controller, ...$function], $query); break;
+            break;
+        case 'admin':
+            require __DIR__ . '/../../../private/api/adminController.php';
+            invokeAdmin($method, $function, $query); break;
+        case 'search':
+            require __DIR__ . '/../../../private/api/searchController.php';
+            invokeSearch($method, $function, $query); break;
+        default:
+            require __DIR__ . '/../../../private/api/otherController.php';
+            invokeDefault($method, [$controller, ...$function], $query); break;
+    }
+} catch (Exception $e) {
+    json_exit(500, "Internal Server Error", "Internal Server Error");
 }
+
 
 function _get_captcha_settings() {
     success([

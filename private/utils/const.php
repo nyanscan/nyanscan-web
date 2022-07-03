@@ -3,6 +3,7 @@
 const STATUS_NOTHING = 0;
 const STATUS_EMAIL_VERIFIED = 1;
 const STATUS_EMAIL_NEWS_LETTER = 1 << 1;
+const STATUS_DELETE = 1 << 2;
 
 const MESSAGE_STATUS_EDITED = 0b1;
 
@@ -41,7 +42,7 @@ const PICTURE_FORMAT_GIF = 'g';
 
 const FORMAT_EXTENSION = [
     PICTURE_FORMAT_NONE => null,
-    PICTURE_FORMAT_WEBP => 'wepb',
+    PICTURE_FORMAT_WEBP => 'webp',
     PICTURE_FORMAT_PNG => 'png',
     PICTURE_FORMAT_JPG => 'jpg',
     PICTURE_FORMAT_GIF => 'gif',
@@ -50,3 +51,11 @@ const FORMAT_EXTENSION = [
 const VERIFICATION_TYPE_EMAIL_CREATE = 0;
 const VERIFICATION_TYPE_EMAIL_CHANGE = 1;
 const VERIFICATION_TYPE_PASSWORD_CHANGE = 2;
+const VERIFICATION_TYPE_DELETE = 3;
+const VERIFICATION_TYPE_PASSWORD_FORGET = 4;
+
+const AVATAR_SETTINGS = [
+    "background" => ["display"=> "Fond", "count" => 9, "nullable" => false],
+    "body" => ["display" => "Corp", "count" => 22, "nullable" => false],
+    "head" => ["display" => "Tête", "count" => 21, "nullable" => false]
+];

@@ -62,6 +62,23 @@ class Picture {
         }
     }
 
+    public function create_from_ressource($resource, string $format, ?int $author=null, ?string $title = null): bool {
+        if ($this->isLoad) {
+            return false;
+        }
+        $this->id = $format . uniqIdReal(23);
+        $this->author = $author;
+        $this->title =  $title;
+        $this->format =  $format;
+        $this->isNew = true;
+        $this->resource = $resource;
+        if (!$this->resource) {
+            return false;
+        }
+        $this->isLoad = true;
+        return true;
+    }
+
     /**
      * @throws Exception
      */

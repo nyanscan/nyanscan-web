@@ -55,6 +55,7 @@ class ForumMessage extends Component {
     replyBlock;
     placeHolder;
     isAuthor;
+    avatar;
 
     set loading(v) {
         this.isLoading = v;
@@ -66,7 +67,7 @@ class ForumMessage extends Component {
     get raw() {
         return `
             <ns-a href="/u/${this.data['author']?.['id']}" class="nsf-message-user">
-                <img class="ns-avatar ns-avatar-md" src="/res/profile.webp">
+                <img class="ns-avatar ns-avatar-md" src="${this.avatar}">
                 <span class="nsf-message-username">${this.data['author']?.['username']}</span>  
             </ns-a>
             <div class="nsf-message-date">
@@ -100,6 +101,7 @@ class ForumMessage extends Component {
         this.data = data;
         this.isEdit = this.data['status'] && (parseInt(this.data['status']) & 1);
         this.isAuthor = this.app.user.isLog && this.app.user.id.toString() === this.data['author']['id'];
+        this.avatar = this.data['author']['avatar'] ? image_id_to_path(this.data['author']['avatar']) : '/res/profile.webp';
     }
 
     build(parent) {
