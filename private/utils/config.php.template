@@ -1,0 +1,36 @@
+<?php
+const DB_HOST = '127.0.0.1';
+const DB_NAME = 'nyanscan';
+const DB_PORT = '3306';
+const DB_DRIVER = 'mysql';
+const DB_USER = '';
+const DB_PREFIX = '';
+const DB_PASSWORD = '';
+
+
+const TABLE_FORUM_CATEGORY = 'FORUM_CATEGORY';
+const TABLE_FORUM_MESSAGE = 'FORUM_MESSAGE';
+const TABLE_FORUM_REPLY = 'FORUM_REPLY';
+const TABLE_FORUM_TOPIC = 'FORUM_TOPIC';
+const TABLE_FRIEND = 'FRIEND';
+const TABLE_USER = 'USER';
+const TABLE_VERIFICATION = 'VERIFICATION';
+const TABLE_PICTURE = 'PICTURE';
+const TABLE_PROJECT = 'PROJECT';
+const TABLE_VOLUME = 'VOLUME';
+const TABLE_CONNECTION = 'CONNECTION';
+const TABLE_EVENT = 'EVENT';
+const TABLE_EVENT_USER = 'EVENT_USER';
+const TABLE_INDEX_CAROUSEL = 'INDEX_CAROUSEL';
+
+const TABLE_LOG_ROOT = 'LOG_ROUTE';
+const TABLE_VOLUME_READING = 'VOLUME_READING';
+
+CONST VIEW_FULL_FORUM_MESSAGE = 'V_FULL_FORUM_MESSAGE';
+CONST VIEW_ROOT_FORUM_CATEGORIES = 'V_ROOT_FORUM_CATEGORIES';
+CONST VIEW_FORUM_REPLY_AUTHOR = 'V_FORUM_REPLY_AUTHOR';
+
+const PICTURE_PATH = '/home/nyanscan/picture/';
+const VOLUME_PATH = '/home/nyanscan/volume/';
+const LOGO_ALPHA_PATH = '/home/nyanscan/res/logo-alpha.png';
+const DOWNLOAD_PATH = '/home/nyanscan/download/';

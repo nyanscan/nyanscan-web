@@ -1,0 +1,8 @@
+RewriteEngine on
+
+Options All -Indexes
+
+<FilesMatch "^volume/">
+Order allow,deny
+Deny from all
+</FilesMatch>

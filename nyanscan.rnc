@@ -1,0 +1,10 @@
+datatypes w = "http://whattf.org/datatype-draft"
+
+ns-a.elem =
+    element ns-a {ns_a.attrs & ns_a.inner}
+ns-a.attrs =
+    (   common.attrs.basic
+    &   shared-hyperlink.attrs.hreflang?
+    )
+ns-a.inner =
+    ( common.inner.flow )
