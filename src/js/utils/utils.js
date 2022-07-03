@@ -255,7 +255,7 @@ class User {
     }
 
     get profile_picture() {
-        if (this.data['avatar'] !== null) return image_id_to_path(this.data['avatar']);
+        if (this.data?.['avatar']) return image_id_to_path(this.data['avatar']);
         return  '/res/profile.webp';
     }
 

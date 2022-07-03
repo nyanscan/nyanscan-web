@@ -37,7 +37,7 @@ function global_search($query) {
 }
 
 function user_search($v, $short): array {
-    $req = getDB()->get_pdo()->prepare('SELECT id, username FROM PAE_USER WHERE username LIKE :username ORDER BY LOCATE(:username_short, username) LIMIT ' . ($short ? '5' : '50'));
+    $req = getDB()->get_pdo()->prepare('SELECT id, username, avatar FROM PAE_USER WHERE username LIKE :username ORDER BY LOCATE(:username_short, username) LIMIT ' . ($short ? '5' : '50'));
     $req->execute(["username" => '%' . $v . '%', "username_short" => $v]);
     return $req->fetchAll(PDO::FETCH_ASSOC);
 }

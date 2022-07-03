@@ -62,7 +62,7 @@ export default class extends Pages {
         createPromise('ns-a', null, div).then( a => {
             a.href = `/u/${data.id}`;
             createPromise('img', null, a, 'ns-avatar').then(img => {
-                img.src = '/res/profile.webp';
+                img.src = data.avatar ? image_id_to_path(data.avatar) : '/res/profile.webp';
             })
         })
         createPromise('span', null, div).then(name => name.innerText = data.username);

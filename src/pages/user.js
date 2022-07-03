@@ -227,7 +227,7 @@ export default class extends Pages {
                         <section class="flex-column flex-md-row d-flex">
                             <div class="col-md-8 d-flex justify-content-start align-items-center gap-3">
                                 <div class="p-2${this.isSelf ? ' ns-profile-avatar-edit' : ''}">
-                                    <img src="/res/profile.webp" alt="profilePhoto" class="ns-avatar img-responsive">
+                                    <img src="/res/profile.webp" id="ns-profile-avatar" alt="profilePhoto" class="ns-avatar img-responsive">
                                     ${this.isSelf ? '<i class="bi bi-pencil"></i>' :''}
                                 </div>
                                 <div class="p-2">
@@ -402,6 +402,8 @@ export default class extends Pages {
             } else {
                 like.innerHTML = `Oh non c'est vide`;
             }
+            console.log(this.dataBlock.rawData);
+            _('#ns-profile-avatar').src = this.dataBlock.rawData.avatar ? image_id_to_path(this.dataBlock.rawData.avatar) : '/res/profile.webp';
         }
     }
 }

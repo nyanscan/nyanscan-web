@@ -42,7 +42,7 @@ const PICTURE_FORMAT_GIF = 'g';
 
 const FORMAT_EXTENSION = [
     PICTURE_FORMAT_NONE => null,
-    PICTURE_FORMAT_WEBP => 'wepb',
+    PICTURE_FORMAT_WEBP => 'webp',
     PICTURE_FORMAT_PNG => 'png',
     PICTURE_FORMAT_JPG => 'jpg',
     PICTURE_FORMAT_GIF => 'gif',
