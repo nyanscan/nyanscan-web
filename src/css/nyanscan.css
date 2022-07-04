@@ -1635,9 +1635,84 @@ ns-project > span > span:empty {
     padding: .5rem;
 }
 
+.ns-event-object {
+    background: linear-gradient(to right, #9f4eb9, #a463c0);
+    border-radius: .5rem;
+    padding: 50px 5%;
+}
+
+.ns-event-head {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5rem;
+}
+.ns-event-head > img {
+    height: 450px;
+    align-self: center;
+}
+.ns-event-head > div {
+ max-width: 450px;
+}
+
+.ns-event-head > div > h3 {
+    color: var(--ns-color-paradise-pink);
+    margin-bottom: 24px;
+}
+
+.ns-event-main-info {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+
+.ns-event-main-info > p {
+    margin: 0;
+}
+
+.ns-event-main-info span {
+    font-weight: bold;
+}
+
+.ns-event-btn-groupe {
+    padding: 2rem 0;
+}
+
+.ns-event-btn-groupe > * {
+    margin-right: 8px;
+}
+
+.ns-event-member {
+    color: var(--ns-color-paradise-pink);
+    font-size: 44px;
+    margin-bottom: 24px;
+}
+
+.ns-events-member-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
 @media not (pointer: fine) {
     .ns-project-picture-edit label {
         display: block;
+    }
+}
+
+@media (max-width: 1600px) {
+    .ns-event-head > img {
+        height: 400px;
+    }
+    .ns-event-head > div {
+        max-width: 380px;
+    }
+}
+
+@media (max-width: 1400px) {
+    .ns-event-head {
+        justify-content: center;
     }
 }
 
@@ -1654,6 +1729,12 @@ ns-project > span > span:empty {
 }
 
 @media (max-width: 768px) {
+
+    .ns-event-head > img {
+        height: auto;
+        width: 100%;
+    }
+
     .ns-container {
         width: 95%;
     }

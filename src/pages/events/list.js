@@ -15,7 +15,7 @@ export default class extends Pages {
 		<section>
 			<div class="ns-categ-center">
 				<div class="p-4 justify-content-start">
-					<h2 class="ns-text-red fw-bold ns-fs-2">${this.c_title}</h2>
+					<h2 class="ns-text-red fw-bold ns-fs-1">${this.c_title}</h2>
 					<div class="d-flex flex-column flex-md-row align-items-md-center align-items-stretch gap-3">
 						<p class="ns-tickle-pink-bg ns-rounded-text text-center">Nombre d'évènements :&nbsp;<span id="ns-events-total" class="d-inline-block ns-empty-placeholder"></span></p>
 						${this.showCreate  ? `<ns-a href="/events/create" id="ns-events-add-event" class="btn ns-tickle-pink-btn ns-hide-disconnected">Nouvelle évènement</ns-a>` : ''}
@@ -27,7 +27,7 @@ export default class extends Pages {
 			<div class="ns-center d-flex">
 				<hr class="ns-line">
 			</div>
-			<div id="ns-events-container" class="d-flex flex-column ns-categ-center ns-empty-placeholder">
+			<div id="ns-events-container" class="d-flex flex-column gap-5 ns-categ-center ns-empty-placeholder">
 			
 			</div>
 		</section>

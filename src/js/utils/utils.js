@@ -15,7 +15,7 @@ const TYPE_INFO = 1;
 const TYPE_WARN = 2;
 const TYPE_ERROR = 3;
 
-const VERSION = 'BETA-3.2.1';
+const VERSION = 'BETA-3.2.2';
 
 //Kind of a selector function :
 //to select html tag
@@ -1355,35 +1355,36 @@ class EventElement extends Component {
 
     get raw() {
         return `
-		
-			<img src="${image_id_to_path(this.event.picture)}" alt="event ${this.event.name} image">
-			<h3>${escapeHtml(this.event.name)}</h3>
-			<p>${escapeHtml(this.event.description)}</p>
-			<div>
-				<p>Début <span>${this.event.start_date}</span></p>
-				<p>Fin <span>${this.event.end_date}</span></p>
-				<p>Type <pan>${this.event.is_distance === '2' ? 'Distanciel/Webinaire' : 'Présentiel' }</pan></p>
-				${this.event.address ? `<p>Adresse <span>${escapeHtml(this.event.address)}</span></p>`: ''}
+		    <div class="ns-event-head">
+                <img src="${image_id_to_path(this.event.picture)}" alt="event ${this.event.name} image">
+                <div>
+                    <h3 class="ns-fs-2">${escapeHtml(this.event.name)}</h3>
+                    <p>${escapeHtml(this.event.description)}</p>
+                    <div class="ns-event-main-info">
+                        <p>Début <span>${this.event.start_date}</span></p>
+                        <p>Fin <span>${this.event.end_date}</span></p>
+                        <p>Type <span>${this.event.is_distance === '2' ? 'Distanciel/Webinaire' : 'Présentiel' }</span></p>
+                        ${this.event.address ? `<p>Adresse <span>${escapeHtml(this.event.address)}</span></p>`: ''}
+                        <p>Contact <span>${escapeHtml(this.event.contact)}</span> -- <i class="bi bi-phone"></i> <span>${this.event.contact_phone}</span></p>
+                        <div>Nombre max de participant <span>${this.event.max_user}</span></div>
+			    </div>
+                </div>
 			</div>
-			<div>
-				<p>Contact <span>${escapeHtml(this.event.contact)}</span> -- <i class="bi bi-phone"></i> <span>${this.event.contact_phone}</span></p>
-			</div>
-			<div>Nombre max de participant <span>${this.event.max_user}</span></div>
-			<div>
+			<div class="ns-event-btn-groupe">
 				${this.event.link ? `<a class="btn ns-btn-sm ns-tickle-pink-btn" href="${this.event.link}" target="_blank">Voir le site</a>` : ''}
 				<button class="ns-hide-disconnected ns-events-join-btn ns-btn-sm btn ns-tickle-pink-btn">Rejoindre</button>
 				<button class="ns-hide-disconnected ns-events-left-btn ns-btn-sm btn ns-tickle-pink-btn">Quitter</button>
 				<button class="ns-hide-disconnected ns-events-delete-btn ns-btn-sm btn ns-tickle-pink-btn bg-danger btn-danger">Supprimer</button>
 			</div>
 			<div>
-				<h4>Membre</h4>
+				<h4 class="ns-event-member">Membre</h4>
 				<div class="ns-events-member-list d-flex flex-row flex-wrap"></div>
 			</div>
 		`;
     }
 
     getHTML() {
-        const e = create('div', null, null);
+        const e = create('div', null, null, 'ns-event-object', 'ns-text-black');
         e.innerHTML = this.raw;
         return e;
     }
@@ -1436,7 +1437,7 @@ class EventElement extends Component {
     addMember(u) {
         const container = create('ns-a', null, null);
         container.href = '/u/' + u.username;
-        createPromise('img', null, container, 'ns-avatar', 'img-responsive', 'ns-avatar-sm').then(img => img.src = get_user_picture_default(u.avatar));
+        createPromise('img', null, container, 'ns-avatar', 'img-responsive', 'ns-avatar-md').then(img => img.src = get_user_picture_default(u.avatar));
         container.title = u.username;
         this.membreDiv.appendChild(container);
     }
