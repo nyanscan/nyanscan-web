@@ -100,6 +100,7 @@ function _admin_stats() {
         "user" => getDB()->count(TABLE_USER, "id"),
         "volume" => getDB()->count(TABLE_VOLUME, "data"),
         "log-root" => getDB()->count(TABLE_LOG_ROOT, "root"),
-        "carousel" => getDB()->count(TABLE_INDEX_CAROUSEL, "picture")
+        "carousel" => getDB()->count(TABLE_INDEX_CAROUSEL, "picture"),
+        "events" => getDB()->count(TABLE_EVENT, "id")
     ]);
 }

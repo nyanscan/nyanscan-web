@@ -1,30 +1,30 @@
 <?php
+// show ell error if debug mode
+if (DEBUG_MODE) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
+// for CORPS
 header('Access-Control-Allow-Origin: *');
 header('strict-origin-when-cross-origin: *');
-header('Access-Control-Allow-Methods: POST, PUT, OPTIONS');
+header('Access-Control-Allow-Methods: POST, PUT, OPTIONS, DELETE');
 header('Access-Control-Allow-Headers: *');
 header('Access-Control-Max-Age: 300');
 
+// return CORPS OPTIONS IF OPTIONS MODE
 $method = strtoupper($_SERVER["REQUEST_METHOD"]);
 if ($method === "OPTIONS") exit(200);
 
+// load commun lib
 require(__DIR__ . '/../../../private/utils/forum.php');
 require(__DIR__ . '/../../../private/utils/mailer.php');
 
-function my_error_handler() {
-    $last_error = error_get_last();
-    if ($last_error && $last_error['type'] == E_ERROR) {
-        header("HTTP/1.1 500 Internal Server Error");
-    }
-}
-
+// set return json for all request
 header("Content-Type: application/json");
 
+// utils function
 function is_moderator() : bool {
     $user = get_log_user();
     return $user->is_connected() && $user->get_permission_level() >= PERMISSION_MODERATOR;
@@ -35,22 +35,29 @@ function is_admin() : bool {
     return $user->is_connected() && $user->get_permission_level() >= PERMISSION_ADMIN;
 }
 
+// invalid method
 function bad_method() {
     json_exit(405, "Method Not Allowed", "Only accept POST");
 }
-
+// invalid request with message
 function bad_request($reason = "") {
     json_exit(400, "Bad Request", $reason);
 }
 
-function unauthorized($invalid_token = false) {
+/**
+ * @param $invalid_token bool if Unauthorized is throw by wrong token
+ * @return void
+ */
+function unauthorized(bool $invalid_token = false) {
     json_exit(401, "Unauthorized",  $invalid_token ? "Invalid Authorization" : "Authentication is required to access ressources");
 }
 
+// return a forbidden
 function forbidden() {
     json_exit(403, "Forbidden", "Forbidden");
 }
 
+// return data
 function success($data = []) {
     http_response_code(200);
     echo json_encode(["code" => 200, "data" => $data]);
@@ -62,11 +69,13 @@ function success204() {
     exit();
 }
 
+// internal error 500
 function internal_error() {
     json_exit(500, "Internal Server Error", "Internal Server Error");
 }
 
-function admin_fetch($table, $col, $query, $primary, $search_col=[]) {
+// utils for admin pan
+function admin_fetch(string $table, array $col, array $query, string $primary, array $search_col=[]) {
     if (!isConnected()) {
         unauthorized();
     }
@@ -102,21 +111,30 @@ function admin_fetch($table, $col, $query, $primary, $search_col=[]) {
     success($data);
 }
 
+// error handler
+function my_error_handler() {
+    $last_error = error_get_last();
+    if ($last_error && $last_error['type'] == E_ERROR) {
+        internal_error();
+    }
+}
 register_shutdown_function('my_error_handler');
 
+// split url to get controller function and query
 $uri = explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 $controller = $uri[3] ?? null;
 $function = array_slice($uri, 4);
 parse_str($_SERVER['QUERY_STRING'], $query);
 
 
-
+// if analytic
 if ($controller === 'analytic') {
     $path = join('/', $function);
 } else {
     $path = join('/', $uri);
 }
 
+// for analytic
 if ($path) {
     $req = getDB()->get_pdo()->prepare('INSERT INTO PAE_LOG_ROUTE (root) VALUES (:path) ON DUPLICATE KEY UPDATE visited=visited+1');
     $req->execute(["path" => $path]);
@@ -124,13 +142,14 @@ if ($path) {
         success204();
     }
 }
-
+// switch to controller
 try {
     switch ($controller) {
         case 'forum':
             require __DIR__ . '/../../../private/api/forumController.php';
             invokeForm($method, $function, $query);break;
         case 'auth':
+            require(__DIR__ . '/../../../private/captchaUtils.php');
             require __DIR__ . '/../../../private/api/authController.php';
             invokeAuth($method, $function, $query); break;
         case 'user':
@@ -147,7 +166,7 @@ try {
             require __DIR__ . '/../../../private/api/projectController.php';
             invokeProject($method, $function, $query);
             break;
-        case 'event':
+        case 'events':
             require __DIR__ . '/../../../private/api/eventController.php';
             invokeEvent($method, $function, $query);
             break;
@@ -162,22 +181,10 @@ try {
             invokeDefault($method, [$controller, ...$function], $query); break;
     }
 } catch (Exception $e) {
-    json_exit(500, "Internal Server Error", "Internal Server Error");
+    // show error in case of debug else 500
+    if (DEBUG_MODE) throw new Exception($e);
+    else internal_error();
 }
-
-
-function _get_captcha_settings() {
-    success([
-        "width" => CAPTCHA_WIDTH,
-        "height" => CAPTCHA_HEIGHT,
-        "piece_size" => CAPTCHA_PIECE_SIZE,
-        "cell_size" => CAPTCHA_CELL_SIZE,
-        "number_piece" => CAPTCHA_NUMBER_PIECE,
-    ]);
-}
-
-
+// if not function call by controller its 404
 json_exit(404, 'Not found', 'invalid api request');
-//header("HTTP/1.1 404 Not Found");
-
 exit();

@@ -1,4 +1,19 @@
 export default class extends Pages {
+
+	get raw() {
+		return `
+		<p>Pas trop vite c'est pas fini ici</p>
+		<ns-a href="/" class="btn ns-tickle-pink-btn"> Page d'accueil</ns-a>
+		`;
+	}
+
+	constructor(app) {
+		super(app);
+	}
+}
+
+/*
+export default class extends Pages {
 	
 	id;
 	isSending = false;
@@ -197,4 +212,4 @@ export default class extends Pages {
 	constructor(app) {
 		super(app);
 	}
-}
+} */

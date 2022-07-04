@@ -1,11 +1,14 @@
 export default class extends Pages {
-	title = "Participations | NyanScan"
+	title = "Évènements | NyanScan"
 	
 	get raw() {
-		return `Participations aux évènements`;
+		return `
+		<p>Pas trop vite c'est pas fini ici</p>
+		<ns-a href="/" class="btn ns-tickle-pink-btn"> Page d'accueil</ns-a>
+		`;
 	}
 	
-	//TODO : create this one
+	//TODO to finish
 	
 	getHTML(vars) {
 		return super.getHTML(vars);
@@ -18,4 +21,5 @@ export default class extends Pages {
 	constructor(app) {
 		super(app);
 	}
+	
 }

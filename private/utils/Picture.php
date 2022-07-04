@@ -9,6 +9,14 @@ class Picture {
     private string $format = PICTURE_FORMAT_NONE;
     private $resource;
 
+    static function delete($id) {
+        $dir = substr($id,  0,5);
+        if (file_exists(PICTURE_PATH . $dir)) {
+            $ext = FORMAT_EXTENSION[$id[0]]??null;
+            unlink(PICTURE_PATH . $dir . '/' . substr($id,  5) . '.' . $ext);
+        }
+    }
+
     public function __construct() {}
 
     public function __destruct() {

@@ -378,7 +378,7 @@ ns-project > span > span:empty {
     min-height: 48px;
 
     display: grid;
-    grid-template-columns: 2fr 40% .4fr 1.6fr;
+    grid-template-columns: 2fr 40% 64px 1.6fr;
     grid-template-rows: 1fr;
     grid-column-gap: 16px;
 
@@ -438,8 +438,6 @@ ns-project > span > span:empty {
     width: 90%;
     padding: 0 24px;
     border-radius: 16px;
-    margin-left: 25px;
-    margin-right: 25px;
 }
 
 .ns-search:focus + .ns-search-result {
@@ -570,7 +568,6 @@ ns-project > span > span:empty {
 
 #ns-footer-logo img {
     display: inline-block;
-    margin-right: 32px;
     height: 140px;
 }
 
@@ -1276,8 +1273,8 @@ ns-project > span > span:empty {
     margin-bottom: 2rem;
 }
 
-#topics-container:empty {
-    background-color: var(--ns-color-deep-mauve);;
+#topics-container:empty, #ns-events-container:empty {
+    background-color: var(--ns-color-deep-mauve);
     height: 100vh;
 }
 
@@ -1636,9 +1633,84 @@ ns-project > span > span:empty {
     padding: .5rem;
 }
 
+.ns-event-object {
+    background: linear-gradient(to right, #9f4eb9, #a463c0);
+    border-radius: .5rem;
+    padding: 50px 5%;
+}
+
+.ns-event-head {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5rem;
+}
+.ns-event-head > img {
+    height: 450px;
+    align-self: center;
+}
+.ns-event-head > div {
+ max-width: 450px;
+}
+
+.ns-event-head > div > h3 {
+    color: var(--ns-color-paradise-pink);
+    margin-bottom: 24px;
+}
+
+.ns-event-main-info {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+
+.ns-event-main-info > p {
+    margin: 0;
+}
+
+.ns-event-main-info span {
+    font-weight: bold;
+}
+
+.ns-event-btn-groupe {
+    padding: 2rem 0;
+}
+
+.ns-event-btn-groupe > * {
+    margin-right: 8px;
+}
+
+.ns-event-member {
+    color: var(--ns-color-paradise-pink);
+    font-size: 44px;
+    margin-bottom: 24px;
+}
+
+.ns-events-member-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
 @media not (pointer: fine) {
     .ns-project-picture-edit label {
         display: block;
+    }
+}
+
+@media (max-width: 1600px) {
+    .ns-event-head > img {
+        height: 400px;
+    }
+    .ns-event-head > div {
+        max-width: 380px;
+    }
+}
+
+@media (max-width: 1400px) {
+    .ns-event-head {
+        justify-content: center;
     }
 }
 
@@ -1655,6 +1727,12 @@ ns-project > span > span:empty {
 }
 
 @media (max-width: 768px) {
+
+    .ns-event-head > img {
+        height: auto;
+        width: 100%;
+    }
+
     .ns-container {
         width: 95%;
     }
@@ -1764,16 +1842,26 @@ ns-project > span > span:empty {
     }
 
     .ns-carousel .ns-carousel-1 {
-        transform: scale(0.8, 0.8) translateX(-20vw);
+        transform: scale(0.8, 0.8) translateX(-19vw);
     }
 
     .ns-carousel .ns-carousel-3 {
-        transform: scale(0.8, 0.8) translateX(20vw);
+        transform: scale(0.8, 0.8) translateX(19vw);
     }
 
     .ns-section-block {
         width: 100%;
     }
+
+    .ns-user-edit-field {
+        grid-template-rows: auto auto auto;
+        grid-template-columns: 1fr;
+    }
+
+    .ns-user-edit-field > * {
+        grid-area: auto !important;
+    }
+
 }
 
 @media (max-width: 576px) {
