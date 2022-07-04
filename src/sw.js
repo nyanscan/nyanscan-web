@@ -11,7 +11,7 @@ const CACHE_FILES = [
     `${BASE}/css/nyanscan.css`,
     `${BASE}/js/utils/custom_elements.js`,
     `${BASE}/js/utils/utils.js`,
-    `${BASE}/js/utils/index.js`,
+    `${BASE}/js/index.js`,
     `${BASE}/pages/user.js`,
     `${BASE}/pages/reading/project.js`,
     `${BASE}/pages/reading/reader.js`,
