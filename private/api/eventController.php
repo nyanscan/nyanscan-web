@@ -242,7 +242,7 @@ function _fetch_event_list($query) {
     $final_data = [];
 
     foreach ($events as $event) {
-        $event['users'] = $users[$event["id"]];
+        $event['users'] = $users[$event["id"]]??[];
         $final_data[] = $event;
     }
 

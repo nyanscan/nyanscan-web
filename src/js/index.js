@@ -103,7 +103,7 @@ class Header extends Component {
                         <ns-a class="ns-a-1" href="/forum">Forum</ns-a>
                     </li>
                     <li>
-                        <ns-a class="ns-a-1" href="/catalogue">Catalogue</ns-a>
+                        <ns-a class="ns-a-1" href="/events">Évènements</ns-a>
                     </li>
                     <li class="ns-hide-disconnected">
                         <ns-a  class="ns-a-1" href="/publish">Publier</ns-a>

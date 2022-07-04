@@ -15,7 +15,7 @@ const TYPE_INFO = 1;
 const TYPE_WARN = 2;
 const TYPE_ERROR = 3;
 
-const VERSION = 'BETA-3.2.0';
+const VERSION = 'BETA-3.2.1';
 
 //Kind of a selector function :
 //to select html tag
@@ -1219,6 +1219,7 @@ function escapeHtml(text) {
         '"': '&quot;',
         "'": '&#039;'
     };
+    if (text === null) return '';
     return text.replace(/[&<>"']/g, function (m) {
         return map[m];
     });
@@ -1361,14 +1362,15 @@ class EventElement extends Component {
 			<div>
 				<p>Début <span>${this.event.start_date}</span></p>
 				<p>Fin <span>${this.event.end_date}</span></p>
-				<p>Adresse <span>${escapeHtml(this.event.address)}</span></p>
+				<p>Type <pan>${this.event.is_distance === '2' ? 'Distanciel/Webinaire' : 'Présentiel' }</pan></p>
+				${this.event.address ? `<p>Adresse <span>${escapeHtml(this.event.address)}</span></p>`: ''}
 			</div>
 			<div>
 				<p>Contact <span>${escapeHtml(this.event.contact)}</span> -- <i class="bi bi-phone"></i> <span>${this.event.contact_phone}</span></p>
 			</div>
 			<div>Nombre max de participant <span>${this.event.max_user}</span></div>
 			<div>
-				${this.event.link ? `<a class="btn ns-btn-sm ns-tickle-pink-btn" href="${this.event.link}">Voir le site</a>` : ''}
+				${this.event.link ? `<a class="btn ns-btn-sm ns-tickle-pink-btn" href="${this.event.link}" target="_blank">Voir le site</a>` : ''}
 				<button class="ns-hide-disconnected ns-events-join-btn ns-btn-sm btn ns-tickle-pink-btn">Rejoindre</button>
 				<button class="ns-hide-disconnected ns-events-left-btn ns-btn-sm btn ns-tickle-pink-btn">Quitter</button>
 				<button class="ns-hide-disconnected ns-events-delete-btn ns-btn-sm btn ns-tickle-pink-btn bg-danger btn-danger">Supprimer</button>
