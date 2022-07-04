@@ -43,7 +43,7 @@ class CreateCarouselBtn  extends Component {
             if (this.editData) {
                 sendApiPostFetch('admin/edit/carousel/' + this.editData['picture'] + '?href=' + encodeURI(fd.get('href')) + '&title=' + encodeURI(fd.get('title')) + '&priority=' + fd.get('priority')).finally(() => window.APP.closeModal())
             }
-            else sendApiPostFetch('admin/carousel', fd).then(() => window.APP.closeModal()).catch(r => window.APP.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', r.reason ? r.reason.map(e => `<p>${e}</p>`) : '<p>Internal error</p>', true));
+            else sendApiPostFetch('admin/carousel', fd).then(() => window.APP.closeModal()).catch(r => window.APP.openInfoModal(TYPE_ERROR, 'Erreur formulaire', r.reason ? r.reason.map(e => `<p>${e}</p>`) : '<p>Internal error</p>', true));
         })
     }
 }
@@ -114,7 +114,7 @@ export default class extends SimpleTablePages {
     }
 
     showImage(id) {
-        this.app.openInfoModal(TYPE_INFO, id, `<img src="${image_id_to_path(id)}">`, true);
+        this.app.openInfoModal(TYPE_INFO, id, `<img src="${image_id_to_path(id)}" alt="">`, true);
     }
 
 }

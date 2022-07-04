@@ -103,6 +103,9 @@ function fetch_index() {
     success($data);
 }
 
+/**
+ * @throws Exception
+ */
 function __get_project_image(&$error, $title) {
 	$img = download_image_from_post("picture", [PICTURE_FORMAT_JPG, PICTURE_FORMAT_PNG, PICTURE_FORMAT_WEBP], 1e6);
 	if (is_numeric($img)) {
@@ -114,7 +117,7 @@ function __get_project_image(&$error, $title) {
 				$error[] = "Vignette trop lourde max 500Ko";
 				break;
 			default:
-				json_exit(500, "Uploading error", "unknow");
+				json_exit(500, "Uploading error", "unknown");
 				break;
 		}
 		return null;
@@ -181,6 +184,9 @@ function _new_project() {
     success();
 }
 
+/**
+ * @throws Exception
+ */
 function _edit_project() {
 	$user = get_log_user();
 	$title = $_POST["title"] ?? null;

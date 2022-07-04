@@ -28,7 +28,7 @@ export default class extends SimpleTablePages {
     }
 
     showImage(id) {
-        this.app.openInfoModal(TYPE_INFO, id, `<img src="${image_id_to_path(id)}">`, true);
+        this.app.openInfoModal(TYPE_INFO, id, `<img src="${image_id_to_path(id)}" alt="">`, true);
     }
 
 }

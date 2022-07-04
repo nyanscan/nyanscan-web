@@ -62,6 +62,9 @@ class Picture {
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function create_from_ressource($resource, string $format, ?int $author=null, ?string $title = null): bool {
         if ($this->isLoad) {
             return false;
@@ -163,7 +166,7 @@ class Picture {
         return true;
     }
 
-    public function resize(int $n_width, int $n_height)
+    public function resize(int $n_width, int $n_height): bool
     {
         if (!$this->id || !$this->resource) return false;
         $width = imagesx($this->resource);

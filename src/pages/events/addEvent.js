@@ -144,11 +144,11 @@ export default class extends Pages {
 					this.previewImage.src = this.pictureURL;
 				} else {
 					event.target.value = '';
-					this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image à un poid limite de 1Mo !');
+					this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image a un poids limite de 1Mo !');
 				}
 			} else {
 				this.pictureInput.value = '';
-				this.app.openInfoModal(TYPE_ERROR, 'Upload image invalide', 'L\'image dois être en png ou jpg !');
+				this.app.openInfoModal(TYPE_ERROR, 'Upload image invalide', 'L\'image doit être en PNG ou JPG !');
 			}
 		} else {
 			this.previewImage.src = '';

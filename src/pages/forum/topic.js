@@ -6,9 +6,9 @@ class ModalDeleteMessage extends Component {
     get raw() {
         return `
         <form id="nsf-modal-delete-message">
-        <h3>Suprimer un message ?</h3>
+        <h3>Supprimer un message ?</h3>
         <div class="ns-form-group d-flex flex-column gap-2">
-            <p>Voulez-vous vraiment supprimer le message .</p>
+            <p>Voulez-vous vraiment supprimer le message ?</p>
         </div>
         <div class="mt-3 ns-modal-btn-container">
             <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
@@ -67,7 +67,7 @@ class ForumMessage extends Component {
     get raw() {
         return `
             <ns-a href="/u/${this.data['author']?.['id']}" class="nsf-message-user">
-                <img class="ns-avatar ns-avatar-md" src="${this.avatar}">
+                <img class="ns-avatar ns-avatar-md" src="${this.avatar}" alt="">
                 <span class="nsf-message-username">${this.data['author']?.['username']}</span>  
             </ns-a>
             <div class="nsf-message-date">
@@ -83,7 +83,7 @@ class ForumMessage extends Component {
                 <button class="nsf-message-reply-less btn ns-tickle-pink-btn btn-sm">Afficher moins de réponses</button>
                 <div class="nsf-message-reply-container"></div>
                 <div class="ns-placeholder" style="height: 50vh; background-color: var(--ns-color-deep-mauve); display: none"></div>
-                <button class="nsf-message-reply-more btn ns-tickle-pink-btn btn-sm">Afficher plus de réponses ( ${this.data['reply_count']} )</button>
+                <button class="nsf-message-reply-more btn ns-tickle-pink-btn btn-sm">Afficher plus de réponses (${this.data['reply_count']} )</button>
             </div>
         `;
     }
@@ -165,7 +165,7 @@ class ForumMessage extends Component {
         let isAuthor = this.app.user.isLog && this.app.user.id.toString() === data['author']['id'];
         block.innerHTML = `
              <ns-a href="/u/${data['author']?.['id']}" class="nsf-message-user">
-                <img class="ns-avatar ns-avatar-md" src="/res/profile.webp">
+                <img class="ns-avatar ns-avatar-md" src="/res/profile.webp" alt="">
                 <span class="nsf-message-username">${data['author']?.['username']}</span>  
             </ns-a>
             <div class="nsf-message-date">
@@ -232,7 +232,7 @@ const COMPOSE_TYPE_REPLY = 3;
 
 export default class extends Pages {
 
-    lengthError = 'Le message doit contenir au minimum 1 caractére et au maximum 2000 !';
+    lengthError = 'Le message doit contenir au minimum 1 caractère et au maximum 2000 !';
 
     firstLoad = true;
     topic = 0;
@@ -304,7 +304,7 @@ export default class extends Pages {
                     <div id="sf-message-compose-area-container">
                         <span id="nsf-message-compose-error"></span>
                         <textarea id="nsf-message-compose-area" name="message" placeholder="Envoyer un message" rows="1"></textarea>
-                        <button id="nsf-message-compose-send" type="button" title="Envoyre" aria-label="send"><i class="bi bi-send-fill"></i></button>
+                        <button id="nsf-message-compose-send" type="button" title="Envoyer" aria-label="send"><i class="bi bi-send-fill"></i></button>
                     </div>
                 </div>
             </ns-api-data-block>

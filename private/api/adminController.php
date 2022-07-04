@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @throws Exception
+ */
 function invokeAdmin($method, $function, $query) {
     if (!is_moderator()) {
         forbidden();
@@ -40,6 +43,9 @@ function __admin_edit_carousel($id, $query) {
 	success();
 }
 
+/**
+ * @throws Exception
+ */
 function _admin_create_carousel() {
 
 	$priority = max(-127, min(127, intval($_POST['priority']?? '0')));

@@ -17,7 +17,7 @@ class ForgetPassword extends Component {
                     <input id="ns-forget-password-password" type="password" name="password" class="form-control" required>
                </div>
                <div>
-                    <label for="ns-forget-password-password-v" class="form-label">Confirmaion</label> 
+                    <label for="ns-forget-password-password-v" class="form-label">Confirmation</label>
                     <input id="ns-forget-password-password-v" type="password" name="password-v" class="form-control" required>
                </div>
             </div>
@@ -87,7 +87,7 @@ export default class extends Pages {
                                     <input id="email" class="form-control ns-form-pink" type="email" required="required">
                                     <label for="mdp">Mot de passe :</label>
                                     <input id="mdp" class="form-control ns-form-pink" type="password" required="required">
-                                    <button id="ns-forget-password" type="button" class="btn ns-btn-sm ns-tickle-pink-btn">Mot de pasee oublié</button>
+                                    <button id="ns-forget-password" type="button" class="btn ns-btn-sm ns-tickle-pink-btn">Mot de passe oublié</button>
                                     <button class="form-control ns-form-pink w-100 w-md-50 mx-auto mt-4" type="submit">Se connecter</button>
                                 </form>
                             </div>
