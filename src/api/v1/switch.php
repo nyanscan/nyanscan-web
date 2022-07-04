@@ -131,6 +131,7 @@ if ($path) {
             require __DIR__ . '/../../../private/api/forumController.php';
             invokeForm($method, $function, $query);break;
         case 'auth':
+            require(__DIR__ . '/../../../private/captchaUtils.php');
             require __DIR__ . '/../../../private/api/authController.php';
             invokeAuth($method, $function, $query); break;
         case 'user':

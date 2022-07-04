@@ -136,8 +136,11 @@ class Header extends Component {
     }
 
     updateLogStatus() {
-        _('#ns-header-profile-picture').src = this.app.user.profile_picture;
-        _('#ns-header-profile-picture2').src = this.app.user.profile_picture;
+        if (_('#ns-header-profile-picture')) {
+            _('#ns-header-profile-picture').src = this.app.user.profile_picture;
+            _('#ns-header-profile-picture2').src = this.app.user.profile_picture;
+        }
+
         const login = _('#ns-h-log');
         if (!login) {
             return;
