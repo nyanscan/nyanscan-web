@@ -378,7 +378,7 @@ ns-project > span > span:empty {
     min-height: 48px;
 
     display: grid;
-    grid-template-columns: 2fr 40% .4fr 1.6fr;
+    grid-template-columns: 2fr 40% 64px 1.6fr;
     grid-template-rows: 1fr;
     grid-column-gap: 16px;
 
@@ -570,7 +570,6 @@ ns-project > span > span:empty {
 
 #ns-footer-logo img {
     display: inline-block;
-    margin-right: 32px;
     height: 140px;
 }
 
