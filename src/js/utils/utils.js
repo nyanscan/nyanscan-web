@@ -669,6 +669,7 @@ class Application extends EventTarget {
     prefix;
     structure;
     modal;
+    currentModal;
     loading;
 
     constructor(header, footer, index, err404, structure, prefix = '') {
@@ -734,12 +735,12 @@ class Application extends EventTarget {
         this.modal.display = "none";
         this.modal.addEventListener("click", ev => {
             if (ev.target.classList.contains("ns-modal-container")) {
-                ev.target.style.display = "none";
+                window.APP.closeModal();
             }
         }, {capture: true});
         _('#ns-modal-main-close').addEventListener("click", (function (ev) {
             ev.preventDefault();
-            this.modal.style.display = "none";
+            window.APP.closeModal();
         }).bind(this))
     }
 
@@ -747,13 +748,15 @@ class Application extends EventTarget {
         if (modal.type !== COMPONENT_TYPE_MODAL) {
             return;
         }
+        if (this.currentModal !== null) this.closeModal();
+        this.currentModal = modal;
         const container = _('#ns-modal-container');
         container.innerHTML = '';
         modal.build(container);
         for (let btn of container.querySelectorAll('.ns-modal-cancel-btn')) {
             btn.addEventListener("click", (function (ev) {
                 ev.preventDefault();
-                this.modal.style.display = "none";
+                window.APP.closeModal();
             }).bind(this))
         }
         this.modal.style.display = 'flex';
@@ -770,6 +773,12 @@ class Application extends EventTarget {
 
     closeModal() {
         this.modal.style.display = 'none';
+        if (this.currentModal) {
+            this.currentModal.destroy();
+            delete this.currentModal;
+            this.currentModal = '';
+        }
+        _('#ns-modal-container').innerHTML = '';
     }
 
     async load_module(name) {
