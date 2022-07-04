@@ -8,43 +8,33 @@ function invokeEvent($method, $function, $query) {
         if ($function[0] === 'create') {
             _new_event();
         }
-        if ($function[0] === 'validation') {
+        elseif ($function[0] === 'validation') {
             _change_status_event();
         }
-        if ($function[0] === 'edit') {
+        elseif ($function[0] === 'edit') {
             _edit_event();
+        } elseif ($function[0] === 'join') {
+            _event_add_user($query, false);
+        } elseif ($function[0] === 'leave') {
+            _event_add_user($query, true);
         }
     } elseif ($method === "GET") {
-        if ($function[0] === 'user' && count($function) === 2) {
-            _fetch_user_events($function[1]);
-        } elseif ($function[0] === 'all') {
+        $count = count($function);
+        if ($count === 1 && $function[0] === 'all') {
             _admin_fetch_events($query);
-        } /*elseif ($function[0] === 'index') {
-            fetch_index();
-        } */ elseif (count($function) === 1) {
+        } elseif (count($function) === 1) {
             _fetch_event($function[0]);
+        } elseif (count($function) === 0) {
+            _fetch_event_list($query);
         }
     } elseif ($method === "DELETE") {
-        if (count($function) === 2) {
-            _delete_event($function[0], $function[1]);
+        if (count($function) === 1) {
+            _delete_event($function[0]);
         }
     } else {
         bad_method();
     }
 }
-
-/*function fetch_index() {
-    $data = [];
-    // todo: change
-    $data["last"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'name'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
-    $data["fame"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'name'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
-    $data["love"] = getDB()->select(TABLE_PROJECT, ['id', 'picture', 'name'], ["status" => PROJECT_STATUS_PUBLISHED], 4, 'date_inserted DESC');
-
-    shuffle($data["fame"]);
-    shuffle($data["love"]);
-
-    success($data);
-}*/
 
 /**
  * @throws Exception
@@ -187,6 +177,99 @@ function _admin_fetch_events($query) {
     admin_fetch(TABLE_EVENT, ["id", "author", "picture", "name", "description", "start_date", "end_date", "max_user", "is_distance", "address", "contact", "contact_phone" , "link", "status", "date_inserted"], $query, 'id', ['name', 'description']);
 }
 
+function __get_id_from_name($name) {
+    if ($name === 'me') {
+        $user = get_log_user();
+        if ($user->is_connected()) return $user->getId();
+        else return null;
+    } elseif (is_numeric($name)) {
+        return $name;
+    } else {
+        $raw = getDB()->select(TABLE_USER, ['id'], ['username' => $name], 1);
+        if (!$raw) return null;
+        else return $raw['id'];
+    }
+}
+
+function _fetch_event_list($query) {
+    $col = ["id", "author", "picture", "name", "description", "start_date", "end_date", "max_user", "is_distance", "address", "contact", "contact_phone" , "link", "status", "date_inserted"];
+
+    $filter_author = null;
+    $filter_participant = null;
+
+    if (isset($query['author'])) {
+        $filter_author = __get_id_from_name($query['author']);
+        if ($filter_author === null) success([]);
+    }
+
+    if (isset($query['participant'])) {
+        $filter_participant = __get_id_from_name($query['participant']);
+        if ($filter_participant === null) success([]);
+    }
+
+    $where = ['status' =>  EVENT_STATUS_PUBLISHED, "end_date" => ['o' => '>=', 'v' => time()]];
+    if ($filter_author !== null) {
+        if ($query['author'] === 'me') {
+            unset($where['status']);
+            unset($where['end_date']);
+        }
+        $where['author'] = $filter_author;
+    }
+
+
+    if ($filter_participant === null)
+    {
+        $events = getDB()->select(TABLE_EVENT, $col, $where, 0, 'start_date ASC');
+    } else {
+        $col = join(', ', $col);
+        $where['user_id'] = $filter_participant;
+        $events = getDB()->select_set_settings("SELECT $col FROM PAE_EVENT_USER LEFT JOIN PAE_EVENT PE ON PAE_EVENT_USER.event_id = PE.id", $where, 0, 'start_date ASC');
+    }
+
+
+    if (count($events) === 0) success([]);
+    $id = array_map(function ($e) {return $e['id'];}, $events);
+
+
+
+    $req = getDB()->get_pdo()->prepare("SELECT event_id, user_id as id, username, avatar
+                                                FROM PAE_EVENT_USER
+                                                LEFT JOIN PAE_USER PU on PAE_EVENT_USER.user_id = PU.id
+                                                WHERE event_id IN (" . join(',', $id) . ')');
+    $req->execute();
+    $users = $req->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
+
+    $final_data = [];
+
+    foreach ($events as $event) {
+        $event['users'] = $users[$event["id"]]??[];
+        $final_data[] = $event;
+    }
+
+    success($final_data);
+}
+
+function _event_add_user($query, $leave) {
+    $user = get_log_user();
+    if (!$user->is_connected()) unauthorized();
+    $event = $query['e']??null;
+    if (!is_numeric($event)) bad_request('Evènements inexistant ou terminé');
+    $eSQL = getDB()->select(TABLE_EVENT, ['id', 'max_user'], ['id' => $event, 'status' =>  EVENT_STATUS_PUBLISHED, "end_date" => ['o' => '>=', 'v' => time()]],1);
+    if (!$eSQL) bad_request('Evènements inexistant ou terminé');
+    if ($leave) {
+        getDB()->delete(TABLE_EVENT_USER, ['user_id' => $user->getId(), 'event_id' => $eSQL['id']]);
+    }
+    else {
+        if (intval($eSQL['max_user']) > 0) {
+            if (intval($eSQL['max_user']) <= getDB()->count(TABLE_EVENT_USER, 'user_id', ['event_id' => $eSQL['id']])) {
+                bad_request('Evènements complet');
+            }
+        }
+        getDB()->insert(TABLE_EVENT_USER, ['user_id' => $user->getId(), 'event_id' => $eSQL['id']], true);
+    }
+    success();
+}
+
 function _change_status_event() {
     if (!is_moderator()) {
         forbidden();
@@ -233,14 +316,18 @@ function _change_status_event() {
 
 //TODO to change
 function _delete_event($id) {
-    if (!is_admin()) {
-        unauthorized();
-    }
+    $user = get_log_user();
+    if (!$user->is_connected()) unauthorized();
 
-    $event = getDB()->select(TABLE_EVENT, ["id", "author", "picture", "name", "description", "start_date", "end_date", "max_user", "is_distance", "address", "contact", "contact_phone" , "link", "status", "date_inserted"], ["id" => $id], 1);
+    $event = getDB()->select(TABLE_EVENT, ["id", 'author', 'picture'], ["id" => $id], 1);
     if ($event) {
-        getDB()->delete(TABLE_EVENT, ["id" => $id]);
-        success();
+        if (is_moderator() || $user->getId() == $event['author']) {
+            try {
+                Picture::delete($event['picture']);
+            } catch (Exception $e) {}
+            getDB()->delete(TABLE_EVENT, ["id" => $id]);
+            success();
+        } else unauthorized();
     } else {
         bad_request("no event " .$event);
     }

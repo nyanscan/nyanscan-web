@@ -307,11 +307,11 @@ function _create_message()
     $topic = $_POST["topic"] ?? null;
 
     if ($topic === null) bad_request('invalid topic');
-    $req = getDB()->get_pdo()->prepare("SELECT T.id AS id, C.permission_create AS permission_create FROM PAE_FORUM_TOPIC AS T LEFT JOIN PAE_FORUM_CATEGORY C on T.category = C.id WHERE T.id=:topic LIMIT 1;");
+    $req = getDB()->get_pdo()->prepare("SELECT T.id AS id, C.permission_view AS permission_view FROM PAE_FORUM_TOPIC AS T LEFT JOIN PAE_FORUM_CATEGORY C on T.category = C.id WHERE T.id=:topic LIMIT 1;");
     $req->execute(['topic' => $topic]);
     $sql_topic = $req->fetch(PDO::FETCH_ASSOC);
 
-    if (!$sql_topic || $sql_topic['permission_create'] > $user->get_permission_level()) bad_request('invalid topic');
+    if (!$sql_topic || $sql_topic['permission_view'] > $user->get_permission_level()) bad_request('invalid topic');
 
     if (strlen($message) < 1 || strlen($message) > 2000) $errors[] = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
 
@@ -344,10 +344,10 @@ function _create_reply()
     $reply = $_POST["reply"] ?? null;
 
     if ($reply === null) bad_request('invalid reply');
-    $req = getDB()->get_pdo()->prepare("SELECT M.id AS id, C.permission_create AS permission_create FROM PAE_FORUM_MESSAGE AS M LEFT JOIN PAE_FORUM_TOPIC T ON M.id = T.last_message LEFT JOIN PAE_FORUM_CATEGORY C ON T.category = C.id WHERE M.id=:message LIMIT 1;");
+    $req = getDB()->get_pdo()->prepare("SELECT M.id AS id, C.permission_view AS permission_view FROM PAE_FORUM_MESSAGE AS M LEFT JOIN PAE_FORUM_TOPIC T ON M.id = T.last_message LEFT JOIN PAE_FORUM_CATEGORY C ON T.category = C.id WHERE M.id=:message LIMIT 1;");
     $req->execute(['message' => $reply]);
     $sql_reply = $req->fetch(PDO::FETCH_ASSOC);
-    if (!$sql_reply || $sql_reply['permission_create'] > $user->get_permission_level()) bad_request('invalid reply');
+    if (!$sql_reply || $sql_reply['permission_view'] > $user->get_permission_level()) bad_request('invalid reply');
 
     if (strlen($message) < 1 || strlen($message) > 2000) $errors["$message"] = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
     if (count($errors) !== 0) bad_request($errors);

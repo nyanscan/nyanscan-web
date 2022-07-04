@@ -1,5 +1,5 @@
 const BASE = location.protocol + '//' + location.host;
-const PREFIX = 'BETA-3.0.0';
+const PREFIX = 'BETA-3.2.2';
 
 const CACHE_FILES = [
     'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
@@ -11,7 +11,7 @@ const CACHE_FILES = [
     `${BASE}/css/nyanscan.css`,
     `${BASE}/js/utils/custom_elements.js`,
     `${BASE}/js/utils/utils.js`,
-    `${BASE}/js/utils/index.js`,
+    `${BASE}/js/index.js`,
     `${BASE}/pages/user.js`,
     `${BASE}/pages/reading/project.js`,
     `${BASE}/pages/reading/reader.js`,
