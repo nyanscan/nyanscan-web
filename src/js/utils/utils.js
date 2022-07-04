@@ -15,7 +15,7 @@ const TYPE_INFO = 1;
 const TYPE_WARN = 2;
 const TYPE_ERROR = 3;
 
-const VERSION = 'BETA-3.0.0';
+const VERSION = 'BETA-3.2.0';
 
 //Kind of a selector function :
 //to select html tag
@@ -480,6 +480,62 @@ class Error404 extends Pages {
 
 }
 
+class ConfirmModal extends Component {
+
+    m_type;
+    title;
+    message;
+    isHTMLMessage;
+    callBack;
+
+    get raw() {
+        return `
+        <h3>${this.title}</h3>
+        <div class="ns-form-group d-flex flex-column gap-2">
+            ${this.isHTMLMessage ?  this.message : `<p>${this.message}</p>`}
+        </div>
+        <div class="mt-3 ns-modal-btn-container">
+            <button type="button" class="ns-modal-cancel-btn bg-secondary">Annuler</button>
+            <button id="ns-confirmation-modal-btn" type="button" class="">Confirmer</button>
+        </div>
+        `;
+    }
+
+    build(parent) {
+        super.build(parent);
+        let btn = _('#ns-confirmation-modal-btn');
+        switch (this.m_type) {
+            case TYPE_ERROR:
+                btn.style.backgroundColor = '#dc3545';
+                break;
+            case TYPE_INFO:
+                btn.style.backgroundColor = '#0dcaf0';
+                break;
+            case TYPE_WARN:
+                btn.style.backgroundColor = '#ffc107';
+                break;
+            case TYPE_SUCCESS:
+            default:
+                btn.style.backgroundColor = '#198754';
+                break;
+        }
+        _('#ns-confirmation-modal-btn').addEventListener('click', (e => {
+            e.preventDefault();
+            this.app.closeModal();
+            this.callBack();
+        }).bind(this));
+    }
+
+    constructor(app, type, title, message, callBack, isHTMLMessage=false) {
+        super(app, COMPONENT_TYPE_MODAL);
+        this.m_type = type;
+        this.title = title;
+        this.message = message;
+        this.isHTMLMessage = isHTMLMessage;
+        this.callBack = callBack;
+    }
+}
+
 class InfoModal extends Component {
 
     m_type;
@@ -506,6 +562,7 @@ class InfoModal extends Component {
         this.message = message;
         this.isHTMLMessage = isHTMLMessage;
     }
+
     build(parent) {
         super.build(parent);
         let btn = parent.querySelector('.ns-modal-cancel-btn');
@@ -764,6 +821,14 @@ class Application extends EventTarget {
 
     openInfoModal(type, title, message, isHtmlMessage=false) {
         this.openModal(new InfoModal(this, type, title, message, isHtmlMessage));
+    }
+
+    openConfirmModal(type, title, message, callBack, isHtmlMessage=false) {
+        this.openModal(new ConfirmModal(this, type, title, message, callBack, isHtmlMessage));
+    }
+
+    openErrorInfoModal(error) {
+        this.openInfoModal(TYPE_ERROR, 'Une erreur est survenue', error?.reason !== undefined ? error.reason : 'Erreur inconnue');
     }
 
     createToast(type, title, message, isHtmlMessage=false, autoClose=600) {
@@ -1100,6 +1165,11 @@ class Captcha extends Component {
     }
 }
 
+function get_user_picture_default(picture) {
+    if (picture) return image_id_to_path(picture);
+    return '/res/profile.webp';
+}
+
 //This function get the path of an image with its ID
 //String.prototype.substr() is deprecated and is not in web standard anymore
 //replaced with String.prototype.substring()
@@ -1274,4 +1344,99 @@ function loadRandomBackGround() {
             e.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("${url}")`;
         }
     })
+}
+
+class EventElement extends Component {
+
+    mainDiv;
+    event;
+    membreDiv;
+
+    get raw() {
+        return `
+		
+			<img src="${image_id_to_path(this.event.picture)}" alt="event ${this.event.name} image">
+			<h3>${escapeHtml(this.event.name)}</h3>
+			<p>${escapeHtml(this.event.description)}</p>
+			<div>
+				<p>Début <span>${this.event.start_date}</span></p>
+				<p>Fin <span>${this.event.end_date}</span></p>
+				<p>Adresse <span>${escapeHtml(this.event.address)}</span></p>
+			</div>
+			<div>
+				<p>Contact <span>${escapeHtml(this.event.contact)}</span> -- <i class="bi bi-phone"></i> <span>${this.event.contact_phone}</span></p>
+			</div>
+			<div>Nombre max de participant <span>${this.event.max_user}</span></div>
+			<div>
+				${this.event.link ? `<a class="btn ns-btn-sm ns-tickle-pink-btn" href="${this.event.link}">Voir le site</a>` : ''}
+				<button class="ns-hide-disconnected ns-events-join-btn ns-btn-sm btn ns-tickle-pink-btn">Rejoindre</button>
+				<button class="ns-hide-disconnected ns-events-left-btn ns-btn-sm btn ns-tickle-pink-btn">Quitter</button>
+				<button class="ns-hide-disconnected ns-events-delete-btn ns-btn-sm btn ns-tickle-pink-btn bg-danger btn-danger">Supprimer</button>
+			</div>
+			<div>
+				<h4>Membre</h4>
+				<div class="ns-events-member-list d-flex flex-row flex-wrap"></div>
+			</div>
+		`;
+    }
+
+    getHTML() {
+        const e = create('div', null, null);
+        e.innerHTML = this.raw;
+        return e;
+    }
+
+    constructor(app, event) {
+        super(app, COMPONENT_TYPE_FLOAT);
+        this.event = event;
+    }
+
+    build(parent) {
+        this.mainDiv = this.getHTML();
+        parent.appendChild(this.mainDiv);
+        this.joinBTN = this.mainDiv.querySelector('.ns-events-join-btn');
+        this.leftBTN = this.mainDiv.querySelector('.ns-events-left-btn');
+        this.deleteBTN = this.mainDiv.querySelector('.ns-events-delete-btn');
+        if (this.app.user?.isLog && this.event.users.some( u => u.id == this.app.user.id)) this.joinBTN.style.display = 'none';
+        else this.leftBTN.style.display = 'none';
+        this.membreDiv = this.mainDiv.querySelector('.ns-events-member-list');
+
+        this.event.users.forEach(this.addMember.bind(this));
+        this.joinBTN.addEventListener('click', this.joinEvent.bind(this, false));
+        this.leftBTN.addEventListener('click', this.joinEvent.bind(this, true));
+        if (this.app.user.permissionLevel >= 200 || this.app.user.id == this.event.author) {
+            this.deleteBTN.addEventListener('click', (e => {
+                e.preventDefault();
+                this.app.openConfirmModal(TYPE_ERROR, 'Suprimmer un évènement ?',
+                    'Voulez vous vraiment suprimer l\'événement : ' + escapeHtml(this.event.name) + ' ?', this.deleteEvent.bind(this))
+            }).bind(this));
+        } else this.deleteBTN.remove();
+    }
+
+    deleteEvent() {
+        loadingScreen(true);
+        sendApiDeleteFetch(`events/${this.event.id}`).then(d => {
+            this.app.createToast(TYPE_SUCCESS, 'Evènements', `Vous avez supprimé ${escapeHtml(this.event.name)}`);
+            this.app.loadURL('/');
+        }).catch(r => window.APP.openErrorInfoModal(r)).finally(() => loadingScreen(false));
+    }
+
+    joinEvent(leave, e) {
+        e.preventDefault();
+        loadingScreen(true);
+        sendApiPostFetch(`events/${leave ? 'leave' : 'join'}?e=${this.event.id}`).then(d => {
+            this.app.createToast(TYPE_SUCCESS, 'Evènements', `Vous avez bien ${leave ? 'quitté' : 'rejoins'} ${escapeHtml(this.event.name)}`);
+            if (!leave)
+                this.addMember({'id': this.app.user.id, 'username': this.app.user.username, 'avatar': this.app.user.data.avatar});
+        }).catch(r => window.APP.openErrorInfoModal(r)).finally(() => loadingScreen(false));
+    }
+
+    addMember(u) {
+        const container = create('ns-a', null, null);
+        container.href = '/u/' + u.username;
+        createPromise('img', null, container, 'ns-avatar', 'img-responsive', 'ns-avatar-sm').then(img => img.src = get_user_picture_default(u.avatar));
+        container.title = u.username;
+        this.membreDiv.appendChild(container);
+    }
+
 }

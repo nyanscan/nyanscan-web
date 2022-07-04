@@ -424,7 +424,7 @@ const STRUCTURE = [
             path_var: [3],
             elements: [
                 {
-                    re: /^$/,
+                    re: /^(|profile)$/,
                     rel: "user"
                 },
                 {
@@ -432,12 +432,14 @@ const STRUCTURE = [
                     rel: "reading/userProject"
                 },
                 {
-                    re: /^(myEvent)$/,
-                    rel: "events/userCreatedEvent"
+                    re: /^(event)$/,
+                    rel: "events/list",
+                    var: [{id: 1, name: 'type'}]
                 },
                 {
-                    re: /^(participate)$/,
-                    rel: "events/userEvent"
+                    re: /^event-(participate)$/,
+                    rel: "events/list",
+                    var: [{id: 1, name: 'type'}]
                 }
             ]
         }
@@ -501,11 +503,6 @@ const STRUCTURE = [
         }
     },
     {
-        re: /^create-event$/,
-        rel: "events/addEvent"
-        //loginLevel: LOGIN_LEVEL_CONNECT,
-    },
-    {
         re: /^(e|events)(\/.*)?$/,
         var: [{id: 1, name: 'event'}],
         child: {
@@ -516,13 +513,18 @@ const STRUCTURE = [
                     rel: 'events/list'
                 },
                 {
-                    re: /^([0-9]+)$/,
-                    rel: 'events/eventFromList',
-                    var: [{id: 1, name: 'category'}]
+                    re: /^(\d+)$/,
+                    rel: 'events/eventView',
+                    var: [{id: 1, name: 'event'}]
                 },
                 {
-                    re: /^(edit)$/,
-                    rel: 'events/editEvent'
+                    re: /^edit\/(\d+)$/,
+                    rel: 'events/editEvent',
+                    var: [{id: 1, name: 'event'}]
+                },
+                {
+                    re: /^create$/,
+                    rel: "events/addEvent"
                 }
             ]
         }

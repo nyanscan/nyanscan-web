@@ -86,7 +86,7 @@ class DBAdapter {
 	    return $req->execute($to_bind);
     }
 
-    public function insert($table, $data): bool {
+    public function insert($table, $data, $ignore=false): bool {
         //Get a list of column names to use in the SQL statement.
         $columnNames = array_keys($data);
         //Contain SQL snippets.
@@ -94,7 +94,9 @@ class DBAdapter {
             return ':' . $k;
         }, $columnNames);
         //Constructing SQL statement
-        $sql = "INSERT INTO ".DB_PREFIX.$table." (" . implode(", ", $columnNames) . ") VALUES (" . implode(", ", $rowsSQL) . ')';
+        $head = "INSERT";
+        if ($ignore) $head .= " IGNORE";
+        $sql = "$head INTO ".DB_PREFIX.$table." (" . implode(", ", $columnNames) . ") VALUES (" . implode(", ", $rowsSQL) . ')';
         //Preparing PDO statement.
         $pdoStatement = $this->pdo->prepare($sql);
         return $pdoStatement->execute($data);

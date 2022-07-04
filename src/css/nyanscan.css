@@ -1275,8 +1275,8 @@ ns-project > span > span:empty {
     margin-bottom: 2rem;
 }
 
-#topics-container:empty {
-    background-color: var(--ns-color-deep-mauve);;
+#topics-container:empty, #ns-events-container:empty {
+    background-color: var(--ns-color-deep-mauve);
     height: 100vh;
 }
 
@@ -1773,6 +1773,16 @@ ns-project > span > span:empty {
     .ns-section-block {
         width: 100%;
     }
+
+    .ns-user-edit-field {
+        grid-template-rows: auto auto auto;
+        grid-template-columns: 1fr;
+    }
+
+    .ns-user-edit-field > * {
+        grid-area: auto !important;
+    }
+
 }
 
 @media (max-width: 576px) {
