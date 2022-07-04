@@ -1377,7 +1377,7 @@ class EventElement extends Component {
 				<button class="ns-hide-disconnected ns-events-delete-btn ns-btn-sm btn ns-tickle-pink-btn bg-danger btn-danger">Supprimer</button>
 			</div>
 			<div>
-				<h4 class="ns-event-member">Membre</h4>
+				<h4 class="ns-event-member">Participants</h4>
 				<div class="ns-events-member-list d-flex flex-row flex-wrap"></div>
 			</div>
 		`;

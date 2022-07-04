@@ -438,8 +438,6 @@ ns-project > span > span:empty {
     width: 90%;
     padding: 0 24px;
     border-radius: 16px;
-    margin-left: 25px;
-    margin-right: 25px;
 }
 
 .ns-search:focus + .ns-search-result {
@@ -1844,11 +1842,11 @@ ns-project > span > span:empty {
     }
 
     .ns-carousel .ns-carousel-1 {
-        transform: scale(0.8, 0.8) translateX(-20vw);
+        transform: scale(0.8, 0.8) translateX(-19vw);
     }
 
     .ns-carousel .ns-carousel-3 {
-        transform: scale(0.8, 0.8) translateX(20vw);
+        transform: scale(0.8, 0.8) translateX(19vw);
     }
 
     .ns-section-block {
