@@ -19,6 +19,7 @@ class Header extends Component {
                     <ns-a class="c-nav-link" href="/users" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
                     <ns-a class="c-nav-link" href="/log-root" aria-label="log" title="Log"><i class="bi bi-journal"></i></ns-a>
                     <ns-a class="c-nav-link" href="/events" aria-label="events" title="Event"><i class="bi bi-calendar2-week"></i></ns-a>
+                    <a class="c-nav-link" href="/" aria-label="NynScan" title="NyanScan"><i class="bi bi-box-arrow-right"></i></a>
                 </div>
             </nav>
         </header>

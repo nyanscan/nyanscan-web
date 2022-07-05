@@ -66,8 +66,8 @@ class ForumMessage extends Component {
 
     get raw() {
         return `
-            <ns-a href="/u/${this.data['author']?.['id']}" class="nsf-message-user">
-                <img class="ns-avatar ns-avatar-md" src="${this.avatar}" alt="">
+            <ns-a href="/u/${this.data['author']?.['username']}" class="nsf-message-user">
+                <img class="ns-avatar ns-avatar-md" src="${this.avatar}">
                 <span class="nsf-message-username">${this.data['author']?.['username']}</span>  
             </ns-a>
             <div class="nsf-message-date">
@@ -164,8 +164,8 @@ class ForumMessage extends Component {
         let isEdit = this.data['status'] && (parseInt(this.data['status']) & 1);
         let isAuthor = this.app.user.isLog && this.app.user.id.toString() === data['author']['id'];
         block.innerHTML = `
-             <ns-a href="/u/${data['author']?.['id']}" class="nsf-message-user">
-                <img class="ns-avatar ns-avatar-md" src="/res/profile.webp" alt="">
+             <ns-a href="/u/${data['author']?.['username']}" class="nsf-message-user">
+                <img class="ns-avatar ns-avatar-md" src="/res/profile.webp">
                 <span class="nsf-message-username">${data['author']?.['username']}</span>  
             </ns-a>
             <div class="nsf-message-date">

@@ -240,6 +240,12 @@ export default class extends Pages {
                                     <button id="ns-profile-download" class="btn ns-btn-sm ns-tickle-pink-btn">Télécharger</button>
                                 </div>
                                 <div class="p-2">
+                                    <ns-a href="/u/${this.user}/event" class="btn ns-btn-sm ns-tickle-pink-btn">Mes évènements</ns-a>
+                                </div>
+                                <div class="p-2">
+                                    <ns-a href="/u/${this.user}/event-participate" class="btn ns-btn-sm ns-tickle-pink-btn">Mes participation aux évènements</ns-a>
+                                </div>
+                                <div class="p-2">
                                     <span> Rejoint le <ns-api-data field="join"></ns-api-data></span>
                                 </div>
                                 <div class="p-2">

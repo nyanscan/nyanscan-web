@@ -6,17 +6,21 @@ if (strtoupper($_SERVER["REQUEST_METHOD"]) !== "GET") {
     exit();
 }
 
-$token = $_GET["t"] ?? null;
-$user = $_GET["user"] ?? null;
-$deny = $_GET["deny"] ?? '0';
+// get uri setting
+$token = $_GET["t"] ?? null; // token
+$user = $_GET["user"] ?? null; // user_id
+$deny = $_GET["deny"] ?? '0'; // bool need deny request
 
+// invalid uri
 if ($token === null || $user === null) {
     http_response_code(400);
     exit();
 }
 
+// get verification statement
 $raw = getDB()->select(TABLE_VERIFICATION, ['id', 'type', 'value'], ['user_id' => $user, "token" => $token], 1);
 if ($raw) {
+    // delete verification
 	getDB()->delete(TABLE_VERIFICATION, ['user_id' => $user, "token" => $token]);
 	switch (intval($raw['type'])) {
 		case VERIFICATION_TYPE_EMAIL_CREATE:
@@ -37,7 +41,6 @@ if ($raw) {
 			header('Location: /auth/verification-success');
 			exit();
 			break;
-            break;
 		case VERIFICATION_TYPE_EMAIL_CHANGE:
 			if ($deny !== '1') {
 				$token = createMD5Token();
@@ -59,5 +62,4 @@ if ($raw) {
             break;
 	}
 }
-
 header('Location: /auth/verification-failed');

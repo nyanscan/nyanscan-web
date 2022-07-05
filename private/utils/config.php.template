@@ -7,6 +7,7 @@ const DB_USER = '';
 const DB_PREFIX = '';
 const DB_PASSWORD = '';
 
+const DEBUG_MODE = true;
 
 const TABLE_FORUM_CATEGORY = 'FORUM_CATEGORY';
 const TABLE_FORUM_MESSAGE = 'FORUM_MESSAGE';

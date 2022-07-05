@@ -24,7 +24,7 @@ export default class extends Pages {
                 <hr class="ns-line">
             </div>
             <div class="ns-center">
-                <form id="ns-event-form" class="ns-categ-topic my-5">
+                <form id="ns-event-form" class="ns-categ-topic my-5 ns-text-black">
                 	<div class="d-flex flex-row gap-3 flex-wrap">
 						<div>
 							<div class="ns-project-picture-edit" style="width: 320px; height: 240px">
@@ -165,19 +165,13 @@ export default class extends Pages {
 	sendCallback(event) {
 		const $repStatus = checkApiResStatus(event);
 		if ($repStatus === API_REP_OK) {
-			// todo: toast
-			// todo: change to list
-			this.app.changePage('/');
+			this.app.createToast(TYPE_SUCCESS, 'Evènements', 'L\'évènements à bien était créé');
+			this.app.changePage('/events');
 		} else if ($repStatus === API_REP_BAD) {
 			const err = getAPIErrorReason(event);
-			this.errorBlock.innerHTML = '';
-			this.errorBlock.style.display = 'block';
-			for (let errElement of err) {
-				createPromise('p', null, this.errorBlock).then(e => e.innerText = errElement);
-			}
+			this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', err.map(e => `<p>${e}</p>`), true);
 		} else {
-			//todo warn
-			console.warn('error upload');
+			this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', 'Erreur d\'upload verifier votre connexion');
 		}
 	}
 	

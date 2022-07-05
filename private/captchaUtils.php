@@ -24,3 +24,13 @@ function get_captcha_status(): int {
         return CAPTCHA_CODE_FALSE;
     }
 }
+
+function _get_captcha_settings() {
+    success([
+        "width" => CAPTCHA_WIDTH,
+        "height" => CAPTCHA_HEIGHT,
+        "piece_size" => CAPTCHA_PIECE_SIZE,
+        "cell_size" => CAPTCHA_CELL_SIZE,
+        "number_piece" => CAPTCHA_NUMBER_PIECE,
+    ]);
+}

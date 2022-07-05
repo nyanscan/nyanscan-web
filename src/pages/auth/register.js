@@ -45,7 +45,7 @@ export default class extends Pages {
                                         <input id="birth" class="form-control ns-form-pink" type="date"  name="birth" required="required">
                                     </div>
                                     <div class="ns-f-w-group align-self-center">
-                                        <div class="form-check">
+                                        <div class="form-check d-none">
                                             <input id="ns-i-check-news" class="form-check-input  ns-form-check" type="checkbox" name="newsletter">
                                             <label for="ns-i-check-news" class="form-check-label">Newsletter</label>
                                         </div>
