@@ -1,4 +1,9 @@
 <?php
+
+// load commun lib
+require(__DIR__ . '/../../../private/utils/forum.php');
+require(__DIR__ . '/../../../private/utils/mailer.php');
+
 // show ell error if debug mode
 if (DEBUG_MODE) {
     ini_set('display_errors', 1);
@@ -17,9 +22,7 @@ header('Access-Control-Max-Age: 300');
 $method = strtoupper($_SERVER["REQUEST_METHOD"]);
 if ($method === "OPTIONS") exit(200);
 
-// load commun lib
-require(__DIR__ . '/../../../private/utils/forum.php');
-require(__DIR__ . '/../../../private/utils/mailer.php');
+
 
 // set return json for all request
 header("Content-Type: application/json");
