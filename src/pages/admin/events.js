@@ -5,7 +5,7 @@ class ModalEditStatus extends Component {
     get raw() {
         return `
         <form id="nsa-modal-pform">
-            <h3>Changer le statut de l'évènements n° ${this.event} ? </h3>
+            <h3>Changer le statut de l'évènement n° ${this.event} ? </h3>
             <div class="ns-form-group">
                 <input type="hidden" hidden="hidden" name="event" value="${this.event}">
                 <label for="nsa-mdoal-ps" class="form-label">Status</label>

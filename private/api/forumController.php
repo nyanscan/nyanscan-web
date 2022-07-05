@@ -313,7 +313,7 @@ function _create_message()
 
     if (!$sql_topic || $sql_topic['permission_view'] > $user->get_permission_level()) bad_request('invalid topic');
 
-    if (strlen($message) < 1 || strlen($message) > 2000) $errors[] = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
+    if (strlen($message) < 1 || strlen($message) > 2000) $errors[] = 'Le $message doit contenir au minimum 1 caractère et au maximum 2000 !';
 
     if (count($errors) !== 0) bad_request($errors);
 
@@ -349,7 +349,7 @@ function _create_reply()
     $sql_reply = $req->fetch(PDO::FETCH_ASSOC);
     if (!$sql_reply || $sql_reply['permission_view'] > $user->get_permission_level()) bad_request('invalid reply');
 
-    if (strlen($message) < 1 || strlen($message) > 2000) $errors["$message"] = 'Le $message doit contenir au minimum 1 caractére et au maximum 2000 !';
+    if (strlen($message) < 1 || strlen($message) > 2000) $errors["$message"] = 'Le $message doit contenir au minimum 1 caractère et au maximum 2000 !';
     if (count($errors) !== 0) bad_request($errors);
 
     $data = ["author" => $user->getId(), "message" => $sql_reply["id"], "content" => $message];
@@ -382,7 +382,7 @@ function _edit_message(bool $isReply)
 	if (!$refData) bad_request('invalid ref');
 	if ($refData['author'] !== $user->getId()) unauthorized();
 
-	if (strlen($content) < 1 || strlen($content) > 2000) bad_request('Le message doit contenir au minimum 1 caractére et au maximum 2000 !');
+	if (strlen($content) < 1 || strlen($content) > 2000) bad_request('Le message doit contenir au minimum 1 caractère et au maximum 2000 !');
 
 	$data = ["content" => $content, "status" => (intval($refData['status']) | MESSAGE_STATUS_EDITED)];
 	getDB()->update($table, $data, ['id' => $ref]);
@@ -416,8 +416,8 @@ function _create_topic()
     $cat = get_category($category);
     if (!$cat || $cat['permission_create'] > $user->get_permission_level()) bad_request('invalid category');
 
-    if (strlen($title) < 5 || strlen($title) > 100) $errors["title"] = 'Le titre doit contenir au minimum 5 caractéres et au maximum 100 !';
-    if (strlen($message) < 10 || strlen($message) > 2000) $errors["$message"] = 'Le $message doit contenir au minimum 10 caractéres et au maximum 2000 !';
+    if (strlen($title) < 5 || strlen($title) > 100) $errors["title"] = 'Le titre doit contenir au minimum 5 caractères et au maximum 100 !';
+    if (strlen($message) < 10 || strlen($message) > 2000) $errors["$message"] = 'Le $message doit contenir au minimum 10 caractères et au maximum 2000 !';
 
     if (count($errors) !== 0) bad_request($errors);
 
@@ -453,8 +453,8 @@ function _create_category()
     $view = $_POST["view"] ?? PERMISSION_DISCONNECT;
     $create = $_POST["create"] ?? PERMISSION_DISCONNECT;
 
-    if (strlen($title) < 5 || strlen($title) > 100) $errors["title"] = 'Le titre doit contenir au minimum 5 caractéres et au maximum 100 !';
-    if (strlen($description) > 255) $errors["description"] = 'La description doit contenir au maximum 255 caractéres !';
+    if (strlen($title) < 5 || strlen($title) > 100) $errors["title"] = 'Le titre doit contenir au minimum 5 caractères et au maximum 100 !';
+    if (strlen($description) > 255) $errors["description"] = 'La description doit contenir au maximum 255 caractères !';
 
     if (!is_numeric($view) || ($view & PERMISSION_MASK) > $user->get_permission_level()) $errors["view"] = 'La préférence de vue est invalide !';
     if (!is_numeric($create) || ($create & PERMISSION_MASK) > $user->get_permission_level() || ($create | PERMISSION_MASK) < ($view | PERMISSION_MASK)) $errors["create"] = 'La préférence de création est invalide !';

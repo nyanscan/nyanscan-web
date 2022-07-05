@@ -37,7 +37,7 @@ class EditAvatarModal extends Component {
             _('#ns-modal-profile-avatar-form').addEventListener('submit', this.send.bind(this));
         }).catch((r) => {
             window.APP.closeModal();
-            window.APP.openInfoModal(TYPE_ERROR, 'Une erreur est survenue', 'Verifier vottre conexion internet et réssayer');
+            window.APP.openInfoModal(TYPE_ERROR, 'Une erreur est survenue', 'Vérifiez voter connexion internet et ressayez');
         })
     }
 
@@ -104,7 +104,7 @@ class EditAvatarModal extends Component {
         }).catch((r) => {
             console.log(r);
             window.APP.closeModal();
-            window.APP.openInfoModal(TYPE_ERROR, 'Une erreur est survenue', 'Verifier vottre conexion internet et réssayer');
+            window.APP.openInfoModal(TYPE_ERROR, 'Une erreur est survenue', 'Verifies voter connexion internet et ressayez!');
         }).finally(() => loadingScreen(false));
     }
 
@@ -177,9 +177,9 @@ class EditInfoModal extends Component {
         const fields = _('#ns-modal-profile-fields');
         if (this.c_type === EditInfoModal.TYPE_DELETE) {
             let warn = create('p', null, fields, 'alert', 'alert-danger');
-            warn.innerHTML = `Une fois ton compte supprimé, tu ne peux pas revenir en arrière !<br>
-                                Nous supprimerons tes données perosnelle (email, date de naissance pseudo) <br> 
-                                tous vos postes ne seront pas supprimés mais seront affiché comme publié par un utilisateur supprimé`
+            warn.innerHTML = `Une fois votre compte supprimé, vous ne pourrez pas revenir en arrière !<br>
+                                Nous supprimerons vos données personnelles (email, date de naissance, pseudo,...) <br>
+                                Tous vos posts ne seront pas supprimés, mais seront affiché comme publié par un utilisateur supprimé.`
         }
         EditInfoModal.STRUCT[this.c_type].fields.forEach(value => this.createField(fields, value));
         this.createField(fields, {name: 'password-c', display: 'Mot de passe actuelle', type: 'password'});

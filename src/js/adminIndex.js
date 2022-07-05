@@ -15,7 +15,7 @@ class Header extends Component {
                     <ns-a class="c-nav-link" href="/event" aria-label="switch" title="Switch"><i class="bi bi-book"></i></ns-a>
                     <ns-a class="c-nav-link" href="/volume" aria-label="device" title="Device"><i class="bi bi-file-earmark-break"></i></ns-a>
                     <ns-a class="c-nav-link" href="/picture" aria-label="picture" title="Image"><i class="bi bi-image"></i></ns-a>
-                    <ns-a class="c-nav-link" href="/carousel" aria-label="carousel" title="Caroussel"><i class="bi bi-window-stack"></i></ns-a>
+                    <ns-a class="c-nav-link" href="/carousel" aria-label="carousel" title="Carousel"><i class="bi bi-window-stack"></i></ns-a>
                     <ns-a class="c-nav-link" href="/users" aria-label="archives" title="Archives"><i class="bi bi-person"></i></ns-a>
                     <ns-a class="c-nav-link" href="/log-root" aria-label="log" title="Log"><i class="bi bi-journal"></i></ns-a>
                     <ns-a class="c-nav-link" href="/events" aria-label="events" title="Event"><i class="bi bi-calendar2-week"></i></ns-a>
@@ -81,7 +81,7 @@ class Index extends Pages {
                     <ns-a class="content" href="/carousel">
                         <i class="bi bi-window-stack"></i>
                         <ns-api-data field="carousel">0</ns-api-data>
-                        <h3>Caroussel</h3>
+                        <h3>Carousel</h3>
                     </ns-a>
                 </div>
                 <div class="box" style="--color-one: #4C6CAD; --color-two: #1D59D1">
@@ -111,7 +111,7 @@ class Index extends Pages {
                     <ns-a class="content" href="/events">
                         <i class="bi bi-calendar2-week"></i>
                         <ns-api-data field="events">0</ns-api-data>
-                        <h3>Evènements</h3>
+                        <h3>Évènements</h3>
                     </ns-a>
                 </div>
             </ns-api-data-block>
