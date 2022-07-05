@@ -15,7 +15,7 @@ const TYPE_INFO = 1;
 const TYPE_WARN = 2;
 const TYPE_ERROR = 3;
 
-const VERSION = 'R-1.0.0';
+const VERSION = 'R-1.0.3';
 
 //Kind of a selector function :
 //to select html tag

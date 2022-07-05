@@ -167,24 +167,15 @@ try {
             break;
         case 'project':
             require __DIR__ . '/../../../private/api/projectController.php';
-            try {
-                invokeProject($method, $function, $query);
-            } catch (Exception $e) {
-            }
+            invokeProject($method, $function, $query);
             break;
         case 'events':
             require __DIR__ . '/../../../private/api/eventController.php';
-            try {
-                invokeEvent($method, $function, $query);
-            } catch (Exception $e) {
-            }
+            invokeEvent($method, $function, $query);
             break;
         case 'admin':
             require __DIR__ . '/../../../private/api/adminController.php';
-            try {
-                invokeAdmin($method, $function, $query);
-            } catch (Exception $e) {
-            }
+            invokeAdmin($method, $function, $query);
             break;
         case 'search':
             require __DIR__ . '/../../../private/api/searchController.php';
