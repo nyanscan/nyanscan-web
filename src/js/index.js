@@ -234,7 +234,7 @@ class Header extends Component {
                         const elli = create('li', null, ul);
                         createPromise('ns-a', null, elli).then(e => {
                             e.innerText = el[cat.field];
-                            e.href = cat.href + el['id'];
+                            e.href = cat.href + (cat.id === 'user' ? el['username'] : el['id']);
                         });
                     }
                 }
