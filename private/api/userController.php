@@ -217,8 +217,8 @@ function _change_user_password() {
 	$new_password_verification = $_POST['password-v']??null;
 
 	if ($new_password === null || $new_password_verification === null) bad_request('Formulaire incomplet');
-	if ($new_password !== $new_password_verification) bad_request('Les mots de passes ne coresponde pas');
-	if (strlen($new_password) < 8 || strlen($new_password) > 60) bad_request("Le mots de passe doit contenir au minimum 8 caractères et au maximum 60 caractères");
+	if ($new_password !== $new_password_verification) bad_request('Les mots de passes ne correspondent pas.');
+	if (strlen($new_password) < 8 || strlen($new_password) > 60) bad_request("Le mots de passe doit contenir au minimum 8 caractères et au maximum 60 caractères.");
 
 	$verification_token = createMD5Token();
 	$token_2 = createMD5Token();
@@ -251,8 +251,8 @@ function _forget_password()
         $new_password_verification = $_POST['password-v']??null;
 
         if ($new_password === null || $new_password_verification === null) bad_request('Formulaire incomplet');
-        if ($new_password !== $new_password_verification) bad_request('Les mots de passes ne coresponde pas');
-        if (strlen($new_password) < 8 || strlen($new_password) > 60) bad_request("Le mots de passe doit contenir au minimum 8 caractères et au maximum 60 caractères");
+        if ($new_password !== $new_password_verification) bad_request('Les mots de passes ne correspondent pas.');
+        if (strlen($new_password) < 8 || strlen($new_password) > 60) bad_request("Le mots de passe doit contenir au minimum 8 caractères et au maximum 60 caractères.");
 
         // always success to prevent email discovery
         $user = getDB()->select(TABLE_USER, ['id', 'status', 'username', 'email'], ['email' => $email], 1);
@@ -295,7 +295,7 @@ function _change_user_avatar()
     }
 
     $img = new Picture();
-    $img->create_from_ressource($background, PICTURE_FORMAT_WEBP, $user->getId(), 'Phto de profil de ' . $user->getUsername());
+    $img->create_from_ressource($background, PICTURE_FORMAT_WEBP, $user->getId(), 'Photo de profil de ' . $user->getUsername());
     $img->save();
 
     getDB()->update(TABLE_USER, ['avatar' => $img->get_id()], ['id' => $user->getId()]);

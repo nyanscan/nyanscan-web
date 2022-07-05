@@ -112,11 +112,11 @@ export default class extends Pages {
                     this.previewImage.src = window.URL.createObjectURL(file);
                 } else {
                     this.pictureInput.value = '';
-                    this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image à un poid limite de 1Mo !');
+                    this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image a un poids limite de 1Mo !');
                 }
             } else {
                 this.pictureInput.value = '';
-                this.app.openInfoModal(TYPE_ERROR, 'Upload image invalide', 'L\'image dois être en png ou jpg !');
+                this.app.openInfoModal(TYPE_ERROR, 'Upload image invalide', 'L\'image doit être en PNG ou JPG !');
             }
         } else {
             this.previewImage.src = '';
@@ -136,9 +136,9 @@ export default class extends Pages {
             this.app.changePage('/');
         } else if ($repStatus === API_REP_BAD) {
             const err = getAPIErrorReason(event);
-            this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', err.map(e => `<p>${e}</p>`), true);
+            this.app.openInfoModal(TYPE_ERROR, 'Erreur formulaire', err.map(e => `<p>${e}</p>`), true);
         } else {
-            this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', 'Erreur d\'upload verifier votre connexion');
+            this.app.openInfoModal(TYPE_ERROR, 'Erreur formulaire', 'Erreur d\'upload verifier votre connexion');
         }
     }
 

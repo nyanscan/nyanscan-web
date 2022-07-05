@@ -163,12 +163,12 @@ export default class extends Pages {
                     (isNew ? this.previewImage: this.projectPreviewImage).src = window.URL.createObjectURL(file);
                 } else  {
                     event.target.value = '';
-                    this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image à un poid limite de 1Mo !');
-                    // this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image à un poid limite de 1Mo !');
+                    this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image a un poids limite de 1Mo !');
+                    // this.app.openInfoModal(TYPE_ERROR, 'Upload image trop lourde', 'L\'image a un poids limite de 1Mo !');
                 }
             } else {
                 event.target.value = '';
-                this.app.openInfoModal(TYPE_ERROR, 'Upload image invalide', 'L\'image dois être en png ou jpg !');
+                this.app.openInfoModal(TYPE_ERROR, 'Upload image invalide', 'L\'image dois être en PNG ou JPG !');
             }
         } else {
             (isNew ? this.previewImage: this.projectPreviewImage).src = '';
@@ -190,9 +190,9 @@ export default class extends Pages {
         console.log(event.target);
         loadingScreen(true);
         sendApiPostFetch('project/edit', fd).then(() =>
-            this.app.createToast(TYPE_SUCCESS, 'Modification', 'la modification à bien était prise en compte.', false, 60)
+            this.app.createToast(TYPE_SUCCESS, 'Modification', 'la modification a bien était prise en compte.', false, 60)
         ).catch(r => {
-            this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', r.reason.map(e => `<p>${e}</p>`), true);
+            this.app.openInfoModal(TYPE_ERROR, 'Erreur formulaire', r.reason.map(e => `<p>${e}</p>`), true);
         }).finally(() => loadingScreen(false));
     }
 
@@ -212,10 +212,10 @@ export default class extends Pages {
             this.app.changePage('/p/' + this.id);
         } else if ($repStatus === API_REP_BAD) {
             const err = getAPIErrorReason(event);
-            this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', err.map(e => `<p>${e}</p>`), true);
+            this.app.openInfoModal(TYPE_ERROR, 'Erreur formulaire', err.map(e => `<p>${e}</p>`), true);
 
         } else {
-            this.app.openInfoModal(TYPE_ERROR, 'Erreur forumulaire', 'Erreur d\'upload verifier votre connexion');
+            this.app.openInfoModal(TYPE_ERROR, 'Erreur formulaire', 'Erreur d\'upload verifier votre connexion');
         }
     }
 
