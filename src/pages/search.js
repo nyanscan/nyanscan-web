@@ -60,7 +60,7 @@ export default class extends Pages {
     createUser(data, container) {
         let div = create('div', null, container, 'ns-search-res-user');
         createPromise('ns-a', null, div).then( a => {
-            a.href = `/u/${data.id}`;
+            a.href = `/u/${data.username}`;
             createPromise('img', null, a, 'ns-avatar').then(img => {
                 img.src = data.avatar ? image_id_to_path(data.avatar) : '/res/profile.webp';
             })
